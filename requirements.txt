@@ -1,6 +1,6 @@
 annotated-types==0.7.0
 anyio==4.8.0
-asgiref==3.7.2
+asgiref==3.8.1
 attrs==25.1.0
 certifi==2025.1.31
 cffi==1.17.1
@@ -10,8 +10,8 @@ cryptography==44.0.0
 defusedxml==0.7.1
 distro==1.9.0
 dj-rest-auth==2.1.11
-Django==4.0.10
-django-allauth==0.48.0
+Django==5.1.4
+django-allauth==65.4.1
 django-cors-headers==3.10.0
 djangorestframework==3.13.0
 drf-spectacular==0.21.0
@@ -28,7 +28,7 @@ jsonschema-specifications==2024.10.1
 nltk==3.9.1
 oauthlib==3.2.2
 openai==1.61.1
-psycopg2-binary==2.9.3
+psycopg2-binary>=2.9.10
 pycparser==2.22
 pydantic==2.10.6
 pydantic_core==2.27.2
