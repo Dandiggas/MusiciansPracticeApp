@@ -54,6 +54,8 @@ class Session(models.Model):
     in_progress = models.BooleanField(default=False)
     started_at = models.DateTimeField(null=True, blank=True)
     paused_duration = models.DurationField(default=timezone.timedelta(seconds=0))
+    paused_at = models.DateTimeField(null=True, blank=True)
+    is_paused = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Session on {self.session_date.strftime('%d-%m-%Y')}"

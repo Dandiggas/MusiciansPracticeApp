@@ -314,3 +314,56 @@ def get_active_timer(request):
 
     serializer = SessionSerializer(session)
     return Response({'active': True, 'session': serializer.data})
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminOrOwner])
+def pause_timer(request, pk):
+    """Pause a practice session timer"""
+    try:
+        session = Session.objects.get(session_id=pk, user=request.user)
+    except Session.DoesNotExist:
+        return Response({'error': 'Session not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not session.in_progress:
+        return Response({'error': 'Session is not in progress'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if session.is_paused:
+        return Response({'error': 'Session is already paused'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Mark as paused and record when
+    session.is_paused = True
+    session.paused_at = timezone.now()
+    session.save()
+
+    serializer = SessionSerializer(session)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminOrOwner])
+def resume_timer(request, pk):
+    """Resume a paused practice session timer"""
+    try:
+        session = Session.objects.get(session_id=pk, user=request.user)
+    except Session.DoesNotExist:
+        return Response({'error': 'Session not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not session.in_progress:
+        return Response({'error': 'Session is not in progress'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not session.is_paused:
+        return Response({'error': 'Session is not paused'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Calculate how long it was paused and add to cumulative paused duration
+    if session.paused_at:
+        pause_elapsed = timezone.now() - session.paused_at
+        session.paused_duration += pause_elapsed
+
+    # Resume the timer
+    session.is_paused = False
+    session.paused_at = None
+    session.save()
+
+    serializer = SessionSerializer(session)
+    return Response(serializer.data)

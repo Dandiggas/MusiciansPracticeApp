@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Square, Clock } from 'lucide-react';
+import { Play, Square, Clock, Pause } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function PracticeTimerPage() {
   const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [instrument, setInstrument] = useState('');
@@ -43,6 +44,7 @@ export default function PracticeTimerPage() {
           setInstrument(session.instrument);
           setDescription(session.description);
           setIsRunning(true);
+          setIsPaused(session.is_paused || false);
 
           // Calculate elapsed time
           const startTime = new Date(session.started_at).getTime();
@@ -58,7 +60,7 @@ export default function PracticeTimerPage() {
   }, [apiBaseUrl, router]);
 
   useEffect(() => {
-    if (isRunning) {
+    if (isRunning && !isPaused) {
       intervalRef.current = setInterval(() => {
         setElapsedSeconds(prev => prev + 1);
       }, 1000);
@@ -73,7 +75,7 @@ export default function PracticeTimerPage() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning]);
+  }, [isRunning, isPaused]);
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -128,6 +130,7 @@ export default function PracticeTimerPage() {
       );
 
       setIsRunning(false);
+      setIsPaused(false);
       setSessionId(null);
       setInstrument('');
       setDescription('');
@@ -137,6 +140,56 @@ export default function PracticeTimerPage() {
       router.push('/profilepage');
     } catch (error) {
       setError('Failed to stop timer');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePause = async () => {
+    if (!sessionId) return;
+
+    setIsLoading(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      await axios.post(
+        `${apiBaseUrl}/timer/${sessionId}/pause/`,
+        {},
+        { headers: { 'Authorization': `Token ${token}` } }
+      );
+
+      setIsPaused(true);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.error || 'Failed to pause timer');
+      } else {
+        setError('An unexpected error occurred');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResume = async () => {
+    if (!sessionId) return;
+
+    setIsLoading(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      await axios.post(
+        `${apiBaseUrl}/timer/${sessionId}/resume/`,
+        {},
+        { headers: { 'Authorization': `Token ${token}` } }
+      );
+
+      setIsPaused(false);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.error || 'Failed to resume timer');
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -155,11 +208,11 @@ export default function PracticeTimerPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            {isRunning ? 'Session in Progress' : 'Start New Session'}
+            {isRunning ? (isPaused ? 'Session Paused' : 'Session in Progress') : 'Start New Session'}
           </CardTitle>
           <CardDescription>
             {isRunning
-              ? 'Your practice session is being tracked'
+              ? (isPaused ? 'Your session is paused. Resume when ready.' : 'Your practice session is being tracked')
               : 'Enter your instrument and start practicing'}
           </CardDescription>
         </CardHeader>
@@ -170,7 +223,7 @@ export default function PracticeTimerPage() {
               {formatTime(elapsedSeconds)}
             </div>
             <p className="text-sm text-muted-foreground mt-4">
-              {isRunning ? 'Time elapsed' : 'Ready to start'}
+              {isRunning ? (isPaused ? '⏸ Paused' : 'Time elapsed') : 'Ready to start'}
             </p>
           </div>
 
@@ -220,8 +273,8 @@ export default function PracticeTimerPage() {
           )}
 
           {/* Controls */}
-          <div className="flex gap-4">
-            {!isRunning ? (
+          {!isRunning ? (
+            <div className="flex gap-4">
               <Button
                 onClick={handleStart}
                 disabled={isLoading}
@@ -231,7 +284,31 @@ export default function PracticeTimerPage() {
                 <Play className="mr-2 h-5 w-5" />
                 {isLoading ? 'Starting...' : 'Start Practice'}
               </Button>
-            ) : (
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {isPaused ? (
+                <Button
+                  onClick={handleResume}
+                  disabled={isLoading}
+                  className="w-full"
+                  size="lg"
+                >
+                  <Play className="mr-2 h-5 w-5" />
+                  {isLoading ? 'Resuming...' : 'Resume'}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handlePause}
+                  disabled={isLoading}
+                  variant="secondary"
+                  className="w-full"
+                  size="lg"
+                >
+                  <Pause className="mr-2 h-5 w-5" />
+                  {isLoading ? 'Pausing...' : 'Pause'}
+                </Button>
+              )}
               <Button
                 onClick={handleStop}
                 disabled={isLoading}
@@ -242,12 +319,14 @@ export default function PracticeTimerPage() {
                 <Square className="mr-2 h-5 w-5" />
                 {isLoading ? 'Stopping...' : 'Stop & Save'}
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           {isRunning && (
             <p className="text-xs text-center text-muted-foreground">
-              Click &quot;Stop & Save&quot; to end your session and save it to your history
+              {isPaused
+                ? 'Session paused. Click "Resume" to continue or "Stop & Save" to end.'
+                : 'Click "Pause" to take a break, or "Stop & Save" to end your session.'}
             </p>
           )}
         </CardContent>

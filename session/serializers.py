@@ -34,6 +34,8 @@ class SessionSerializer(serializers.ModelSerializer):
             "in_progress",
             "started_at",
             "paused_duration",
+            "paused_at",
+            "is_paused",
         )
         model = Session
         read_only_fields = ['display_id', 'user']

@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     SessionList, SessionDetail, PracticeRecommendationView,
     TagList, TagDetail, StatsView, PracticeCalendarView,
-    PracticeByInstrumentView, start_timer, stop_timer, get_active_timer
+    PracticeByInstrumentView, start_timer, stop_timer, get_active_timer,
+    pause_timer, resume_timer
 )
 
 
@@ -24,5 +25,7 @@ urlpatterns = [
     # Timer endpoints
     path('timer/start/', start_timer, name='start-timer'),
     path('timer/<int:pk>/stop/', stop_timer, name='stop-timer'),
+    path('timer/<int:pk>/pause/', pause_timer, name='pause-timer'),
+    path('timer/<int:pk>/resume/', resume_timer, name='resume-timer'),
     path('timer/active/', get_active_timer, name='active-timer'),
 ]
