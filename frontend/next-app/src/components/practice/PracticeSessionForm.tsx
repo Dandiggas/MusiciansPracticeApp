@@ -1,6 +1,11 @@
+"use client";
+
 import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import axios from 'axios';
-import PracticeChart from './PracticeChart';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { TagSelector } from "./TagSelector";
 
 export interface PracticeSession {
   session_id?: number;
@@ -24,23 +29,26 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
     description: practiceSessionData?.description || '',
     session_date: practiceSessionData?.session_date || '',
   });
-  
+
   const [allSessions, setAllSessions] = useState<PracticeSession[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedSessionIdForDeletion, setSelectedSessionIdForDeletion] = useState<number | ''>('');
   const [selectedSessionIdForUpdate, setSelectedSessionIdForUpdate] = useState<number | ''>('');
   const [error, setError] = useState<string>('');
+  const [selectedTags, setSelectedTags] = useState<number[]>([]);
+
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
   useEffect(() => {
     fetchSessions();
     fetchUserDetails();
-  }, []); // Empty dependency array to run the effect only once
+  }, []);
 
   const fetchSessions = async () => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/', {
+        const response = await axios.get(`${apiBaseUrl}/`, {
           headers: { Authorization: `Token ${token}` }
         });
         setAllSessions(response.data);
@@ -54,7 +62,7 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/current-user/', {
+        const response = await axios.get(`${apiBaseUrl}/current-user/`, {
           headers: { Authorization: `Token ${token}` }
         });
         setFormData(currentFormData => ({
@@ -101,27 +109,33 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
 
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Token ${token}` };
-    const apiUrl = 'http://localhost:8000/api/v1/';
-    const url = selectedSessionIdForUpdate ? `${apiUrl}${selectedSessionIdForUpdate}/` : apiUrl;
+    const url = selectedSessionIdForUpdate ? `${apiBaseUrl}/${selectedSessionIdForUpdate}/` : `${apiBaseUrl}/`;
+
+    // Include tags in the request
+    const requestData = {
+      ...formData,
+      tag_ids: selectedTags,
+    };
 
     try {
       const method = selectedSessionIdForUpdate ? 'put' : 'post';
-      const response = await axios({ method, url, data: formData, headers });
+      const response = await axios({ method, url, data: requestData, headers });
 
       setPracticeSessions(prev => selectedSessionIdForUpdate
         ? prev.map(s => s.session_id === selectedSessionIdForUpdate ? response.data : s)
         : [...prev, response.data]);
-      
+
       setAllSessions(prev => selectedSessionIdForUpdate
         ? prev.map(s => s.session_id === selectedSessionIdForUpdate ? response.data : s)
         : [...prev, response.data]);
-      
+
       setFormData({
         instrument: '',
         duration: '',
         description: '',
         session_date: '',
       });
+      setSelectedTags([]);
       setSelectedSessionIdForUpdate('');
       window.location.reload();
     } catch (err) {
@@ -149,7 +163,7 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Token ${token}` };
       try {
-        await axios.delete(`http://localhost:8000/api/v1/${selectedSessionIdForDeletion}/`, { headers });
+        await axios.delete(`${apiBaseUrl}/${selectedSessionIdForDeletion}/`, { headers });
         setAllSessions(prev => prev.filter(s => s.session_id !== selectedSessionIdForDeletion));
         setPracticeSessions(prev => prev.filter(s => s.session_id !== selectedSessionIdForDeletion));
         setSelectedSessionIdForDeletion('');
@@ -163,66 +177,119 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
   };
 
   return (
-    <div>
-      <select value={selectedSessionIdForUpdate} onChange={handleSessionSelectForUpdate}>
-        <option value="0">Create New Session</option>
-        {allSessions.map((session, index) => {
-    const displayNumber = index + 1;
-    return (
-      <option key={session.session_id} value={session.session_id}>
-        Session {displayNumber} - {session.instrument}
-      </option>
-    );
-  })}
-      </select>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="instrument"
-          value={formData.instrument}
-          onChange={handleChange}
-          placeholder="Instrument"
-        />
-        <input
-          type="text"
-          name="duration"
-          value={formData.duration}
-          onChange={handleChange}
-          placeholder="Duration"
-        />
-        <input
-          type="text"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Description"
-        />
-        <input
-          type="date"
-          name="session_date"
-          value={formData.session_date}
-          onChange={handleChange}
-        />
-        <button type="submit" disabled={isSubmitting}>
-          {selectedSessionIdForUpdate ? 'Update Session' : 'Add Session'}
-        </button>
-      </form>
-      <select value={selectedSessionIdForDeletion} onChange={handleSessionChangeForDeletion} disabled={isSubmitting}>
-        <option value="">Select a session to delete</option>
-        {allSessions.map((session, index) => {
-    const displayNumber = index + 1;
-    return (
-      <option key={session.session_id} value={session.session_id}>
-        Session {displayNumber} - {session.instrument}
-      </option>
-    );
-  })}
-      </select>
-      <button onClick={handleSessionDeletion} disabled={!selectedSessionIdForDeletion || isSubmitting}>
-        Delete Selected Session
-      </button>
-      {error && <p>{error}</p>}
+    <div className="my-8 space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="session-select">Select Session</Label>
+        <select
+          id="session-select"
+          value={selectedSessionIdForUpdate}
+          onChange={handleSessionSelectForUpdate}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <option value="0">Create New Session</option>
+          {allSessions.map((session, index) => {
+            const displayNumber = index + 1;
+            return (
+              <option key={session.session_id} value={session.session_id}>
+                Session {displayNumber} - {session.instrument}
+              </option>
+            );
+          })}
+        </select>
+      </div>
 
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="instrument">Instrument</Label>
+          <Input
+            id="instrument"
+            type="text"
+            name="instrument"
+            value={formData.instrument}
+            onChange={handleChange}
+            placeholder="Instrument"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="duration">Duration (HH:MM:SS)</Label>
+          <Input
+            id="duration"
+            type="text"
+            name="duration"
+            value={formData.duration}
+            onChange={handleChange}
+            placeholder="Duration (e.g., 01:30:00)"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Input
+            id="description"
+            type="text"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Description"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="session_date">Session Date</Label>
+          <Input
+            id="session_date"
+            type="date"
+            name="session_date"
+            value={formData.session_date}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {/* Tag Selector */}
+        <TagSelector
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
+          apiBaseUrl={apiBaseUrl}
+          token={localStorage.getItem('token') || ''}
+        />
+
+        <Button type="submit" disabled={isSubmitting} className="w-full">
+          {selectedSessionIdForUpdate ? 'Update Session' : 'Add Session'}
+        </Button>
+      </form>
+
+      <div className="space-y-2">
+        <Label htmlFor="delete-select">Delete Session</Label>
+        <select
+          id="delete-select"
+          value={selectedSessionIdForDeletion}
+          onChange={handleSessionChangeForDeletion}
+          disabled={isSubmitting}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <option value="">Select a session to delete</option>
+          {allSessions.map((session, index) => {
+            const displayNumber = index + 1;
+            return (
+              <option key={session.session_id} value={session.session_id}>
+                Session {displayNumber} - {session.instrument}
+              </option>
+            );
+          })}
+        </select>
+        <Button
+          onClick={handleSessionDeletion}
+          disabled={!selectedSessionIdForDeletion || isSubmitting}
+          variant="destructive"
+          className="w-full"
+        >
+          Delete Selected Session
+        </Button>
+      </div>
+
+      {error && <p className="text-sm font-medium text-destructive">{error}</p>}
     </div>
   );
 };
