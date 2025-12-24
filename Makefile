@@ -34,8 +34,31 @@ frontend-next:
 	@echo "Starting Next.js frontend development server (new)..."
 	cd frontend/next-app && npm run dev
 
+# Test commands
+test: test-backend test-frontend
+	@echo "✅ All tests completed!"
+
+test-backend:
+	@echo "Running backend tests..."
+	docker-compose exec web python manage.py test
+
+test-frontend:
+	@echo "Running frontend unit tests..."
+	cd frontend/next-app && npm test
+
+test-frontend-coverage:
+	@echo "Running frontend tests with coverage..."
+	cd frontend/next-app && npm run test:coverage
+
+test-e2e:
+	@echo "Running E2E tests..."
+	cd frontend/next-app && npm run test:e2e
+
+test-all: test-backend test-frontend test-e2e
+	@echo "✅ All tests (unit + E2E) completed!"
+
 # Combined stop command (stops backend, frontend needs manual stop or separate command)
 stop: stop-backend
 	@echo "Backend services stopped. Frontend (if running) needs to be stopped manually (Ctrl+C)."
 
-.PHONY: all start backend frontend frontend-cra frontend-next stop-backend logs-backend build-backend stop
+.PHONY: all start backend frontend frontend-cra frontend-next stop-backend logs-backend build-backend stop test test-backend test-frontend test-frontend-coverage test-e2e test-all
