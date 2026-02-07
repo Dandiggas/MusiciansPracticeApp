@@ -15,3 +15,9 @@ RUN pip install -r requirements.txt
 
 # Copy project
 COPY . .
+
+# Collect static files for production
+RUN python manage.py collectstatic --noinput
+
+# Run gunicorn in production (Railway will use this)
+CMD gunicorn django_project.wsgi:application --bind 0.0.0.0:$PORT
