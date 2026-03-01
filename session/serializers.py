@@ -36,6 +36,7 @@ class SessionSerializer(serializers.ModelSerializer):
             "paused_duration",
             "paused_at",
             "is_paused",
+            "youtube_url",
         )
         model = Session
         read_only_fields = ['display_id', 'user']
