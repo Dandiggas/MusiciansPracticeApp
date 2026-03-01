@@ -127,10 +127,13 @@ export default function DashboardPage() {
             See your complete practice history and charts
           </p>
         </div>
-        <div className="cursor-pointer rounded-lg border bg-card p-6 hover:bg-accent transition-colors opacity-50 cursor-not-allowed">
+        <div
+          onClick={() => router.push('/recommendations')}
+          className="cursor-pointer rounded-lg border bg-card p-6 hover:bg-accent transition-colors"
+        >
           <h3 className="font-semibold mb-2">Practice Recommendations</h3>
           <p className="text-sm text-muted-foreground">
-            Get AI-powered practice suggestions (Coming soon)
+            Get AI-powered practice suggestions
           </p>
         </div>
       </div>

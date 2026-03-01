@@ -11,6 +11,7 @@ services:
     depends_on:
       - db
     environment:
+      - DEBUG=True
       - OPENAI_API_KEY
   db:
     image: postgres:13

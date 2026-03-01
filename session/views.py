@@ -10,10 +10,8 @@ from .serializers import SessionSerializer, TagSerializer
 from django.db.models import Max, Sum, Count, Q
 from django.utils import timezone
 from datetime import timedelta, datetime
-import openai
+from openai import OpenAI
 import os
-
-openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 class SessionList(generics.ListCreateAPIView):
     permission_classes = (IsAdminOrOwner,)
@@ -41,46 +39,40 @@ class PracticeRecommendationView(APIView):
     permission_classes = (IsAdminOrOwner,)
 
     def post(self, request):
-        user_id = request.data.get('user_id')
         skill_level = request.data.get('skill_level')
         instrument = request.data.get('instrument')
         goals = request.data.get('goals')
 
-        if not user_id or not skill_level or not instrument or not goals:
+        if not skill_level or not instrument or not goals:
             return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        valid_skill_levels = [choice[0] for choice in Session.SKILL_LEVEL_CHOICES]
+        if skill_level not in valid_skill_levels:
+            return Response({'error': f'Invalid skill_level. Must be one of: {", ".join(valid_skill_levels)}'}, status=status.HTTP_400_BAD_REQUEST)
 
-        prompt = f"Generate a practice recommendation for a {skill_level} level {instrument} player who wants to focus on {goals}."
+        valid_instruments = [choice[0] for choice in Session.INSTRUMENT_CHOICES]
+        if instrument not in valid_instruments:
+            return Response({'error': f'Invalid instrument. Must be one of: {", ".join(valid_instruments)}'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            response = openai.Completion.create(
-                engine='text-davinci-002',
-                prompt=prompt,
-                max_tokens=100,
-                n=1,
-                stop=None,
+            client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+            response = client.chat.completions.create(
+                model='gpt-4o-mini',
+                messages=[
+                    {'role': 'system', 'content': 'You are an experienced music teacher who provides detailed, actionable practice recommendations.'},
+                    {'role': 'user', 'content': f'Generate a practice recommendation for a {skill_level} level {instrument} player who wants to focus on {goals}.'}
+                ],
+                max_tokens=1000,
                 temperature=0.7,
             )
-            recommendation = response.choices[0].text.strip()
+            recommendation = response.choices[0].message.content.strip()
 
-            session_data = {
-                'user': user.id,
+            return Response({
+                'recommendation': recommendation,
                 'instrument': instrument,
                 'skill_level': skill_level,
                 'goals': goals,
-                'recommendation': recommendation,
-            }
-
-            serializer = SessionSerializer(data=session_data)
-            if serializer.is_valid():
-                session = serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
