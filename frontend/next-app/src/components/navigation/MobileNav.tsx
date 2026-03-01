@@ -16,6 +16,7 @@ export function MobileNav() {
     { name: "Dashboard", href: "/dashboard" },
     { name: "Profile", href: "/profilepage" },
     { name: "Practice Timer", href: "/practice-timer" },
+    { name: "Recommendations", href: "/recommendations" },
   ];
 
   // Don't show on login/register pages

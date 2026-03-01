@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from datetime import timedelta, date, datetime
+from unittest.mock import patch, MagicMock
 
 from .models import Session, Tag
 
@@ -511,3 +512,79 @@ class TagAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Tag.objects.count(), 0)
+
+
+class RecommendationAPITests(APITestCase):
+    """Test cases for Practice Recommendation endpoint"""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            username="testuser",
+            email="test@email.com",
+            password="testpass123"
+        )
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.url = reverse('practice-recommendation')
+        self.valid_data = {
+            'instrument': 'guitar',
+            'skill_level': 'beginner',
+            'goals': 'improve finger picking technique'
+        }
+
+    def test_missing_fields_returns_400(self):
+        """Test that missing required fields returns 400"""
+        response = self.client.post(self.url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error', response.data)
+
+    def test_invalid_skill_level_returns_400(self):
+        """Test that invalid skill_level returns 400"""
+        data = {**self.valid_data, 'skill_level': 'expert'}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error', response.data)
+
+    def test_invalid_instrument_returns_400(self):
+        """Test that invalid instrument returns 400"""
+        data = {**self.valid_data, 'instrument': 'theremin'}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error', response.data)
+
+    @patch('session.views.OpenAI')
+    def test_successful_recommendation(self, mock_openai_cls):
+        """Test successful recommendation with mocked OpenAI"""
+        mock_client = MagicMock()
+        mock_openai_cls.return_value = mock_client
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = 'Practice scales for 15 minutes daily.'
+        mock_client.chat.completions.create.return_value = mock_response
+
+        response = self.client.post(self.url, self.valid_data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['recommendation'], 'Practice scales for 15 minutes daily.')
+        self.assertEqual(response.data['instrument'], 'guitar')
+        self.assertEqual(response.data['skill_level'], 'beginner')
+        self.assertEqual(response.data['goals'], 'improve finger picking technique')
+
+    def test_unauthenticated_returns_401_or_403(self):
+        """Test that unauthenticated requests are rejected"""
+        self.client.credentials()
+        response = self.client.post(self.url, self.valid_data, format='json')
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+    @patch('session.views.OpenAI')
+    def test_openai_error_returns_500(self, mock_openai_cls):
+        """Test that OpenAI API errors return 500"""
+        mock_client = MagicMock()
+        mock_openai_cls.return_value = mock_client
+        mock_client.chat.completions.create.side_effect = Exception('API rate limit exceeded')
+
+        response = self.client.post(self.url, self.valid_data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn('error', response.data)
