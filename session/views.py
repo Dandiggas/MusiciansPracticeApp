@@ -243,6 +243,7 @@ def start_timer(request):
     """Start a new practice session timer"""
     instrument = request.data.get('instrument')
     description = request.data.get('description', '')
+    youtube_url = request.data.get('youtube_url', '')
 
     if not instrument:
         return Response({'error': 'Instrument is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -259,6 +260,7 @@ def start_timer(request):
         user=request.user,
         instrument=instrument,
         description=description,
+        youtube_url=youtube_url,
         session_date=timezone.now().date(),
         duration=timedelta(0),
         in_progress=True,

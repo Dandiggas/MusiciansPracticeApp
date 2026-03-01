@@ -17,6 +17,7 @@ export function Header() {
     { name: "Profile", href: "/profilepage" },
     { name: "Practice Timer", href: "/practice-timer" },
     { name: "Recommendations", href: "/recommendations" },
+    { name: "YouTube Practice", href: "/youtube-practice" },
   ];
 
   // Don't show header on login/register pages

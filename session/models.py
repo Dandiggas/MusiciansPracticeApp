@@ -44,6 +44,7 @@ class Session(models.Model):
     skill_level = models.CharField(max_length=20, choices=SKILL_LEVEL_CHOICES, default="Instrument Choice")
     instrument_preference = models.CharField(max_length=20, choices=INSTRUMENT_CHOICES, default="Instrument Choice")
     goals = models.TextField(default='Insert Goal')
+    youtube_url = models.URLField(max_length=500, blank=True, default='')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 

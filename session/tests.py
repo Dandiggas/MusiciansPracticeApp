@@ -75,6 +75,27 @@ class SessionModelTests(TestCase):
         )
         self.assertEqual(str(session), "Session on 15-03-2024")
 
+    def test_session_with_youtube_url(self):
+        """Test session creation with YouTube URL"""
+        session = Session.objects.create(
+            user=self.user,
+            instrument="guitar",
+            duration=timedelta(minutes=30),
+            session_date=date.today(),
+            youtube_url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        )
+        self.assertEqual(session.youtube_url, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+
+    def test_session_youtube_url_defaults_to_empty(self):
+        """Test that youtube_url defaults to empty string"""
+        session = Session.objects.create(
+            user=self.user,
+            instrument="guitar",
+            duration=timedelta(minutes=30),
+            session_date=date.today()
+        )
+        self.assertEqual(session.youtube_url, '')
+
     def test_session_with_tags(self):
         """Test session with tags relationship"""
         tag1 = Tag.objects.create(name="scales", user=self.user)
@@ -219,6 +240,29 @@ class SessionAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Session.objects.count(), 0)
 
+    def test_update_youtube_url_mid_session(self):
+        """Test adding a YouTube URL to an existing session via PATCH"""
+        session = Session.objects.create(
+            user=self.user,
+            instrument='guitar',
+            duration=timedelta(0),
+            session_date=date.today(),
+            display_id=1,
+            in_progress=True,
+            started_at=timezone.now()
+        )
+
+        url = reverse('session_detail', args=[session.session_id])
+        response = self.client.patch(
+            url,
+            {'youtube_url': 'https://www.youtube.com/watch?v=abc123def45'},
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        session.refresh_from_db()
+        self.assertEqual(session.youtube_url, 'https://www.youtube.com/watch?v=abc123def45')
+
     def test_unauthenticated_access(self):
         """Test that unauthenticated users cannot access sessions"""
         self.client.credentials()  # Remove authentication
@@ -255,6 +299,28 @@ class TimerAPITests(APITestCase):
         self.assertTrue(response.data['in_progress'])
         self.assertIsNotNone(response.data['started_at'])
         self.assertEqual(response.data['instrument'], 'guitar')
+
+    def test_start_timer_with_youtube_url(self):
+        """Test starting a timer with a YouTube URL"""
+        url = reverse('start-timer')
+        data = {
+            'instrument': 'guitar',
+            'description': 'learning a lick',
+            'youtube_url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        }
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['youtube_url'], 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+
+    def test_start_timer_without_youtube_url(self):
+        """Test starting a timer without YouTube URL defaults to empty"""
+        url = reverse('start-timer')
+        data = {'instrument': 'guitar'}
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['youtube_url'], '')
 
     def test_start_timer_without_instrument(self):
         """Test that starting timer requires instrument"""

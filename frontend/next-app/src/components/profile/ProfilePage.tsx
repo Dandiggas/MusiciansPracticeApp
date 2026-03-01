@@ -18,6 +18,7 @@ interface Session {
   duration: string;
   description: string;
   session_date: string;
+  youtube_url?: string;
 }
 
 const ProfilePage = () => {
@@ -120,12 +121,13 @@ const ProfilePage = () => {
               <th className="border-b px-4 py-3 text-left text-sm font-medium">Duration</th>
               <th className="border-b px-4 py-3 text-left text-sm font-medium">Description</th>
               <th className="border-b px-4 py-3 text-left text-sm font-medium">Session Date</th>
+              <th className="border-b px-4 py-3 text-left text-sm font-medium">Video</th>
             </tr>
           </thead>
           <tbody>
             {sessions.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                   No sessions yet. Start your first practice session!
                 </td>
               </tr>
@@ -139,6 +141,20 @@ const ProfilePage = () => {
                     <td className="border-b px-4 py-3">{session.duration}</td>
                     <td className="border-b px-4 py-3">{session.description}</td>
                     <td className="border-b px-4 py-3">{session.session_date}</td>
+                    <td className="border-b px-4 py-3">
+                      {session.youtube_url ? (
+                        <a
+                          href={session.youtube_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline text-sm"
+                        >
+                          View
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">--</span>
+                      )}
+                    </td>
                   </tr>
                 );
               })
