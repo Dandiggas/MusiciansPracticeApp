@@ -208,8 +208,8 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
 
 # Security settings for production
 if not DEBUG:
-    # Force HTTPS in production
-    SECURE_SSL_REDIRECT = True
+    # Force HTTPS in production (can be disabled for CI testing via env var)
+    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True

@@ -40,6 +40,7 @@ jobs:
       - name: Run Django tests
         env:
           DATABASE_URL: postgresql://postgres@localhost:5432/postgres
+          SECURE_SSL_REDIRECT: "False"
         run: |
           python manage.py test
 

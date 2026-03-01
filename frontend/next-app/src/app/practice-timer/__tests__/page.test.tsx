@@ -115,7 +115,7 @@ describe('PracticeTimerPage', () => {
       await waitFor(() => {
         expect(mockedAxios.post).toHaveBeenCalledWith(
           'http://localhost:8000/api/v1/timer/start/',
-          { instrument: 'Piano', description: '' },
+          { instrument: 'Piano', description: '', youtube_url: '' },
           expect.objectContaining({
             headers: { 'Authorization': 'Token test-token' }
           })
