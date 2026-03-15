@@ -35,6 +35,13 @@ export default function PracticeTimerPage() {
   const hasVideo = Boolean(videoId);
 
   useEffect(() => {
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
     // Check if there's an active timer
     const checkActiveTimer = async () => {
       const token = localStorage.getItem('token');
@@ -127,6 +134,46 @@ export default function PracticeTimerPage() {
     }
   };
 
+  const playCompletionSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.8);
+
+      // Second beep
+      const osc2 = audioContext.createOscillator();
+      const gain2 = audioContext.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioContext.destination);
+      osc2.frequency.value = 1000;
+      osc2.type = 'sine';
+      gain2.gain.setValueAtTime(0.3, audioContext.currentTime + 0.3);
+      gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.1);
+      osc2.start(audioContext.currentTime + 0.3);
+      osc2.stop(audioContext.currentTime + 1.1);
+    } catch {
+      // Audio not supported, silent fallback
+    }
+  };
+
+  const notifySessionComplete = (duration: string) => {
+    playCompletionSound();
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Practice Session Complete!', {
+        body: `Great work! You practiced ${instrument} for ${duration}.`,
+      });
+    }
+  };
+
   const handleStop = async () => {
     if (!sessionId) return;
 
@@ -139,6 +186,9 @@ export default function PracticeTimerPage() {
         {},
         { headers: { 'Authorization': `Token ${token}` } }
       );
+
+      const completedDuration = formatTime(elapsedSeconds);
+      notifySessionComplete(completedDuration);
 
       // Clean up YouTube player
       const player = youtubePlayerRef.current?.getPlayer();
