@@ -35,13 +35,6 @@ export default function PracticeTimerPage() {
   const hasVideo = Boolean(videoId);
 
   useEffect(() => {
-    // Request notification permission
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  useEffect(() => {
     // Check if there's an active timer
     const checkActiveTimer = async () => {
       const token = localStorage.getItem('token');
