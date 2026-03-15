@@ -77,7 +77,7 @@ export default function YouTubePracticePage() {
       }
 
       try {
-        const response = await axios.get(`${apiBaseUrl}/sessions/`, {
+        const response = await axios.get(`${apiBaseUrl}/`, {
           headers: { Authorization: `Token ${token}` },
         });
         const sessionsWithVideo = response.data.filter(
@@ -173,7 +173,7 @@ export default function YouTubePracticePage() {
 
     try {
       const response = await axios.post(
-        `${apiBaseUrl}/sessions/`,
+        `${apiBaseUrl}/`,
         {
           instrument,
           description,
@@ -379,9 +379,15 @@ export default function YouTubePracticePage() {
           </CardHeader>
           <CardContent>
             {isLoadingLibrary ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Loading your videos...
-              </p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="rounded-lg border p-3 space-y-2">
+                    <div className="aspect-video w-full rounded-md bg-muted animate-pulse" />
+                    <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                    <div className="h-3 w-16 bg-muted animate-pulse rounded" />
+                  </div>
+                ))}
+              </div>
             ) : librarySessions.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 No practice sessions with videos yet. Paste a URL above to get
