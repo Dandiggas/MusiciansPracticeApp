@@ -67,6 +67,9 @@ const ProfilePage = () => {
           headers: { 'Authorization': `Token ${token}` }
         });
         setSessions(sessionResponse.data);
+        // Keep practiceSessions in sync with sessions so mutations from the form
+        // are reflected in the main sessions list and charts.
+        setPracticeSessions(sessionResponse.data as PracticeSession[]);
       } catch (error) {
         console.error('Error fetching data', error);
         setError('Error fetching data');
@@ -76,6 +79,12 @@ const ProfilePage = () => {
 
     fetchData();
   }, []);
+
+  // Whenever practiceSessions changes (e.g., via PracticeSessionForm),
+  // update sessions so all charts/tables using sessions see the latest data.
+  useEffect(() => {
+    setSessions(practiceSessions as unknown as Session[]);
+  }, [practiceSessions]);
 
   if (isLoading) {
     return (
