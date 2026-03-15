@@ -159,6 +159,9 @@ export default function PracticeTimerPage() {
       gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.1);
       osc2.start(audioContext.currentTime + 0.3);
       osc2.stop(audioContext.currentTime + 1.1);
+      osc2.onended = () => {
+        audioContext.close();
+      };
     } catch {
       // Audio not supported, silent fallback
     }
