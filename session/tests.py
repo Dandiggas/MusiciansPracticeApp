@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from datetime import timedelta, date, datetime
 from unittest.mock import patch, MagicMock
+import os
 
 from .models import Session, Tag
 
@@ -619,6 +620,7 @@ class RecommendationAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('error', response.data)
 
+    @patch.dict(os.environ, {'OPENAI_API_KEY': 'test-key'})
     @patch('session.views.OpenAI')
     def test_successful_recommendation(self, mock_openai_cls):
         """Test successful recommendation with mocked OpenAI"""
@@ -643,6 +645,7 @@ class RecommendationAPITests(APITestCase):
         response = self.client.post(self.url, self.valid_data, format='json')
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
+    @patch.dict(os.environ, {'OPENAI_API_KEY': 'test-key'})
     @patch('session.views.OpenAI')
     def test_openai_error_returns_500(self, mock_openai_cls):
         """Test that OpenAI API errors return 500"""
@@ -654,3 +657,12 @@ class RecommendationAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn('error', response.data)
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_missing_api_key_returns_503(self):
+        """Test that missing OpenAI API key returns 503"""
+        response = self.client.post(self.url, self.valid_data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertIn('error', response.data)
+        self.assertIn('not configured', response.data['error'])
