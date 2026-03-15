@@ -172,6 +172,8 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
         setAllSessions(prev => prev.filter(s => s.session_id !== selectedSessionIdForDeletion));
         setPracticeSessions(prev => prev.filter(s => s.session_id !== selectedSessionIdForDeletion));
         setSelectedSessionIdForDeletion('');
+        // Ensure all parts of the UI that depend on the canonical sessions list are refreshed
+        window.location.reload();
       } catch (error) {
         setError('Failed to delete the session');
       } finally {
