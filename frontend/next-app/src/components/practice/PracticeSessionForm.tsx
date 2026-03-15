@@ -137,7 +137,6 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
       });
       setSelectedTags([]);
       setSelectedSessionIdForUpdate('');
-      window.location.reload();
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError('Error: ' + err.response?.data?.message || err.message);
@@ -167,7 +166,6 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
         setAllSessions(prev => prev.filter(s => s.session_id !== selectedSessionIdForDeletion));
         setPracticeSessions(prev => prev.filter(s => s.session_id !== selectedSessionIdForDeletion));
         setSelectedSessionIdForDeletion('');
-        window.location.reload();
       } catch (error) {
         setError('Failed to delete the session');
       } finally {

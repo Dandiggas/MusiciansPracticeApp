@@ -54,8 +54,15 @@ class PracticeRecommendationView(APIView):
         if instrument not in valid_instruments:
             return Response({'error': f'Invalid instrument. Must be one of: {", ".join(valid_instruments)}'}, status=status.HTTP_400_BAD_REQUEST)
 
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if not api_key:
+            return Response(
+                {'error': 'AI recommendations are not configured. Please contact the administrator.'},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
+
         try:
-            client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+            client = OpenAI(api_key=api_key)
             response = client.chat.completions.create(
                 model='gpt-4o-mini',
                 messages=[

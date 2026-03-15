@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -108,12 +110,17 @@ const LoginPage = () => {
             </Button>
           </form>
         </CardContent>
-        {/* Optional CardFooter for links like 'Forgot password?' or 'Sign up' */}
-        {/* <CardFooter className="flex flex-col items-center space-y-2">
-          <Button variant="link" size="sm" asChild>
-            <Link href="/register">Don't have an account? Sign up</Link>
-          </Button>
-        </CardFooter> */}
+        <CardFooter className="flex flex-col items-center space-y-2">
+          <Link href="/forgot-password" className="text-sm text-muted-foreground hover:underline">
+            Forgot your password?
+          </Link>
+          <p className="text-sm text-muted-foreground">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-primary hover:underline font-medium">
+              Sign up
+            </Link>
+          </p>
+        </CardFooter>
       </Card>
     </div>
   );
