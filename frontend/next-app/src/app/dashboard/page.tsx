@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { StatsCard } from '@/components/dashboard/StatsCard';
+import { Button } from '@/components/ui/button';
 import { Clock, TrendingUp, Flame, Music } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -48,10 +49,19 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading your dashboard...</p>
+      <div className="container mx-auto p-4 md:p-8">
+        <div className="mb-8">
+          <div className="h-10 w-48 bg-muted animate-pulse rounded-md" />
+          <div className="h-5 w-72 bg-muted animate-pulse rounded-md mt-2" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-lg border bg-card p-6 space-y-3">
+              <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+              <div className="h-8 w-16 bg-muted animate-pulse rounded" />
+              <div className="h-3 w-32 bg-muted animate-pulse rounded" />
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -106,6 +116,20 @@ export default function DashboardPage() {
           icon={Music}
         />
       </div>
+
+      {/* Welcome Banner for new users */}
+      {stats.total_sessions === 0 && (
+        <div className="mt-8 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-8 text-center">
+          <h2 className="text-2xl font-bold mb-2">Welcome to your practice journey!</h2>
+          <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+            Start your first practice session to begin tracking your progress.
+            Use the timer, log your sessions, and watch your skills grow over time.
+          </p>
+          <Button onClick={() => router.push('/practice-timer')} size="lg">
+            Start Your First Session
+          </Button>
+        </div>
+      )}
 
       {/* Quick Actions Section */}
       <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
