@@ -16,6 +16,8 @@ export function MobileNav() {
     { name: "Dashboard", href: "/dashboard" },
     { name: "Profile", href: "/profilepage" },
     { name: "Practice Timer", href: "/practice-timer" },
+    { name: "Metronome", href: "/metronome" },
+    { name: "Tuner", href: "/tuner" },
     { name: "Recommendations", href: "/recommendations" },
     { name: "YouTube Practice", href: "/youtube-practice" },
   ];
