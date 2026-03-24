@@ -4,8 +4,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
+export interface LoopableMediaController {
+  getCurrentTime: () => number;
+  seekTo: (seconds: number) => void;
+}
+
 interface ABLoopControlProps {
-  getPlayer: () => YT.Player | null;
+  getController: () => LoopableMediaController | null;
 }
 
 function formatTimestamp(seconds: number): string {
@@ -14,7 +19,7 @@ function formatTimestamp(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-export default function ABLoopControl({ getPlayer }: ABLoopControlProps) {
+export default function ABLoopControl({ getController }: ABLoopControlProps) {
   const [pointA, setPointA] = useState<number | null>(null);
   const [pointB, setPointB] = useState<number | null>(null);
   const loopIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -36,17 +41,17 @@ export default function ABLoopControl({ getPlayer }: ABLoopControlProps) {
     }
 
     loopIntervalRef.current = setInterval(() => {
-      const player = getPlayer();
-      if (!player) return;
+      const controller = getController();
+      if (!controller) return;
 
-      const currentTime = player.getCurrentTime();
+      const currentTime = controller.getCurrentTime();
       if (currentTime >= pointB!) {
-        player.seekTo(pointA!, true);
+        controller.seekTo(pointA!);
       }
     }, 200);
 
     return clearLoop;
-  }, [pointA, pointB, isLooping, getPlayer, clearLoop]);
+  }, [pointA, pointB, isLooping, getController, clearLoop]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -54,9 +59,9 @@ export default function ABLoopControl({ getPlayer }: ABLoopControlProps) {
   }, [clearLoop]);
 
   const handleSetA = () => {
-    const player = getPlayer();
-    if (!player) return;
-    const time = player.getCurrentTime();
+    const controller = getController();
+    if (!controller) return;
+    const time = controller.getCurrentTime();
     setPointA(time);
     // If B is set and now A >= B, clear B
     if (pointB !== null && time >= pointB) {
@@ -65,13 +70,12 @@ export default function ABLoopControl({ getPlayer }: ABLoopControlProps) {
   };
 
   const handleSetB = () => {
-    const player = getPlayer();
-    if (!player) return;
-    const time = player.getCurrentTime();
+    const controller = getController();
+    if (!controller) return;
+    const time = controller.getCurrentTime();
     if (pointA !== null && time > pointA) {
       setPointB(time);
-      // Immediately seek to A to start the loop
-      player.seekTo(pointA, true);
+      controller.seekTo(pointA);
     }
   };
 

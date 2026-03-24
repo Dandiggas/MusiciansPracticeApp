@@ -115,7 +115,7 @@ export default function DashboardPage() {
         >
           <h3 className="font-semibold mb-2">Start Practice Session</h3>
           <p className="text-sm text-muted-foreground">
-            Begin timing your practice with our built-in timer
+            Open your all-in-one workspace for media, looping, timer, metronome, and tuner
           </p>
         </div>
         <div
@@ -133,7 +133,7 @@ export default function DashboardPage() {
         >
           <h3 className="font-semibold mb-2">Practice Recommendations</h3>
           <p className="text-sm text-muted-foreground">
-            Get AI-powered practice suggestions
+            Get AI-powered ideas before your next session
           </p>
         </div>
       </div>

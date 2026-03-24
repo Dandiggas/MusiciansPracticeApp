@@ -15,11 +15,8 @@ export function MobileNav() {
     { name: "Home", href: "/" },
     { name: "Dashboard", href: "/dashboard" },
     { name: "Profile", href: "/profilepage" },
-    { name: "Practice Timer", href: "/practice-timer" },
-    { name: "Metronome", href: "/metronome" },
-    { name: "Tuner", href: "/tuner" },
+    { name: "Practice Session", href: "/practice-timer" },
     { name: "Recommendations", href: "/recommendations" },
-    { name: "YouTube Practice", href: "/youtube-practice" },
   ];
 
   // Don't show on login/register pages
