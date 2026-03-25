@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { MobileNav } from "./MobileNav";
 import { Music } from "lucide-react";
 import { cn } from "@/lib/utils";
+import LogoutButton from "@/components/practice/LogoutButton";
 
 export function Header() {
   const pathname = usePathname();
@@ -65,6 +66,10 @@ export function Header() {
             {/* Future: Search component can go here */}
           </div>
           <nav className="flex items-center space-x-2">
+            <LogoutButton
+              label="Log Out"
+              className="hidden h-10 rounded-full border-slate-300 bg-white/80 px-4 text-slate-700 shadow-sm hover:bg-white md:inline-flex"
+            />
             <ThemeToggle />
             <MobileNav />
           </nav>

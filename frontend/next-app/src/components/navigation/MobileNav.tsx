@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import LogoutButton from "@/components/practice/LogoutButton";
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,6 +60,10 @@ export function MobileNav() {
                   {item.name}
                 </Link>
               ))}
+              <LogoutButton
+                label="Log Out"
+                className="mt-2 h-11 w-full justify-center rounded-xl border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
+              />
             </div>
           </nav>
         </>
