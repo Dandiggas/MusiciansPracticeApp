@@ -70,6 +70,32 @@ jest.mock('@/components/media/TakeRecorder', () => ({
   default: jest.fn().mockReturnValue(null),
 }));
 
+// Mock studio components that are heavy / not under test
+jest.mock('@/components/studio/PracticeMedia', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue(<div data-testid="practice-media" />),
+}));
+
+jest.mock('@/components/studio/MetronomeWidget', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue(<div data-testid="metronome-widget" />),
+}));
+
+jest.mock('@/components/studio/TunerWidget', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue(<div data-testid="tuner-widget" />),
+}));
+
+jest.mock('@/components/studio/SessionPerformance', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue(<div data-testid="session-performance" />),
+}));
+
+jest.mock('@/components/studio/FocusPoints', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue(<div data-testid="focus-points" />),
+}));
+
 describe('PracticeTimerPage', () => {
   const originalConsoleError = console.error;
 
@@ -93,22 +119,29 @@ describe('PracticeTimerPage', () => {
     console.error = originalConsoleError;
   });
 
+  /** Helper: mock the two GETs the mount effect makes (active-timer + recent sessions) */
+  function mockNoActiveSession() {
+    mockedAxios.get
+      .mockResolvedValueOnce({ data: { active: false } })   // /timer/active/
+      .mockResolvedValueOnce({ data: [] });                  // recent sessions
+  }
+
   describe('Initial Render', () => {
     it('renders the practice timer page with initial state', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
 
       render(<PracticeTimerPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Practice Session')).toBeInTheDocument();
-        expect(screen.getByText('Start New Session')).toBeInTheDocument();
+        expect(screen.getByText('Session Setup')).toBeInTheDocument();
+        expect(screen.getByText('New Session')).toBeInTheDocument();
         expect(screen.getByText('00:00:00')).toBeInTheDocument();
         expect(screen.getByLabelText(/instrument/i)).toBeInTheDocument();
       });
     });
 
     it('checks for active timer on mount', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
 
       render(<PracticeTimerPage />);
 
@@ -138,7 +171,7 @@ describe('PracticeTimerPage', () => {
       render(<PracticeTimerPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Main Workspace')).toBeInTheDocument();
+        expect(screen.getByText('Session Active')).toBeInTheDocument();
         // Form is hidden when session is running, so check for pause/stop buttons instead
         expect(screen.getByRole('button', { name: /pause/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /stop & save/i })).toBeInTheDocument();
@@ -189,7 +222,7 @@ describe('PracticeTimerPage', () => {
     });
 
     it('calls saveProject on session start', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
       mockedAxios.post.mockResolvedValueOnce({
         data: {
           session_id: 1,
@@ -210,7 +243,7 @@ describe('PracticeTimerPage', () => {
       const instrumentSelect = screen.getByLabelText(/instrument/i);
       await user.selectOptions(instrumentSelect, 'Guitar');
 
-      const startButton = screen.getByRole('button', { name: /start practice/i });
+      const startButton = screen.getByRole('button', { name: /start session/i });
       await user.click(startButton);
 
       await waitFor(() => {
@@ -264,7 +297,7 @@ describe('PracticeTimerPage', () => {
 
   describe('Song Title and Notes', () => {
     it('renders song title input', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
 
       render(<PracticeTimerPage />);
 
@@ -274,19 +307,19 @@ describe('PracticeTimerPage', () => {
     });
 
     it('renders notes textarea', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
 
       render(<PracticeTimerPage />);
 
       await waitFor(() => {
-        expect(screen.getByLabelText(/practice notes/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/focus points/i)).toBeInTheDocument();
       });
     });
   });
 
   describe('Start Timer', () => {
     it('starts a new timer with instrument', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
       mockedAxios.post.mockResolvedValueOnce({
         data: {
           session_id: 1,
@@ -307,7 +340,7 @@ describe('PracticeTimerPage', () => {
       const instrumentSelect = screen.getByLabelText(/instrument/i);
       await user.selectOptions(instrumentSelect, 'Drums');
 
-      const startButton = screen.getByRole('button', { name: /start practice/i });
+      const startButton = screen.getByRole('button', { name: /start session/i });
       await user.click(startButton);
 
       await waitFor(() => {
@@ -322,17 +355,17 @@ describe('PracticeTimerPage', () => {
     });
 
     it('displays error when starting without instrument', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
 
       const user = userEvent.setup({ delay: null });
       render(<PracticeTimerPage />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /start practice/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /start session/i })).toBeInTheDocument();
       });
 
       // Try to start without selecting an instrument
-      const startButton = screen.getByRole('button', { name: /start practice/i });
+      const startButton = screen.getByRole('button', { name: /start session/i });
       await user.click(startButton);
 
       await waitFor(() => {
@@ -344,7 +377,7 @@ describe('PracticeTimerPage', () => {
     });
 
     it('increments timer after starting', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
       mockedAxios.post.mockResolvedValueOnce({
         data: {
           session_id: 1,
@@ -365,11 +398,11 @@ describe('PracticeTimerPage', () => {
       const instrumentSelect = screen.getByLabelText(/instrument/i);
       await user.selectOptions(instrumentSelect, 'Drums');
 
-      const startButton = screen.getByRole('button', { name: /start practice/i });
+      const startButton = screen.getByRole('button', { name: /start session/i });
       await user.click(startButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Main Workspace')).toBeInTheDocument();
+        expect(screen.getByText('Session Active')).toBeInTheDocument();
       });
 
       // Fast-forward 3 seconds and let React process the update
@@ -422,7 +455,7 @@ describe('PracticeTimerPage', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('⏸ Paused')).toBeInTheDocument();
+        expect(screen.getByText('Paused')).toBeInTheDocument();
       });
     });
 
@@ -464,7 +497,7 @@ describe('PracticeTimerPage', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Main Workspace')).toBeInTheDocument();
+        expect(screen.getByText('Session Active')).toBeInTheDocument();
       });
     });
 
@@ -499,7 +532,7 @@ describe('PracticeTimerPage', () => {
       await user.click(pauseButton);
 
       await waitFor(() => {
-        expect(screen.getByText('⏸ Paused')).toBeInTheDocument();
+        expect(screen.getByText('Paused')).toBeInTheDocument();
       });
 
       // Fast-forward another 5 seconds while paused
@@ -691,7 +724,7 @@ describe('PracticeTimerPage', () => {
 
   describe('UI State Changes', () => {
     it('disables buttons while loading', async () => {
-      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockNoActiveSession();
       mockedAxios.post.mockImplementation(() => new Promise(() => {})); // Never resolves
 
       const user = userEvent.setup({ delay: null });
@@ -704,7 +737,7 @@ describe('PracticeTimerPage', () => {
       const instrumentSelect = screen.getByLabelText(/instrument/i);
       await user.selectOptions(instrumentSelect, 'Guitar');
 
-      const startButton = screen.getByRole('button', { name: /start practice/i });
+      const startButton = screen.getByRole('button', { name: /start session/i });
       await user.click(startButton);
 
       await waitFor(() => {
@@ -729,7 +762,7 @@ describe('PracticeTimerPage', () => {
       render(<PracticeTimerPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('⏸ Paused')).toBeInTheDocument();
+        expect(screen.getByText('Paused')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /resume/i })).toBeInTheDocument();
       });
     });
