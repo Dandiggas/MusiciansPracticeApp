@@ -24,6 +24,8 @@ import {
   MicOff,
   Music,
   Upload,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -96,6 +98,7 @@ export default function PracticeTimerPage() {
   const [tunerNote, setTunerNote] = useState<NoteInfo | null>(null);
   const [referenceFreq, setReferenceFreq] = useState(440);
   const [tunerError, setTunerError] = useState("");
+  const [isTunerExpanded, setIsTunerExpanded] = useState(false);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const youtubePlayerRef = useRef<YouTubePlayerHandle>(null);
@@ -687,6 +690,12 @@ export default function PracticeTimerPage() {
   const isInTune = tunerNote !== null && Math.abs(tunerNote.cents) <= 5;
   const isClose = tunerNote !== null && Math.abs(tunerNote.cents) <= 15;
 
+  useEffect(() => {
+    if (tunerActive) {
+      setIsTunerExpanded(true);
+    }
+  }, [tunerActive]);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.16),_transparent_28%),radial-gradient(circle_at_85%_18%,_rgba(14,165,233,0.15),_transparent_22%),linear-gradient(180deg,_#fffdf7_0%,_#fff_38%,_#f8fafc_100%)]">
       <div className="pointer-events-none absolute inset-0 opacity-70">
@@ -1108,86 +1117,107 @@ export default function PracticeTimerPage() {
                     </div>
                   </div>
 
-                  <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] p-4 shadow-inner shadow-slate-200/50 md:p-5">
-                    <div className="mb-4 flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                          Active Source
-                        </p>
-                        <p className="mt-1 text-sm text-slate-600">
-                          {audioFileName
-                            ? `Loaded track: ${audioFileName}`
-                            : mediaSource === "youtube"
-                              ? "Paste a YouTube lesson, performance, or play-along."
-                              : "Upload a local MP3 and practice with the same controls."}
-                        </p>
-                      </div>
-                      <div className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white">
-                        {activeMediaLabel}
-                      </div>
-                    </div>
-
-                    {mediaSource === "youtube" ? (
-                      hasVideo ? (
-                        <YouTubePlayer
-                          ref={youtubePlayerRef}
-                          videoId={videoId!}
-                          onReady={(player) => {
-                            if (playbackSpeed !== 1) {
-                              player.setPlaybackRate(playbackSpeed);
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="flex aspect-video items-center justify-center rounded-[1.5rem] border border-dashed border-slate-300 bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.14),_transparent_35%),linear-gradient(180deg,_#fff_0%,_#f8fafc_100%)] text-center">
-                          <div className="space-y-4 px-6">
-                            <div className="mx-auto w-fit rounded-full bg-amber-100 p-4 text-amber-700">
-                              <Youtube className="h-8 w-8" />
-                            </div>
-                            <div>
-                              <p className="font-semibold text-slate-900">
-                                Paste a YouTube URL to load your practice video
-                              </p>
-                              <p className="mt-1 text-sm text-slate-500">
-                                Great for lessons, play-alongs, and performance videos.
-                              </p>
-                            </div>
+                  <div className="grid gap-4 xl:grid-cols-[1.28fr_0.88fr] xl:items-start">
+                    <div className="space-y-4">
+                      <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] p-4 shadow-inner shadow-slate-200/50 md:p-5">
+                        <div className="mb-4 flex items-center justify-between gap-4">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                              Active Source
+                            </p>
+                            <p className="mt-1 text-sm text-slate-600">
+                              {audioFileName
+                                ? `Loaded track: ${audioFileName}`
+                                : mediaSource === "youtube"
+                                  ? "Paste a YouTube lesson, performance, or play-along."
+                                  : "Upload a local MP3 and practice with the same controls."}
+                            </p>
+                          </div>
+                          <div className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white">
+                            {activeMediaLabel}
                           </div>
                         </div>
-                      )
-                    ) : (
-                      <LocalAudioPlayer
-                        ref={audioPlayerRef}
-                        audioUrl={audioObjectUrl}
-                        fileName={audioFileName}
-                        playbackSpeed={playbackSpeed}
-                      />
-                    )}
-                  </div>
 
-                  <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
-                      <PlaybackSpeedControl
-                        currentSpeed={playbackSpeed}
-                        onSpeedChange={handleSpeedChange}
-                      />
-                    </div>
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
-                      <p className="text-sm font-semibold text-slate-900">
-                        A-B Loop
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500">
-                        Mark the phrase you want to isolate and repeat.
-                      </p>
-                      <div className="mt-3">
-                        <ABLoopControl getController={getLoopController} />
+                        {mediaSource === "youtube" ? (
+                          hasVideo ? (
+                            <YouTubePlayer
+                              ref={youtubePlayerRef}
+                              videoId={videoId!}
+                              onReady={(player) => {
+                                if (playbackSpeed !== 1) {
+                                  player.setPlaybackRate(playbackSpeed);
+                                }
+                              }}
+                            />
+                          ) : (
+                            <div className="flex aspect-video items-center justify-center rounded-[1.5rem] border border-dashed border-slate-300 bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.14),_transparent_35%),linear-gradient(180deg,_#fff_0%,_#f8fafc_100%)] text-center">
+                              <div className="space-y-4 px-6">
+                                <div className="mx-auto w-fit rounded-full bg-amber-100 p-4 text-amber-700">
+                                  <Youtube className="h-8 w-8" />
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-slate-900">
+                                    Paste a YouTube URL to load your practice video
+                                  </p>
+                                  <p className="mt-1 text-sm text-slate-500">
+                                    Great for lessons, play-alongs, and performance videos.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        ) : (
+                          <LocalAudioPlayer
+                            ref={audioPlayerRef}
+                            audioUrl={audioObjectUrl}
+                            fileName={audioFileName}
+                            playbackSpeed={playbackSpeed}
+                          />
+                        )}
                       </div>
+
+                      <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+                        <div className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
+                          <PlaybackSpeedControl
+                            currentSpeed={playbackSpeed}
+                            onSpeedChange={handleSpeedChange}
+                          />
+                        </div>
+                        <div className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
+                          <p className="text-sm font-semibold text-slate-900">
+                            A-B Loop
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Mark the phrase you want to isolate and repeat.
+                          </p>
+                          <div className="mt-3">
+                            <ABLoopControl getController={getLoopController} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] p-4 shadow-inner shadow-slate-200/50 md:p-5">
+                      <div className="mb-4 flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            Review Take
+                          </p>
+                          <p className="mt-1 text-sm text-slate-600">
+                            Record yourself beside the source so listening back feels like part of the same loop.
+                          </p>
+                        </div>
+                        <div className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white">
+                          Recorder
+                        </div>
+                      </div>
+                      <TakeRecorder />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <div className="grid gap-6 md:grid-cols-2 2xl:grid-cols-4">
+              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 <Card className="border-white/70 bg-white/86 shadow-[0_20px_80px_-55px_rgba(15,23,42,0.45)] backdrop-blur">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
@@ -1411,82 +1441,129 @@ export default function PracticeTimerPage() {
 
                 <Card className="border-white/70 bg-white/86 shadow-[0_20px_80px_-55px_rgba(15,23,42,0.45)] backdrop-blur">
                   <CardHeader>
-                    <CardTitle className="text-lg text-slate-900">
-                      Tuner
-                    </CardTitle>
-                    <CardDescription className="text-slate-600">
-                      Tune with your microphone
-                    </CardDescription>
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <CardTitle className="text-lg text-slate-900">
+                          Tuner
+                        </CardTitle>
+                        <CardDescription className="text-slate-600">
+                          Tune up, then tuck this away for the rest of the session.
+                        </CardDescription>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsTunerExpanded((prev) => !prev)}
+                        className="rounded-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                      >
+                        {isTunerExpanded ? (
+                          <>
+                            <ChevronUp className="mr-2 h-4 w-4" />
+                            Hide
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="mr-2 h-4 w-4" />
+                            Open
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="rounded-[1.75rem] border border-emerald-200 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.18),_transparent_42%),linear-gradient(180deg,_#fff_0%,_#ecfdf5_100%)] px-4 py-5 text-center">
-                      <div
-                        className={cn(
-                          "text-6xl font-black font-mono transition-colors",
-                          !tunerNote && "text-slate-300",
-                          tunerNote && isInTune && "text-green-600",
-                          tunerNote && !isInTune && isClose && "text-amber-500",
-                          tunerNote && !isInTune && !isClose && "text-red-500"
-                        )}
-                      >
-                        {tunerNote ? `${tunerNote.name}${tunerNote.octave}` : "--"}
-                      </div>
-                      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        {tunerNote
-                          ? `${tunerNote.frequency.toFixed(1)} Hz`
-                          : tunerActive
-                            ? "Listening"
-                            : "Idle"}
-                      </p>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        <span>Flat</span>
-                        <span>In Tune</span>
-                        <span>Sharp</span>
-                      </div>
-                      <div className="relative h-3 overflow-hidden rounded-full bg-slate-200">
-                        <div className="absolute left-1/2 top-0 bottom-0 z-10 w-0.5 bg-green-500" />
-                        <div
-                          className={cn(
-                            "absolute top-0 bottom-0 w-2 -translate-x-1/2 rounded-full transition-all duration-100",
-                            isInTune
-                              ? "bg-green-500"
-                              : isClose
-                                ? "bg-amber-500"
-                                : "bg-red-500"
-                          )}
-                          style={{ left: `${gaugePercent}%` }}
-                        />
-                      </div>
-                      <div className="text-center text-sm font-mono font-semibold text-slate-700">
-                        {tunerNote
-                          ? `${tunerNote.cents > 0 ? "+" : ""}${tunerNote.cents} cents`
-                          : "-- cents"}
+                    <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                            Status
+                          </p>
+                          <p className="mt-1 text-sm font-semibold text-slate-900">
+                            {tunerActive
+                              ? tunerNote
+                                ? `${tunerNote.name}${tunerNote.octave} · ${tunerNote.cents > 0 ? "+" : ""}${tunerNote.cents} cents`
+                                : "Listening for a note"
+                              : "Tuner tucked away"}
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-700 shadow-sm">
+                          {tunerActive ? "On" : "Off"}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                      <Label
-                        htmlFor="ref-freq-grid"
-                        className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"
-                      >
-                        A4 =
-                      </Label>
-                      <Input
-                        id="ref-freq-grid"
-                        type="number"
-                        min={420}
-                        max={460}
-                        value={referenceFreq}
-                        onChange={(e) => setReferenceFreq(Number(e.target.value))}
-                        className="h-10 w-20 rounded-xl border-slate-200 bg-white text-center shadow-none"
-                      />
-                      <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        Hz
-                      </span>
-                    </div>
+                    {isTunerExpanded && (
+                      <>
+                        <div className="rounded-[1.75rem] border border-emerald-200 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.18),_transparent_42%),linear-gradient(180deg,_#fff_0%,_#ecfdf5_100%)] px-4 py-5 text-center">
+                          <div
+                            className={cn(
+                              "text-6xl font-black font-mono transition-colors",
+                              !tunerNote && "text-slate-300",
+                              tunerNote && isInTune && "text-green-600",
+                              tunerNote && !isInTune && isClose && "text-amber-500",
+                              tunerNote && !isInTune && !isClose && "text-red-500"
+                            )}
+                          >
+                            {tunerNote ? `${tunerNote.name}${tunerNote.octave}` : "--"}
+                          </div>
+                          <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                            {tunerNote
+                              ? `${tunerNote.frequency.toFixed(1)} Hz`
+                              : tunerActive
+                                ? "Listening"
+                                : "Idle"}
+                          </p>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                            <span>Flat</span>
+                            <span>In Tune</span>
+                            <span>Sharp</span>
+                          </div>
+                          <div className="relative h-3 overflow-hidden rounded-full bg-slate-200">
+                            <div className="absolute left-1/2 top-0 bottom-0 z-10 w-0.5 bg-green-500" />
+                            <div
+                              className={cn(
+                                "absolute top-0 bottom-0 w-2 -translate-x-1/2 rounded-full transition-all duration-100",
+                                isInTune
+                                  ? "bg-green-500"
+                                  : isClose
+                                    ? "bg-amber-500"
+                                    : "bg-red-500"
+                              )}
+                              style={{ left: `${gaugePercent}%` }}
+                            />
+                          </div>
+                          <div className="text-center text-sm font-mono font-semibold text-slate-700">
+                            {tunerNote
+                              ? `${tunerNote.cents > 0 ? "+" : ""}${tunerNote.cents} cents`
+                              : "-- cents"}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                          <Label
+                            htmlFor="ref-freq-grid"
+                            className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"
+                          >
+                            A4 =
+                          </Label>
+                          <Input
+                            id="ref-freq-grid"
+                            type="number"
+                            min={420}
+                            max={460}
+                            value={referenceFreq}
+                            onChange={(e) => setReferenceFreq(Number(e.target.value))}
+                            className="h-10 w-20 rounded-xl border-slate-200 bg-white text-center shadow-none"
+                          />
+                          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                            Hz
+                          </span>
+                        </div>
+                      </>
+                    )}
 
                     {tunerError && (
                       <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
@@ -1517,20 +1594,6 @@ export default function PracticeTimerPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-white/70 bg-white/86 shadow-[0_20px_80px_-55px_rgba(15,23,42,0.45)] backdrop-blur md:col-span-2 2xl:col-span-1">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
-                      <Mic className="h-5 w-5" />
-                      Record Take
-                    </CardTitle>
-                    <CardDescription className="text-slate-600">
-                      Capture what you actually sound like, then review it immediately.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <TakeRecorder />
-                  </CardContent>
-                </Card>
               </div>
             </>
           )}
