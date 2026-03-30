@@ -108,3 +108,70 @@ export const saveStoredRecommendation = (
 export const clearStoredRecommendation = () => {
   removeItem(RECOMMENDATION_KEY);
 };
+
+// --- Per-instrument project persistence (Launch Pad) ---
+
+export const INSTRUMENTS = ["Guitar", "Bass", "Drums", "Keys"] as const;
+export type InstrumentName = (typeof INSTRUMENTS)[number];
+
+export interface InstrumentProject {
+  instrument: InstrumentName;
+  songTitle: string;
+  description: string;
+  youtubeUrl: string;
+  bpm: number;
+  notes: string;
+  mediaSource: StoredMediaSource;
+  audioFileName: string | null;
+  lastPracticedAt: string;
+}
+
+const PROJECTS_KEY = "practice:projects";
+
+export const getAllProjects = (): Partial<Record<InstrumentName, InstrumentProject>> =>
+  readJson<Partial<Record<InstrumentName, InstrumentProject>>>(PROJECTS_KEY) ?? {};
+
+export const getProject = (instrument: InstrumentName): InstrumentProject | null => {
+  const projects = getAllProjects();
+  return projects[instrument] ?? null;
+};
+
+export const saveProject = (project: InstrumentProject): void => {
+  const projects = getAllProjects();
+  projects[project.instrument] = project;
+  writeJson(PROJECTS_KEY, projects);
+};
+
+export const migrateFromLegacySetup = (): void => {
+  const legacy = readJson<StoredPracticeSetup>(PRACTICE_SETUP_KEY);
+  if (!legacy) return;
+
+  const existingProjects = getAllProjects();
+  if (Object.keys(existingProjects).length > 0) return;
+
+  const instrumentName = legacy.instrument?.trim();
+  if (!instrumentName) {
+    removeItem(PRACTICE_SETUP_KEY);
+    return;
+  }
+
+  const matchedInstrument = INSTRUMENTS.find(
+    (i) => i.toLowerCase() === instrumentName.toLowerCase()
+  );
+
+  if (matchedInstrument) {
+    saveProject({
+      instrument: matchedInstrument,
+      songTitle: "",
+      description: legacy.description || "",
+      youtubeUrl: legacy.youtubeUrl || "",
+      bpm: 120,
+      notes: "",
+      mediaSource: legacy.mediaSource || "youtube",
+      audioFileName: legacy.audioFileName ?? null,
+      lastPracticedAt: legacy.updatedAt || new Date().toISOString(),
+    });
+  }
+
+  removeItem(PRACTICE_SETUP_KEY);
+};
