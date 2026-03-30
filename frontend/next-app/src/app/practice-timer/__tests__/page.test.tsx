@@ -12,13 +12,14 @@ jest.mock('axios', () => ({
 }));
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Mock next/navigation
+// Mock next/navigation with mutable search params
 const mockPush = jest.fn();
+let mockSearchParams = new URLSearchParams();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => mockSearchParams,
 }));
 
 // Mock audio APIs that don't exist in jsdom
@@ -40,7 +41,9 @@ jest.mock('@/lib/audio/note-utils', () => ({
   frequencyToNote: jest.fn().mockReturnValue({ name: 'A', octave: 4, cents: 0, frequency: 440 }),
 }));
 
-// Mock practice-session-store to prevent localStorage re-render loops
+// Mock practice-session-store with all exports
+const mockGetProject = jest.fn().mockReturnValue(null);
+const mockSaveProject = jest.fn();
 jest.mock('@/lib/practice-session-store', () => ({
   getStoredPracticeSetup: jest.fn().mockReturnValue(null),
   saveStoredPracticeSetup: jest.fn(),
@@ -48,6 +51,9 @@ jest.mock('@/lib/practice-session-store', () => ({
   getStoredSessionSnapshot: jest.fn().mockReturnValue(null),
   saveStoredSessionSnapshot: jest.fn(),
   clearStoredSessionSnapshot: jest.fn(),
+  getProject: (...args: unknown[]) => mockGetProject(...args),
+  saveProject: (...args: unknown[]) => mockSaveProject(...args),
+  INSTRUMENTS: ['Guitar', 'Bass', 'Drums', 'Keys'] as const,
 }));
 
 // Mock heavy components that don't need testing here
@@ -72,8 +78,8 @@ describe('PracticeTimerPage', () => {
     localStorage.clear();
     localStorage.setItem('token', 'test-token');
     jest.useFakeTimers();
+    mockSearchParams = new URLSearchParams();
     // Suppress React "Maximum update depth exceeded" warnings in tests
-    // This is a known issue with complex components + fake timers
     console.error = (...args: unknown[]) => {
       if (typeof args[0] === 'string' && args[0].includes('Maximum update depth exceeded')) return;
       originalConsoleError(...args);
@@ -140,13 +146,54 @@ describe('PracticeTimerPage', () => {
     });
   });
 
-  describe('Start Timer', () => {
-    it('starts a new timer with instrument', async () => {
+  describe('Launch Pad Integration', () => {
+    it('pre-fills form from project store when ?instrument= param is present', async () => {
+      mockSearchParams = new URLSearchParams('instrument=Guitar');
+      mockGetProject.mockReturnValueOnce({
+        instrument: 'Guitar',
+        songTitle: 'All The Things You Are',
+        description: 'Chord melody arrangement',
+        youtubeUrl: 'https://youtube.com/watch?v=test123',
+        bpm: 140,
+        notes: 'Focus on bridge section',
+        mediaSource: 'youtube',
+        audioFileName: null,
+        lastPracticedAt: '2026-03-29T10:00:00Z',
+      });
+      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+
+      render(<PracticeTimerPage />);
+
+      await waitFor(() => {
+        expect(mockGetProject).toHaveBeenCalledWith('Guitar');
+        const instrumentSelect = screen.getByLabelText(/instrument/i) as HTMLSelectElement;
+        expect(instrumentSelect.value).toBe('Guitar');
+        expect(screen.getByDisplayValue('All The Things You Are')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('Chord melody arrangement')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('Focus on bridge section')).toBeInTheDocument();
+      });
+    });
+
+    it('sets only instrument when ?instrument= param has no existing project', async () => {
+      mockSearchParams = new URLSearchParams('instrument=Bass');
+      mockGetProject.mockReturnValueOnce(null);
+      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+
+      render(<PracticeTimerPage />);
+
+      await waitFor(() => {
+        expect(mockGetProject).toHaveBeenCalledWith('Bass');
+        const instrumentSelect = screen.getByLabelText(/instrument/i) as HTMLSelectElement;
+        expect(instrumentSelect.value).toBe('Bass');
+      });
+    });
+
+    it('calls saveProject on session start', async () => {
       mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
       mockedAxios.post.mockResolvedValueOnce({
         data: {
           session_id: 1,
-          instrument: 'Piano',
+          instrument: 'Guitar',
           description: '',
           started_at: new Date().toISOString(),
           in_progress: true,
@@ -160,8 +207,105 @@ describe('PracticeTimerPage', () => {
         expect(screen.getByLabelText(/instrument/i)).toBeInTheDocument();
       });
 
-      const instrumentInput = screen.getByLabelText(/instrument/i);
-      await user.type(instrumentInput, 'Piano');
+      const instrumentSelect = screen.getByLabelText(/instrument/i);
+      await user.selectOptions(instrumentSelect, 'Guitar');
+
+      const startButton = screen.getByRole('button', { name: /start practice/i });
+      await user.click(startButton);
+
+      await waitFor(() => {
+        expect(mockSaveProject).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instrument: 'Guitar',
+            lastPracticedAt: expect.any(String),
+          })
+        );
+      });
+    });
+
+    it('calls saveProject on session stop and redirects to dashboard', async () => {
+      const mockSession = {
+        session_id: 1,
+        instrument: 'Guitar',
+        description: 'Test',
+        started_at: new Date().toISOString(),
+        is_paused: false,
+        in_progress: true,
+      };
+
+      mockedAxios.get.mockResolvedValueOnce({
+        data: { active: true, session: mockSession }
+      });
+      mockedAxios.post.mockResolvedValueOnce({
+        data: { ...mockSession, in_progress: false }
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<PracticeTimerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /stop & save/i })).toBeInTheDocument();
+      });
+
+      const stopButton = screen.getByRole('button', { name: /stop & save/i });
+      await user.click(stopButton);
+
+      await waitFor(() => {
+        expect(mockSaveProject).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instrument: 'Guitar',
+            lastPracticedAt: expect.any(String),
+          })
+        );
+        expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      });
+    });
+  });
+
+  describe('Song Title and Notes', () => {
+    it('renders song title input', async () => {
+      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+
+      render(<PracticeTimerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/song title/i)).toBeInTheDocument();
+      });
+    });
+
+    it('renders notes textarea', async () => {
+      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+
+      render(<PracticeTimerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/practice notes/i)).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Start Timer', () => {
+    it('starts a new timer with instrument', async () => {
+      mockedAxios.get.mockResolvedValueOnce({ data: { active: false } });
+      mockedAxios.post.mockResolvedValueOnce({
+        data: {
+          session_id: 1,
+          instrument: 'Drums',
+          description: '',
+          started_at: new Date().toISOString(),
+          in_progress: true,
+        }
+      });
+
+      const user = userEvent.setup({ delay: null });
+      render(<PracticeTimerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/instrument/i)).toBeInTheDocument();
+      });
+
+      const instrumentSelect = screen.getByLabelText(/instrument/i);
+      await user.selectOptions(instrumentSelect, 'Drums');
 
       const startButton = screen.getByRole('button', { name: /start practice/i });
       await user.click(startButton);
@@ -169,7 +313,7 @@ describe('PracticeTimerPage', () => {
       await waitFor(() => {
         expect(mockedAxios.post).toHaveBeenCalledWith(
           'http://localhost:8000/api/v1/timer/start/',
-          { instrument: 'Piano', description: '', youtube_url: '' },
+          { instrument: 'Drums', description: '', youtube_url: '' },
           expect.objectContaining({
             headers: { 'Authorization': 'Token test-token' }
           })
@@ -187,7 +331,7 @@ describe('PracticeTimerPage', () => {
         expect(screen.getByRole('button', { name: /start practice/i })).toBeInTheDocument();
       });
 
-      // Try to start without entering an instrument
+      // Try to start without selecting an instrument
       const startButton = screen.getByRole('button', { name: /start practice/i });
       await user.click(startButton);
 
@@ -218,8 +362,8 @@ describe('PracticeTimerPage', () => {
         expect(screen.getByLabelText(/instrument/i)).toBeInTheDocument();
       });
 
-      const instrumentInput = screen.getByLabelText(/instrument/i);
-      await user.type(instrumentInput, 'Drums');
+      const instrumentSelect = screen.getByLabelText(/instrument/i);
+      await user.selectOptions(instrumentSelect, 'Drums');
 
       const startButton = screen.getByRole('button', { name: /start practice/i });
       await user.click(startButton);
@@ -370,7 +514,7 @@ describe('PracticeTimerPage', () => {
   });
 
   describe('Stop Timer', () => {
-    it('stops timer and redirects to profile page', async () => {
+    it('stops timer and redirects to dashboard', async () => {
       const mockSession = {
         session_id: 1,
         instrument: 'Guitar',
@@ -408,7 +552,7 @@ describe('PracticeTimerPage', () => {
       });
 
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith('/profilepage');
+        expect(mockPush).toHaveBeenCalledWith('/dashboard');
       });
     });
 
@@ -557,8 +701,8 @@ describe('PracticeTimerPage', () => {
         expect(screen.getByLabelText(/instrument/i)).toBeInTheDocument();
       });
 
-      const instrumentInput = screen.getByLabelText(/instrument/i);
-      await user.type(instrumentInput, 'Piano');
+      const instrumentSelect = screen.getByLabelText(/instrument/i);
+      await user.selectOptions(instrumentSelect, 'Guitar');
 
       const startButton = screen.getByRole('button', { name: /start practice/i });
       await user.click(startButton);

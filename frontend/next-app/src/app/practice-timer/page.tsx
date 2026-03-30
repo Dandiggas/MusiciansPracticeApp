@@ -48,6 +48,10 @@ import {
   getStoredPracticeSetup,
   saveStoredPracticeSetup,
   saveStoredSessionSnapshot,
+  getProject,
+  saveProject,
+  INSTRUMENTS,
+  type InstrumentName,
   type StoredPracticeSetup,
 } from "@/lib/practice-session-store";
 
@@ -76,7 +80,9 @@ export default function PracticeTimerPage() {
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [instrument, setInstrument] = useState("");
+  const [songTitle, setSongTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [notes, setNotes] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -120,6 +126,7 @@ export default function PracticeTimerPage() {
   const hasVideo = Boolean(videoId);
   const activeMediaLabel = mediaSource === "youtube" ? "YouTube" : "MP3 Upload";
   const shouldAutoResume = searchParams.get("resume") === "1";
+  const instrumentParam = searchParams.get("instrument") as InstrumentName | null;
 
   const resetUploadedAudio = useCallback(() => {
     if (audioObjectUrl) {
@@ -224,28 +231,43 @@ export default function PracticeTimerPage() {
           return;
         }
 
-        const recentResponse = await axios.get(`${apiBaseUrl}/`, {
-          headers: { Authorization: `Token ${token}` },
-        });
-
-        if (!recentResponse || !Array.isArray(recentResponse.data)) {
-          return;
-        }
-
-        const latestSession = [...recentResponse.data]
-          .sort((a: RecentSession, b: RecentSession) => {
-            const dateDiff =
-              new Date(b.session_date).getTime() - new Date(a.session_date).getTime();
-            if (dateDiff !== 0) return dateDiff;
-            return (b.session_id || 0) - (a.session_id || 0);
-          })[0];
-
-        if (latestSession) {
-          setRecentSession(latestSession);
-          if (localSetup?.mediaSource === "audio") {
-            applyStoredSetupRef.current(localSetup);
+        // Priority: instrument param from Launch Pad > recent session > stored setup
+        if (instrumentParam && INSTRUMENTS.includes(instrumentParam)) {
+          const project = getProject(instrumentParam);
+          if (project) {
+            setInstrument(project.instrument);
+            setSongTitle(project.songTitle || "");
+            setDescription(project.description || "");
+            setNotes(project.notes || "");
+            setYoutubeUrl(project.youtubeUrl || "");
+            setBpm(project.bpm || 120);
+            setMediaSource(project.mediaSource || "youtube");
+            setAudioFileName(project.audioFileName);
           } else {
-            applyRecentSessionRef.current(latestSession);
+            setInstrument(instrumentParam);
+          }
+        } else {
+          const recentResponse = await axios.get(`${apiBaseUrl}/`, {
+            headers: { Authorization: `Token ${token}` },
+          });
+
+          if (recentResponse && Array.isArray(recentResponse.data)) {
+            const latestSession = [...recentResponse.data]
+              .sort((a: RecentSession, b: RecentSession) => {
+                const dateDiff =
+                  new Date(b.session_date).getTime() - new Date(a.session_date).getTime();
+                if (dateDiff !== 0) return dateDiff;
+                return (b.session_id || 0) - (a.session_id || 0);
+              })[0];
+
+            if (latestSession) {
+              setRecentSession(latestSession);
+              if (localSetup?.mediaSource === "audio") {
+                applyStoredSetupRef.current(localSetup);
+              } else {
+                applyRecentSessionRef.current(latestSession);
+              }
+            }
           }
         }
       } catch (requestError) {
@@ -318,7 +340,9 @@ export default function PracticeTimerPage() {
 
   const clearSetup = useCallback(() => {
     setInstrument("");
+    setSongTitle("");
     setDescription("");
+    setNotes("");
     setYoutubeUrl("");
     setMediaSource("youtube");
     resetUploadedAudio();
@@ -357,6 +381,20 @@ export default function PracticeTimerPage() {
         youtubeUrl: youtubeUrl.trim(),
         audioFileName,
       });
+
+      if (INSTRUMENTS.includes(instrument as InstrumentName)) {
+        saveProject({
+          instrument: instrument as InstrumentName,
+          songTitle,
+          description,
+          youtubeUrl,
+          bpm,
+          notes,
+          mediaSource,
+          audioFileName,
+          lastPracticedAt: new Date().toISOString(),
+        });
+      }
     } catch (requestError) {
       if (axios.isAxiosError(requestError)) {
         setError(requestError.response?.data?.error || "Failed to start timer");
@@ -369,9 +407,12 @@ export default function PracticeTimerPage() {
   }, [
     apiBaseUrl,
     audioFileName,
+    bpm,
     description,
     instrument,
     mediaSource,
+    notes,
+    songTitle,
     youtubeUrl,
   ]);
 
@@ -408,6 +449,16 @@ export default function PracticeTimerPage() {
   const handleStop = async () => {
     if (!sessionId) return;
 
+    // Snapshot current values before clearing state
+    const currentInstrument = instrument;
+    const currentSongTitle = songTitle;
+    const currentDescription = description;
+    const currentNotes = notes;
+    const currentYoutubeUrl = youtubeUrl;
+    const currentBpm = bpm;
+    const currentMediaSource = mediaSource;
+    const currentAudioFileName = audioFileName;
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
 
@@ -417,6 +468,20 @@ export default function PracticeTimerPage() {
         {},
         { headers: { Authorization: `Token ${token}` } }
       );
+
+      if (INSTRUMENTS.includes(currentInstrument as InstrumentName)) {
+        saveProject({
+          instrument: currentInstrument as InstrumentName,
+          songTitle: currentSongTitle,
+          description: currentDescription,
+          youtubeUrl: currentYoutubeUrl,
+          bpm: currentBpm,
+          notes: currentNotes,
+          mediaSource: currentMediaSource,
+          audioFileName: currentAudioFileName,
+          lastPracticedAt: new Date().toISOString(),
+        });
+      }
 
       const player = youtubePlayerRef.current?.getPlayer();
       if (player) {
@@ -429,7 +494,9 @@ export default function PracticeTimerPage() {
       setIsPaused(false);
       setSessionId(null);
       setInstrument("");
+      setSongTitle("");
       setDescription("");
+      setNotes("");
       setYoutubeUrl("");
       setMediaSource("youtube");
       resetUploadedAudio();
@@ -437,7 +504,7 @@ export default function PracticeTimerPage() {
       setElapsedSeconds(0);
       clearStoredSessionSnapshot();
 
-      router.push("/profilepage");
+      router.push("/dashboard");
     } catch {
       setError("Failed to stop timer");
     } finally {
@@ -737,52 +804,14 @@ export default function PracticeTimerPage() {
                   <div className="inline-flex w-fit items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-slate-200">
                     Session Setup
                   </div>
-                  <div className="space-y-3">
-                    <CardTitle className="text-3xl font-black tracking-tight text-white md:text-4xl">
-                      Start with the track you are actually working on.
-                    </CardTitle>
-                    <CardDescription className="max-w-xl text-base leading-7 text-slate-300">
-                      Pick a YouTube lesson or upload an MP3, then build the rest
-                      of the session around that source. The practice tools stay
-                      close, but the music stays primary.
-                    </CardDescription>
-                  </div>
-
-                  <div className="grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
-                    <div className="rounded-2xl border border-white/12 bg-white/6 p-4">
-                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
-                        Primary
-                      </p>
-                      <p className="mt-2 text-sm font-semibold text-white">
-                        Media-first layout
-                      </p>
-                      <p className="mt-1 text-sm text-slate-300">
-                        Keep the song at the top instead of hiding it behind tools.
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/12 bg-white/6 p-4">
-                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
-                        Practice
-                      </p>
-                      <p className="mt-2 text-sm font-semibold text-white">
-                        Loop and slowdown
-                      </p>
-                      <p className="mt-1 text-sm text-slate-300">
-                        Repeat hard phrases and reduce tempo without leaving the session.
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/12 bg-white/6 p-4">
-                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
-                        Support
-                      </p>
-                      <p className="mt-2 text-sm font-semibold text-white">
-                        Timer, tuner, pulse
-                      </p>
-                      <p className="mt-1 text-sm text-slate-300">
-                        Keep the session structured while your hands stay on the instrument.
-                      </p>
-                    </div>
-                  </div>
+                  <CardTitle className="text-2xl font-black tracking-tight text-white md:text-3xl">
+                    {instrument ? `${instrument} Session` : "New Session"}
+                    {songTitle && (
+                      <span className="block mt-1 text-lg font-semibold text-slate-300">
+                        {songTitle}
+                      </span>
+                    )}
+                  </CardTitle>
 
                   <div className="rounded-3xl border border-white/12 bg-gradient-to-br from-white/10 via-white/6 to-transparent p-6">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -896,13 +925,34 @@ export default function PracticeTimerPage() {
                       >
                         Instrument *
                       </Label>
-                      <Input
+                      <select
                         id="instrument"
-                        type="text"
                         value={instrument}
                         onChange={(e) => setInstrument(e.target.value)}
-                        placeholder="e.g., Guitar, Piano, Drums"
                         required
+                        className="flex h-12 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 text-sm shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      >
+                        <option value="">Select an instrument</option>
+                        {INSTRUMENTS.map((inst) => (
+                          <option key={inst} value={inst}>
+                            {inst}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="song-title"
+                        className="text-sm font-semibold text-slate-800"
+                      >
+                        Song Title
+                      </Label>
+                      <Input
+                        id="song-title"
+                        type="text"
+                        value={songTitle}
+                        onChange={(e) => setSongTitle(e.target.value)}
+                        placeholder="e.g., All The Things You Are"
                         className="h-12 rounded-2xl border-slate-200 bg-white/80 px-4 shadow-none"
                       />
                     </div>
@@ -920,6 +970,22 @@ export default function PracticeTimerPage() {
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="e.g., Verse clean-up, scales, full-song rehearsal"
                         className="h-12 rounded-2xl border-slate-200 bg-white/80 px-4 shadow-none"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="notes"
+                        className="text-sm font-semibold text-slate-800"
+                      >
+                        Practice Notes
+                      </Label>
+                      <textarea
+                        id="notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Practice notes from last session..."
+                        rows={3}
+                        className="flex w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                       />
                     </div>
                   </div>
@@ -1604,51 +1670,6 @@ export default function PracticeTimerPage() {
             </>
           )}
 
-          {!isRunning && (
-            <Card className="border-white/70 bg-white/86 shadow-[0_20px_80px_-55px_rgba(15,23,42,0.45)] backdrop-blur">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold text-slate-900">
-                  Practice Notes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                      Media
-                    </p>
-                    <p className="mt-2 text-sm text-slate-700">
-                      Pick the source you will actually rehearse with.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                      Tempo
-                    </p>
-                    <p className="mt-2 text-sm text-slate-700">
-                      Slow hard passages down before you raise the speed again.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                      Looping
-                    </p>
-                    <p className="mt-2 text-sm text-slate-700">
-                      Use A-B loop for short problem bars instead of replaying the full song.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                      Focus
-                    </p>
-                    <p className="mt-2 text-sm text-slate-700">
-                      Write down your objective so the session stays intentional.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
     </div>
