@@ -151,6 +151,11 @@ export default function PracticeTimerPage() {
     setRestoredFromRecent(true);
   }, [resetUploadedAudio]);
 
+  const applyStoredSetupRef = useRef(applyStoredSetup);
+  applyStoredSetupRef.current = applyStoredSetup;
+  const applyRecentSessionRef = useRef(applyRecentSession);
+  applyRecentSessionRef.current = applyRecentSession;
+
   const cleanupTools = useCallback(() => {
     metronomeRef.current?.stop();
     metronomeRef.current = null;
@@ -238,9 +243,9 @@ export default function PracticeTimerPage() {
         if (latestSession) {
           setRecentSession(latestSession);
           if (localSetup?.mediaSource === "audio") {
-            applyStoredSetup(localSetup);
+            applyStoredSetupRef.current(localSetup);
           } else {
-            applyRecentSession(latestSession);
+            applyRecentSessionRef.current(latestSession);
           }
         }
       } catch (requestError) {
@@ -251,7 +256,8 @@ export default function PracticeTimerPage() {
     };
 
     void checkActiveTimer();
-  }, [apiBaseUrl, applyRecentSession, applyStoredSetup, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiBaseUrl, router]);
 
   useEffect(() => {
     if (isRunning && !isPaused) {
