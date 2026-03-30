@@ -3,26 +3,22 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { StatsCard } from "@/components/dashboard/StatsCard";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   Clock,
-  FileAudio,
   Flame,
+  Guitar,
   Music,
-  PauseCircle,
-  PlayCircle,
-  Sparkles,
-  TrendingUp,
+  Piano,
+  Drum,
 } from "lucide-react";
 import {
-  getStoredPracticeSetup,
-  getStoredRecommendation,
-  getStoredSessionSnapshot,
-  type StoredPracticeSetup,
-  type StoredRecommendation,
-  type StoredSessionSnapshot,
+  getAllProjects,
+  migrateFromLegacySetup,
+  INSTRUMENTS,
+  type InstrumentName,
+  type InstrumentProject,
 } from "@/lib/practice-session-store";
 
 interface Stats {
@@ -33,38 +29,60 @@ interface Stats {
   favorite_instrument: string;
 }
 
-interface Session {
+interface ActiveSession {
   session_id: number;
-  display_id?: number;
   instrument: string;
-  description: string;
-  session_date: string;
-  youtube_url?: string;
+  started_at: string;
+  is_paused: boolean;
 }
 
-const formatDateLabel = (value?: string) => {
-  if (!value) return "just now";
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
+const INSTRUMENT_CONFIG: Record<
+  InstrumentName,
+  { icon: typeof Guitar; accentBg: string; accentBorder: string; accentText: string }
+> = {
+  Guitar: {
+    icon: Guitar,
+    accentBg: "bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.14),_transparent_42%),linear-gradient(180deg,_#fff_0%,_#fffbeb_100%)]",
+    accentBorder: "border-amber-200",
+    accentText: "text-amber-700",
+  },
+  Bass: {
+    icon: Guitar,
+    accentBg: "bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.14),_transparent_42%),linear-gradient(180deg,_#fff_0%,_#f0f9ff_100%)]",
+    accentBorder: "border-sky-200",
+    accentText: "text-sky-700",
+  },
+  Drums: {
+    icon: Drum,
+    accentBg: "bg-[radial-gradient(circle_at_top,_rgba(244,63,94,0.12),_transparent_42%),linear-gradient(180deg,_#fff_0%,_#fff1f2_100%)]",
+    accentBorder: "border-rose-200",
+    accentText: "text-rose-700",
+  },
+  Keys: {
+    icon: Piano,
+    accentBg: "bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.14),_transparent_42%),linear-gradient(180deg,_#fff_0%,_#ecfdf5_100%)]",
+    accentBorder: "border-emerald-200",
+    accentText: "text-emerald-700",
+  },
 };
 
-const trimText = (value: string, limit = 88) => {
-  if (value.length <= limit) return value;
-  return `${value.slice(0, limit - 1)}...`;
+const formatRelativeDate = (isoDate: string): string => {
+  const date = new Date(isoDate);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return "today";
+  if (diffDays === 1) return "yesterday";
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(date);
 };
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [storedSetup, setStoredSetup] = useState<StoredPracticeSetup | null>(null);
-  const [sessionSnapshot, setSessionSnapshot] =
-    useState<StoredSessionSnapshot | null>(null);
-  const [lastRecommendation, setLastRecommendation] =
-    useState<StoredRecommendation | null>(null);
+  const [activeSession, setActiveSession] = useState<ActiveSession | null>(null);
+  const [projects, setProjects] = useState<Partial<Record<InstrumentName, InstrumentProject>>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -73,19 +91,12 @@ export default function DashboardPage() {
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
   useEffect(() => {
-    const syncStoredState = () => {
-      setStoredSetup(getStoredPracticeSetup());
-      setSessionSnapshot(getStoredSessionSnapshot());
-      setLastRecommendation(getStoredRecommendation());
-    };
-
-    syncStoredState();
-    window.addEventListener("focus", syncStoredState);
-    return () => window.removeEventListener("focus", syncStoredState);
+    migrateFromLegacySetup();
+    setProjects(getAllProjects());
   }, []);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchData = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
         router.push("/login");
@@ -93,17 +104,19 @@ export default function DashboardPage() {
       }
 
       try {
-        const [statsResponse, sessionsResponse] = await Promise.all([
+        const [statsRes, activeRes] = await Promise.all([
           axios.get(`${apiBaseUrl}/stats/`, {
             headers: { Authorization: `Token ${token}` },
           }),
-          axios.get(`${apiBaseUrl}/`, {
+          axios.get(`${apiBaseUrl}/timer/active/`, {
             headers: { Authorization: `Token ${token}` },
           }),
         ]);
 
-        setStats(statsResponse.data);
-        setSessions(sessionsResponse.data);
+        setStats(statsRes.data);
+        if (activeRes.data.active) {
+          setActiveSession(activeRes.data.session);
+        }
       } catch (requestError) {
         console.error("Error fetching dashboard data", requestError);
         setError("Failed to load dashboard");
@@ -112,119 +125,40 @@ export default function DashboardPage() {
       }
     };
 
-    void fetchDashboardData();
+    void fetchData();
   }, [apiBaseUrl, router]);
 
-  const latestSession = useMemo(() => {
-    if (!sessions.length) return null;
-
-    return [...sessions].sort((a, b) => {
-      const dateDiff =
-        new Date(b.session_date).getTime() - new Date(a.session_date).getTime();
-      if (dateDiff !== 0) return dateDiff;
-      return (b.session_id || 0) - (a.session_id || 0);
-    })[0];
-  }, [sessions]);
-
-  const isFirstTimeUser = useMemo(() => {
-    if (!stats) return false;
-    return (
-      stats.total_sessions === 0 &&
-      !storedSetup &&
-      !sessionSnapshot &&
-      !lastRecommendation
-    );
-  }, [lastRecommendation, sessionSnapshot, stats, storedSetup]);
-
-  const continueCard = useMemo(() => {
-    if (sessionSnapshot?.status === "paused") {
-      return {
-        badge: "Paused Session",
-        title: "Resume exactly where you stopped.",
-        body: sessionSnapshot.description
-          ? `${sessionSnapshot.instrument} · ${sessionSnapshot.description}`
-          : sessionSnapshot.instrument,
-        meta:
-          sessionSnapshot.mediaSource === "audio" && sessionSnapshot.audioFileName
-            ? `Local MP3: ${sessionSnapshot.audioFileName}`
-            : sessionSnapshot.youtubeUrl
-              ? "YouTube source still attached"
-              : "Session timer is paused and ready",
-        buttonLabel: "Resume Paused Session",
-        href: "/practice-timer",
-      };
+  const mostRecentInstrument = useMemo(() => {
+    let latest: InstrumentName | null = null;
+    let latestTime = 0;
+    for (const instrument of INSTRUMENTS) {
+      const project = projects[instrument];
+      if (project?.lastPracticedAt) {
+        const time = new Date(project.lastPracticedAt).getTime();
+        if (time > latestTime) {
+          latestTime = time;
+          latest = instrument;
+        }
+      }
     }
+    return latest;
+  }, [projects]);
 
-    if (sessionSnapshot?.status === "active") {
-      return {
-        badge: "Active Session",
-        title: "Your practice session is already live.",
-        body: sessionSnapshot.description
-          ? `${sessionSnapshot.instrument} · ${sessionSnapshot.description}`
-          : sessionSnapshot.instrument,
-        meta:
-          sessionSnapshot.mediaSource === "audio" && sessionSnapshot.audioFileName
-            ? `Local MP3: ${sessionSnapshot.audioFileName}`
-            : sessionSnapshot.youtubeUrl
-              ? "YouTube source still attached"
-              : "Jump back into the workspace",
-        buttonLabel: "Open Active Session",
-        href: "/practice-timer",
-      };
-    }
-
-    if (storedSetup) {
-      return {
-        badge: "Last Setup",
-        title: "Continue the last setup you built.",
-        body: storedSetup.description
-          ? `${storedSetup.instrument} · ${storedSetup.description}`
-          : storedSetup.instrument || "Saved practice setup",
-        meta:
-          storedSetup.mediaSource === "audio" && storedSetup.audioFileName
-            ? `Last MP3: ${storedSetup.audioFileName} · re-upload to restore the track`
-            : storedSetup.youtubeUrl
-              ? "Saved YouTube source ready to load"
-              : "Setup saved without a media source",
-        buttonLabel: "Continue Last Setup",
-        href:
-          storedSetup.mediaSource === "audio" && storedSetup.audioFileName
-            ? "/practice-timer"
-            : "/practice-timer?resume=1",
-      };
-    }
-
-    if (latestSession) {
-      return {
-        badge: "Last Session",
-        title: "Restart from your most recent session.",
-        body: latestSession.description
-          ? `${latestSession.instrument} · ${latestSession.description}`
-          : latestSession.instrument,
-        meta: latestSession.youtube_url
-          ? `From ${formatDateLabel(latestSession.session_date)} · YouTube source saved`
-          : `From ${formatDateLabel(latestSession.session_date)} · session notes available`,
-        buttonLabel: "Restart From History",
-        href: latestSession.youtube_url ? "/practice-timer?resume=1" : "/practice-timer",
-      };
-    }
-
-    return {
-      badge: "Start Here",
-      title: "Build your first practice flow.",
-      body: "Create one session setup and the dashboard will keep bringing you back to it.",
-      meta: "Add your instrument, choose YouTube or MP3, then press Start Practice.",
-      buttonLabel: "Start First Session",
-      href: "/practice-timer",
-    };
-  }, [latestSession, sessionSnapshot, storedSetup]);
+  const isFirstTime = useMemo(
+    () => Object.keys(projects).length === 0 && stats?.total_sessions === 0,
+    [projects, stats]
+  );
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
-          <p className="mt-4 text-muted-foreground">Loading your dashboard...</p>
+      <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,_#fffdf7_0%,_#fff_38%,_#f8fafc_100%)]">
+        <div className="space-y-4">
+          <div className="mx-auto grid grid-cols-4 gap-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-40 w-32 animate-pulse rounded-[2rem] bg-slate-200" />
+            ))}
+          </div>
+          <p className="text-center text-sm text-slate-500">Loading your practice room...</p>
         </div>
       </div>
     );
@@ -233,15 +167,9 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive">{error}</p>
-        </div>
+        <p className="text-destructive">{error}</p>
       </div>
     );
-  }
-
-  if (!stats) {
-    return null;
   }
 
   return (
@@ -252,322 +180,150 @@ export default function DashboardPage() {
       </div>
 
       <div className="container relative mx-auto p-4 md:p-8">
-        <div className="mx-auto max-w-7xl space-y-8">
-          <section className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
-            <div className="rounded-[2rem] border border-white/60 bg-slate-950 p-8 text-white shadow-[0_35px_100px_-55px_rgba(15,23,42,0.95)]">
-              <div className="inline-flex items-center rounded-full border border-white/12 bg-white/8 px-4 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
-                Your Practice Hub
-              </div>
-              <h1 className="mt-5 text-4xl font-black tracking-tight md:text-6xl">
-                Practice should be easy to restart.
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 md:text-lg">
-                The app should remember your flow, not make you rebuild it.
-                See what state you left things in, jump back into the session,
-                and keep the friction low.
-              </p>
-
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
-                    Session State
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-white">
-                    {sessionSnapshot?.status === "paused"
-                      ? "Paused"
-                      : sessionSnapshot?.status === "active"
-                        ? "Active"
-                        : storedSetup
-                          ? "Saved"
-                          : "Ready"}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-300">
-                    {sessionSnapshot?.status === "paused"
-                      ? "resume anytime"
-                      : sessionSnapshot?.status === "active"
-                        ? "session is live"
-                        : storedSetup
-                          ? "last setup stored"
-                          : "nothing blocking you"}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
-                    Last Setup
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-white">
-                    {storedSetup?.instrument || latestSession?.instrument || "None"}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-300">
-                    {storedSetup?.mediaSource === "audio"
-                      ? "local MP3 workflow"
-                      : storedSetup?.youtubeUrl || latestSession?.youtube_url
-                        ? "YouTube-ready"
-                        : "needs a source"}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
-                    Last Recommendation
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-white">
-                    {lastRecommendation ? "Saved" : "None"}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-300">
-                    {lastRecommendation
-                      ? lastRecommendation.skillLevel
-                      : "generate one when you need direction"}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
-                    This Week
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-white">
-                    {stats.week_hours.toFixed(1)}h
-                  </p>
-                  <p className="mt-1 text-sm text-slate-300">already logged</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/70 bg-white/88 p-6 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)] backdrop-blur">
-              <div className="flex items-start justify-between gap-4">
+        <div className="mx-auto max-w-5xl space-y-8">
+          {/* Active session banner */}
+          {activeSession && (
+            <div
+              role="alert"
+              className="rounded-[2rem] border border-amber-200 bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.18),_transparent_40%),linear-gradient(180deg,_#fffbeb_0%,_#fff7ed_100%)] p-5 shadow-sm"
+            >
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                    Continue Last Session
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+                    Session in Progress
                   </p>
-                  <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
-                    {continueCard.title}
-                  </h2>
-                </div>
-                {sessionSnapshot?.status === "paused" ? (
-                  <PauseCircle className="h-8 w-8 text-amber-700" />
-                ) : (
-                  <PlayCircle className="h-8 w-8 text-amber-700" />
-                )}
-              </div>
-
-              <div className="mt-6 rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
-                <div className="inline-flex items-center rounded-full bg-slate-950 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
-                  {continueCard.badge}
-                </div>
-                <p className="mt-4 text-base font-semibold text-slate-900">
-                  {continueCard.body}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {continueCard.meta}
-                </p>
-
-                <div className="mt-5 grid gap-3">
-                  <Button
-                    onClick={() => router.push(continueCard.href)}
-                    className="h-12 w-full rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
-                  >
-                    {continueCard.buttonLabel}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                  {lastRecommendation && (
-                    <Button
-                      onClick={() => router.push("/recommendations")}
-                      variant="secondary"
-                      className="h-11 rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-none hover:bg-slate-50"
-                    >
-                      Review Last Recommendation
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {storedSetup?.mediaSource === "audio" && storedSetup.audioFileName && (
-                <div className="mt-4 rounded-[1.5rem] border border-sky-200 bg-[radial-gradient(circle_at_top,_rgba(125,211,252,0.16),_transparent_40%),linear-gradient(180deg,_#f8fdff_0%,_#eff6ff_100%)] p-4">
-                  <div className="flex items-start gap-3">
-                    <FileAudio className="mt-0.5 h-5 w-5 text-sky-700" />
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Last local track: {storedSetup.audioFileName}
-                      </p>
-                      <p className="mt-1 text-sm text-slate-600">
-                        The setup is saved, but local MP3 files need to be re-uploaded when you come back.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-
-          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <StatsCard
-              title="Total Practice Hours"
-              value={stats.total_hours.toFixed(1)}
-              description="All-time practice time"
-              icon={Clock}
-            />
-            <StatsCard
-              title="This Week"
-              value={`${stats.week_hours.toFixed(1)}h`}
-              description={`${stats.total_sessions} total sessions`}
-              icon={TrendingUp}
-            />
-            <StatsCard
-              title="Current Streak"
-              value={`${stats.current_streak} days`}
-              description={
-                stats.current_streak > 0
-                  ? "Keep it going"
-                  : "Start a new streak today"
-              }
-              icon={Flame}
-            />
-            <StatsCard
-              title="Favorite Instrument"
-              value={stats.favorite_instrument}
-              description="Most practiced"
-              icon={Music}
-            />
-          </section>
-
-          {isFirstTimeUser ? (
-            <section className="rounded-[2rem] border border-white/70 bg-white/88 p-6 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)] backdrop-blur">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                Start Here
-              </p>
-              <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
-                First session? Make one clean pass through the flow.
-              </h2>
-              <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm font-semibold text-slate-900">1. Build the session</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Pick your instrument, add a YouTube link or upload an MP3, and start the session.
+                  <p className="mt-1 text-lg font-bold text-slate-900">
+                    {activeSession.instrument}
+                    {activeSession.is_paused && " (paused)"}
                   </p>
                 </div>
-                <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm font-semibold text-slate-900">2. Save some momentum</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Use the timer, tuner, and media tools so the app has something meaningful to restore next time.
-                  </p>
-                </div>
-                <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm font-semibold text-slate-900">3. Ask for a plan when needed</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Recommendations are there when you want focus, not when you already know what to practice.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Button
                   onClick={() => router.push("/practice-timer")}
                   className="h-11 rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
                 >
-                  Start First Practice Session
-                </Button>
-                <Button
-                  onClick={() => router.push("/recommendations")}
-                  variant="secondary"
-                  className="h-11 rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-none hover:bg-slate-50"
-                >
-                  Generate A First Recommendation
+                  Return to Session
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
-            </section>
-          ) : (
-            <section className="grid gap-6 xl:grid-cols-[1fr_0.92fr]">
-              <div className="rounded-[2rem] border border-white/70 bg-white/88 p-6 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)] backdrop-blur">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                  Quick Actions
-                </p>
-                <div className="mt-5 grid gap-4 md:grid-cols-3">
-                  <button
-                    onClick={() => router.push("/practice-timer")}
-                    className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 text-left transition hover:-translate-y-0.5 hover:bg-white"
-                  >
-                    <p className="text-sm font-semibold text-slate-900">
-                      Practice Session
-                    </p>
-                    <p className="mt-2 text-sm text-slate-600">
-                      Open the all-in-one media workspace.
-                    </p>
-                  </button>
-                  <button
-                    onClick={() => router.push("/recommendations")}
-                    className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 text-left transition hover:-translate-y-0.5 hover:bg-white"
-                  >
-                    <p className="text-sm font-semibold text-slate-900">
-                      Plan The Next Session
-                    </p>
-                    <p className="mt-2 text-sm text-slate-600">
-                      Generate practice ideas before you start.
-                    </p>
-                  </button>
-                  <button
-                    onClick={() => router.push("/profilepage")}
-                    className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 text-left transition hover:-translate-y-0.5 hover:bg-white"
-                  >
-                    <p className="text-sm font-semibold text-slate-900">
-                      Review History
-                    </p>
-                    <p className="mt-2 text-sm text-slate-600">
-                      Dive into charts, sessions, and long-term trends.
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-[2rem] border border-white/70 bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.14),_transparent_38%),linear-gradient(180deg,_#fff_0%,_#fff7ed_100%)] p-6 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)]">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
-                      Last Recommendation
-                    </p>
-                    <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-                      {lastRecommendation
-                        ? "Keep your next plan visible."
-                        : "Use recommendations when you need focus."}
-                    </h2>
-                  </div>
-                  <Sparkles className="h-8 w-8 text-amber-700" />
-                </div>
-
-                {lastRecommendation ? (
-                  <>
-                    <p className="mt-4 text-sm leading-7 text-slate-700">
-                      {trimText(lastRecommendation.recommendation, 170)}
-                    </p>
-                    <div className="mt-5 rounded-[1.5rem] border border-amber-200 bg-white/80 p-5">
-                      <p className="text-sm font-semibold text-slate-900">
-                        {lastRecommendation.instrument} · {lastRecommendation.skillLevel}
-                      </p>
-                      <p className="mt-2 text-sm text-slate-700">
-                        {trimText(lastRecommendation.goals, 110)}
-                      </p>
-                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-amber-700">
-                        Saved {formatDateLabel(lastRecommendation.updatedAt)}
-                      </p>
-                    </div>
-                  </>
-                ) : (
-                  <div className="mt-5 rounded-[1.5rem] border border-amber-200 bg-white/80 p-5">
-                    <p className="text-sm font-semibold text-slate-900">
-                      No saved recommendation yet.
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-700">
-                      The best time to use recommendations is before a short session when you need a clear next move.
-                    </p>
-                  </div>
-                )}
-
-                <Button
-                  onClick={() => router.push("/recommendations")}
-                  className="mt-5 h-11 w-full rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
-                >
-                  {lastRecommendation ? "Open Recommendations" : "Generate Recommendation"}
-                </Button>
-              </div>
-            </section>
+            </div>
           )}
 
+          {/* Header */}
+          <div className="text-center">
+            <h1 className="text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
+              {isFirstTime ? "Your Practice Room" : "Pick up where you left off."}
+            </h1>
+            {isFirstTime && (
+              <p className="mx-auto mt-3 max-w-lg text-base text-slate-600">
+                Everything&apos;s set up. Pick an instrument to get started.
+              </p>
+            )}
+          </div>
+
+          {/* Instrument cards */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {INSTRUMENTS.map((instrument) => {
+              const project = projects[instrument];
+              const config = INSTRUMENT_CONFIG[instrument];
+              const Icon = config.icon;
+              const isMostRecent = instrument === mostRecentInstrument;
+              const isActive =
+                activeSession?.instrument?.toLowerCase() === instrument.toLowerCase();
+
+              return (
+                <a
+                  key={instrument}
+                  href={`/practice-timer?instrument=${instrument}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push(
+                      isActive
+                        ? "/practice-timer"
+                        : `/practice-timer?instrument=${instrument}`
+                    );
+                  }}
+                  className={`group relative rounded-[2rem] border p-5 transition-all hover:-translate-y-1 hover:shadow-[0_20px_80px_-55px_rgba(15,23,42,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 ${config.accentBg} ${config.accentBorder} ${
+                    isMostRecent
+                      ? "shadow-[0_20px_80px_-55px_rgba(15,23,42,0.35)] ring-2 ring-slate-950/10"
+                      : "shadow-sm"
+                  }`}
+                >
+                  {isActive && (
+                    <span className="absolute right-4 top-4 rounded-full bg-amber-500 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                      In Progress
+                    </span>
+                  )}
+
+                  <div className={`inline-flex rounded-2xl p-3 ${config.accentBorder} border bg-white/80`}>
+                    <Icon className={`h-6 w-6 ${config.accentText}`} />
+                  </div>
+
+                  <h2 className="mt-4 text-xl font-black tracking-tight text-slate-950">
+                    {instrument}
+                  </h2>
+
+                  {project ? (
+                    <div className="mt-3 space-y-1">
+                      {project.songTitle && (
+                        <p className="text-sm font-semibold text-slate-800">
+                          {project.songTitle}
+                        </p>
+                      )}
+                      {project.description && (
+                        <p className="text-sm text-slate-600 line-clamp-1">
+                          {project.description}
+                        </p>
+                      )}
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                        {formatRelativeDate(project.lastPracticedAt)}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-sm text-slate-500">
+                      Tap to start your first {instrument.toLowerCase()} session.
+                    </p>
+                  )}
+
+                  <div className="mt-4">
+                    <span className={`inline-flex items-center gap-1 text-sm font-semibold ${config.accentText} group-hover:underline`}>
+                      {project ? "Resume" : "Start"}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+
+          {/* Stats row */}
+          {stats && (
+            <div className="flex flex-wrap items-center justify-center gap-6 rounded-[2rem] border border-white/70 bg-white/80 px-6 py-4 backdrop-blur">
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Clock className="h-4 w-4 text-slate-400" />
+                <span className="font-semibold text-slate-900">{stats.total_hours.toFixed(1)}h</span>
+                total
+              </div>
+              <div className="h-4 w-px bg-slate-200" />
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Flame className="h-4 w-4 text-slate-400" />
+                <span className="font-semibold text-slate-900">{stats.current_streak}</span>
+                day streak
+              </div>
+              <div className="h-4 w-px bg-slate-200" />
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Music className="h-4 w-4 text-slate-400" />
+                Favorite:
+                <span className="font-semibold text-slate-900">{stats.favorite_instrument || "—"}</span>
+              </div>
+              <div className="hidden h-4 w-px bg-slate-200 sm:block" />
+              <button
+                onClick={() => router.push("/profilepage")}
+                className="text-sm font-semibold text-slate-500 hover:text-slate-900 hover:underline"
+              >
+                View history
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
