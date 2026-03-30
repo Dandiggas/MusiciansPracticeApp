@@ -13,11 +13,10 @@ export function MobileNav() {
   const pathname = usePathname();
 
   const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "Profile", href: "/profilepage" },
-    { name: "Practice Session", href: "/practice-timer" },
-    { name: "Recommendations", href: "/recommendations" },
+    { name: "The Shed", href: "/dashboard" },
+    { name: "Studio", href: "/practice-timer" },
+    { name: "AI Tutor", href: "/recommendations" },
+    { name: "Analytics", href: "/profilepage" },
   ];
 
   // Don't show on login/register pages
