@@ -85,7 +85,7 @@ jobs:
       - name: Deploy to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service backend
+        run: railway up --service MusiciansPracticeApp
 
   deploy-frontend:
     name: Deploy Frontend to Railway
@@ -102,4 +102,4 @@ jobs:
       - name: Deploy to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service frontend --directory frontend/next-app
+        run: railway up --service frontend frontend/next-app
