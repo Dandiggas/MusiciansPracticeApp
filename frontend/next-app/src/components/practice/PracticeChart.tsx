@@ -77,14 +77,14 @@ export default function PracticeChart({ sessions }: PracticeChartProps) {
         label: "Session Length",
         data: chartState.durations,
         backgroundColor: [
-          "rgba(245, 158, 11, 0.92)",
-          "rgba(249, 115, 22, 0.88)",
-          "rgba(234, 179, 8, 0.85)",
-          "rgba(14, 165, 233, 0.72)",
-          "rgba(56, 189, 248, 0.74)",
-          "rgba(245, 158, 11, 0.84)",
-          "rgba(249, 115, 22, 0.9)",
-          "rgba(234, 179, 8, 0.82)",
+          "rgba(186, 158, 255, 0.92)",
+          "rgba(132, 85, 239, 0.88)",
+          "rgba(110, 59, 215, 0.85)",
+          "rgba(155, 255, 206, 0.72)",
+          "rgba(88, 231, 171, 0.74)",
+          "rgba(186, 158, 255, 0.84)",
+          "rgba(132, 85, 239, 0.9)",
+          "rgba(110, 59, 215, 0.82)",
         ],
         borderRadius: {
           topLeft: 24,
@@ -97,7 +97,7 @@ export default function PracticeChart({ sessions }: PracticeChartProps) {
         categoryPercentage: 0.72,
         barPercentage: 0.72,
         clip: 8,
-        hoverBackgroundColor: "#0f172a",
+        hoverBackgroundColor: "#ba9eff",
       },
     ],
   };
@@ -122,9 +122,9 @@ export default function PracticeChart({ sessions }: PracticeChartProps) {
         display: false,
       },
       tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.94)",
+        backgroundColor: "rgba(20, 31, 56, 0.95)",
         titleColor: "#fff",
-        bodyColor: "#e2e8f0",
+        bodyColor: "#a3aac4",
         displayColors: false,
         padding: 14,
         callbacks: {
@@ -154,7 +154,7 @@ export default function PracticeChart({ sessions }: PracticeChartProps) {
           display: false,
         },
         ticks: {
-          color: "#64748b",
+          color: "#a3aac4",
           maxRotation: 0,
           autoSkip: true,
           padding: 12,
@@ -171,11 +171,11 @@ export default function PracticeChart({ sessions }: PracticeChartProps) {
           display: false,
         },
         grid: {
-          color: "rgba(148, 163, 184, 0.16)",
+          color: "rgba(163, 170, 196, 0.1)",
           drawTicks: false,
         },
         ticks: {
-          color: "#64748b",
+          color: "#a3aac4",
           callback: (value) => `${value}m`,
           padding: 8,
         },
@@ -184,17 +184,17 @@ export default function PracticeChart({ sessions }: PracticeChartProps) {
   };
 
   return (
-    <div className="h-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(248,250,252,0.96))] p-4">
+    <div className="h-full overflow-hidden rounded-[1.5rem] border border-border bg-secondary p-4">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Timeline
           </p>
-          <h3 className="mt-1 text-lg font-bold text-slate-950">
+          <h3 className="mt-1 text-lg font-bold text-foreground">
             Recent sessions
           </h3>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-muted-foreground">
           {chartState.items.length} session{chartState.items.length === 1 ? "" : "s"} shown
         </p>
       </div>
