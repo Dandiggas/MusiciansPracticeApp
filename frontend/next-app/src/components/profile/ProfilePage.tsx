@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 import PracticeChart from "../practice/PracticeChart";
 import LogoutButton from "../practice/LogoutButton";
 import { PracticeCalendarHeatmap } from "../charts/CalendarHeatmap";
@@ -27,6 +28,10 @@ const ProfilePage = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [instrumentFilter, setInstrumentFilter] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
   const apiBaseUrl =
@@ -73,6 +78,42 @@ const ProfilePage = () => {
       return (b.session_id || 0) - (a.session_id || 0);
     })[0];
   }, [sessions]);
+
+  const uniqueInstruments = useMemo(() => {
+    const instruments = new Set(sessions.map((s) => s.instrument));
+    return Array.from(instruments).sort();
+  }, [sessions]);
+
+  const filteredSessions = useMemo(() => {
+    return [...sessions]
+      .filter((session) => {
+        if (instrumentFilter !== "all" && session.instrument !== instrumentFilter) return false;
+        if (dateFrom && session.session_date < dateFrom) return false;
+        if (dateTo && session.session_date > dateTo) return false;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const matchesInstrument = session.instrument.toLowerCase().includes(q);
+          const matchesDescription = session.description?.toLowerCase().includes(q);
+          const matchesId = String(session.display_id ?? session.session_id).includes(q);
+          if (!matchesInstrument && !matchesDescription && !matchesId) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const dateDiff = new Date(b.session_date).getTime() - new Date(a.session_date).getTime();
+        if (dateDiff !== 0) return dateDiff;
+        return (b.session_id || 0) - (a.session_id || 0);
+      });
+  }, [sessions, instrumentFilter, dateFrom, dateTo, searchQuery]);
+
+  const clearFilters = useCallback(() => {
+    setInstrumentFilter("all");
+    setDateFrom("");
+    setDateTo("");
+    setSearchQuery("");
+  }, []);
+
+  const hasActiveFilters = instrumentFilter !== "all" || dateFrom || dateTo || searchQuery;
 
   if (isLoading) {
     return (
@@ -288,20 +329,97 @@ const ProfilePage = () => {
               </Button>
             </div>
 
+            {/* Filters */}
+            {sessions.length > 0 && (
+              <div className="mt-6 space-y-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant={instrumentFilter === "all" ? "default" : "secondary"}
+                    size="sm"
+                    className="rounded-lg text-xs"
+                    onClick={() => setInstrumentFilter("all")}
+                  >
+                    All Instruments
+                  </Button>
+                  {uniqueInstruments.map((inst) => (
+                    <Button
+                      key={inst}
+                      variant={instrumentFilter === inst ? "default" : "secondary"}
+                      size="sm"
+                      className="rounded-lg text-xs"
+                      onClick={() => setInstrumentFilter(inst)}
+                    >
+                      {inst}
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-end gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                      From
+                    </label>
+                    <Input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      className="h-9 w-40 rounded-lg bg-secondary border border-border text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                      To
+                    </label>
+                    <Input
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      className="h-9 w-40 rounded-lg bg-secondary border border-border text-sm"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-[200px] space-y-1">
+                    <label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                      Search
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Search by instrument, description, or session #"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="h-9 rounded-lg bg-secondary border border-border text-sm"
+                    />
+                  </div>
+                  {hasActiveFilters && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="rounded-lg text-xs"
+                      onClick={clearFilters}
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
+
+                {hasActiveFilters && (
+                  <p className="text-sm text-muted-foreground">
+                    Showing {filteredSessions.length} of {sessions.length} sessions
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="mt-6 grid gap-4">
               {sessions.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border bg-secondary p-8 text-center text-muted-foreground">
                   No sessions yet. Start your first practice session and your history will show up here.
                 </div>
+              ) : filteredSessions.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-border bg-secondary p-8 text-center text-muted-foreground">
+                  No sessions match your filters.
+                </div>
               ) : (
-                [...sessions]
-                  .sort((a, b) => {
-                    const dateDiff =
-                      new Date(b.session_date).getTime() - new Date(a.session_date).getTime();
-                    if (dateDiff !== 0) return dateDiff;
-                    return (b.session_id || 0) - (a.session_id || 0);
-                  })
-                  .map((session) => (
+                filteredSessions.map((session) => (
                     <div
                       key={session.session_id}
                       className="grid gap-4 rounded-xl border border-border bg-secondary p-5 transition hover:bg-secondary/80 md:grid-cols-[110px_1fr_120px_140px]"
