@@ -79,7 +79,7 @@ export function PracticeCalendarHeatmap({
         }
         .react-calendar-heatmap text {
           font-size: 10px;
-          fill: #64748b;
+          fill: #a3aac4;
           font-weight: 600;
         }
         .react-calendar-heatmap rect {
@@ -88,54 +88,54 @@ export function PracticeCalendarHeatmap({
           shape-rendering: geometricPrecision;
         }
         .react-calendar-heatmap .color-empty {
-          fill: #e8edf4;
+          fill: #1f2b49;
         }
         .react-calendar-heatmap .color-scale-1 {
-          fill: #fde7b0;
+          fill: #3b2a6e;
         }
         .react-calendar-heatmap .color-scale-2 {
-          fill: #f9c86f;
+          fill: #6e3bd7;
         }
         .react-calendar-heatmap .color-scale-3 {
-          fill: #f59e0b;
+          fill: #8455ef;
         }
         .react-calendar-heatmap .color-scale-4 {
-          fill: #c96b11;
+          fill: #ba9eff;
         }
         .react-calendar-heatmap rect:hover {
-          stroke: #0f172a;
+          stroke: #ba9eff;
           stroke-width: 1.5px;
         }
       `}</style>
 
       <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Consistency
           </p>
-          <h3 className="mt-1 text-lg font-bold text-slate-950">
+          <h3 className="mt-1 text-lg font-bold text-foreground">
             Practice rhythm over the last year
           </h3>
         </div>
         <div className="flex gap-3">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+          <div className="rounded-2xl border border-border bg-secondary px-4 py-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               Active Days
             </p>
-            <p className="mt-1 text-lg font-black text-slate-950">{summary.activeDays}</p>
+            <p className="mt-1 text-lg font-black text-foreground">{summary.activeDays}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+          <div className="rounded-2xl border border-border bg-secondary px-4 py-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               Total Time
             </p>
-            <p className="mt-1 text-lg font-black text-slate-950">
+            <p className="mt-1 text-lg font-black text-foreground">
               {Math.round(summary.totalMinutes / 60)}h
             </p>
           </div>
         </div>
       </div>
 
-      <div className="rounded-[1.5rem] border border-slate-200 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(248,250,252,0.96))] p-4">
+      <div className="rounded-[1.5rem] border border-border bg-secondary p-4">
         <CalendarHeatmap
           startDate={startDate}
           endDate={today}
@@ -156,14 +156,14 @@ export function PracticeCalendarHeatmap({
           showWeekdayLabels
         />
 
-        <div className="mt-5 flex items-center gap-3 text-xs font-medium text-slate-500">
+        <div className="mt-5 flex items-center gap-3 text-xs font-medium text-muted-foreground">
           <span>Light</span>
           <div className="flex gap-1">
-            <div className="h-3 w-3 rounded-[3px] bg-[#e8edf4]" />
-            <div className="h-3 w-3 rounded-[3px] bg-[#fde7b0]" />
-            <div className="h-3 w-3 rounded-[3px] bg-[#f9c86f]" />
-            <div className="h-3 w-3 rounded-[3px] bg-[#f59e0b]" />
-            <div className="h-3 w-3 rounded-[3px] bg-[#c96b11]" />
+            <div className="h-3 w-3 rounded-[3px] bg-[#1f2b49]" />
+            <div className="h-3 w-3 rounded-[3px] bg-[#3b2a6e]" />
+            <div className="h-3 w-3 rounded-[3px] bg-[#6e3bd7]" />
+            <div className="h-3 w-3 rounded-[3px] bg-[#8455ef]" />
+            <div className="h-3 w-3 rounded-[3px] bg-[#ba9eff]" />
           </div>
           <span>Deep</span>
         </div>
