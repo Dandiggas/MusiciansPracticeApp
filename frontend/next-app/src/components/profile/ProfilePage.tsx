@@ -76,7 +76,7 @@ const ProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
           <p className="mt-4 text-muted-foreground">Loading your history...</p>
@@ -87,7 +87,7 @@ const ProfilePage = () => {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <p className="text-destructive">Error: {error}</p>
         </div>
@@ -98,94 +98,89 @@ const ProfilePage = () => {
   const token = localStorage.getItem("token") || "";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.16),_transparent_28%),radial-gradient(circle_at_84%_18%,_rgba(14,165,233,0.14),_transparent_22%),linear-gradient(180deg,_#fffdf7_0%,_#fff_38%,_#f8fafc_100%)]">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 top-12 h-64 w-64 rounded-full bg-amber-200/25 blur-3xl" />
-        <div className="absolute right-0 top-16 h-80 w-80 rounded-full bg-sky-200/20 blur-3xl" />
-      </div>
-
+    <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="container relative mx-auto p-4 md:p-8">
         <div className="mx-auto max-w-7xl space-y-8">
           <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-[2rem] border border-white/60 bg-slate-950 p-8 text-white shadow-[0_35px_100px_-55px_rgba(15,23,42,0.95)]">
-              <div className="inline-flex items-center rounded-full border border-white/12 bg-white/8 px-4 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
+            <div className="rounded-xl bg-card p-8 text-card-foreground shadow-lg">
+              <div className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                 Practice History
               </div>
-              <h1 className="mt-5 text-4xl font-black tracking-tight md:text-6xl">
+              <h1 className="mt-5 text-4xl font-black tracking-tight text-foreground md:text-6xl">
                 Welcome back, {username}.
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 md:text-lg">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
                 Review your recent work, spot your momentum, and jump back into
                 the next session without losing context.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
+                <div className="rounded-xl bg-secondary p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                     Sessions
                   </p>
-                  <p className="mt-2 text-2xl font-black text-white">
+                  <p className="mt-2 text-2xl font-black text-foreground">
                     {sessions.length}
                   </p>
-                  <p className="mt-1 text-sm text-slate-300">recorded so far</p>
+                  <p className="mt-1 text-sm text-muted-foreground">recorded so far</p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
+                <div className="rounded-xl bg-secondary p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                     Latest
                   </p>
-                  <p className="mt-2 text-2xl font-black text-white">
+                  <p className="mt-2 text-2xl font-black text-foreground">
                     {latestSession?.instrument || "None"}
                   </p>
-                  <p className="mt-1 text-sm text-slate-300">most recent focus</p>
+                  <p className="mt-1 text-sm text-muted-foreground">most recent focus</p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
+                <div className="rounded-xl bg-secondary p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                     Workflow
                   </p>
-                  <p className="mt-2 text-2xl font-black text-white">Resume</p>
-                  <p className="mt-1 text-sm text-slate-300">from the dashboard</p>
+                  <p className="mt-2 text-2xl font-black text-foreground">Resume</p>
+                  <p className="mt-1 text-sm text-muted-foreground">from the dashboard</p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/70 bg-white/86 p-6 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)] backdrop-blur">
+            <div className="rounded-xl bg-card p-6 text-card-foreground shadow-lg">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                     Next Move
                   </p>
-                  <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+                  <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
                     Continue from your latest work
                   </h2>
                 </div>
-                <PlayCircle className="h-8 w-8 text-amber-700" />
+                <PlayCircle className="h-8 w-8 text-primary" />
               </div>
 
-              <div className="mt-6 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
+              <div className="mt-6 rounded-xl border border-border bg-secondary p-5">
                 {latestSession ? (
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">
+                      <p className="text-sm font-semibold text-foreground">
                         {latestSession.instrument}
                         {latestSession.description
                           ? ` · ${latestSession.description}`
                           : ""}
                       </p>
-                      <p className="mt-1 text-sm text-slate-600">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         Session #{latestSession.display_id ?? latestSession.session_id} on{" "}
                         {latestSession.session_date}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       {latestSession.youtube_url ? (
                         <>
-                          <Youtube className="h-4 w-4 text-red-500" />
+                          <Youtube className="h-4 w-4 text-destructive" />
                           YouTube source saved in that session
                         </>
                       ) : (
                         <>
-                          <History className="h-4 w-4 text-slate-500" />
+                          <History className="h-4 w-4 text-muted-foreground" />
                           Session notes and setup available to reuse
                         </>
                       )}
@@ -194,7 +189,7 @@ const ProfilePage = () => {
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Button
                         onClick={() => router.push("/dashboard")}
-                        className="h-11 rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
+                        className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
                       >
                         Continue From Dashboard
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -202,7 +197,7 @@ const ProfilePage = () => {
                       <Button
                         onClick={() => router.push("/practice-timer")}
                         variant="secondary"
-                        className="h-11 rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-none hover:bg-slate-50"
+                        className="h-11 rounded-lg bg-secondary text-secondary-foreground shadow-none hover:opacity-80"
                       >
                         Open Practice Session
                       </Button>
@@ -210,13 +205,13 @@ const ProfilePage = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-muted-foreground">
                       No history yet. Start a session and this page will become
                       your review and restart space.
                     </p>
                     <Button
                       onClick={() => router.push("/practice-timer")}
-                      className="h-11 w-full rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
+                      className="h-11 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
                     >
                       Start First Practice Session
                     </Button>
@@ -231,9 +226,9 @@ const ProfilePage = () => {
           </section>
 
           <section className="grid gap-6">
-            <Card className="border-white/70 bg-white/86 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)] backdrop-blur">
+            <Card className="rounded-xl border-border bg-card text-card-foreground shadow-lg">
               <CardHeader>
-                <CardTitle className="text-xl text-slate-950">
+                <CardTitle className="text-xl text-foreground">
                   Practice Rhythm
                 </CardTitle>
               </CardHeader>
@@ -243,9 +238,9 @@ const ProfilePage = () => {
             </Card>
 
             <div className="grid gap-6 md:grid-cols-2">
-              <Card className="border-white/70 bg-white/86 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)] backdrop-blur">
+              <Card className="rounded-xl border-border bg-card text-card-foreground shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-xl text-slate-950">
+                  <CardTitle className="text-xl text-foreground">
                     Time Over Sessions
                   </CardTitle>
                 </CardHeader>
@@ -255,16 +250,16 @@ const ProfilePage = () => {
                       <PracticeChart sessions={sessions} />
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-muted-foreground">
                       No chart data yet. Log a few sessions and this view will come alive.
                     </p>
                   )}
                 </CardContent>
               </Card>
 
-              <Card className="border-white/70 bg-white/86 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)] backdrop-blur">
+              <Card className="rounded-xl border-border bg-card text-card-foreground shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-xl text-slate-950">
+                  <CardTitle className="text-xl text-foreground">
                     Instrument Mix
                   </CardTitle>
                 </CardHeader>
@@ -275,19 +270,19 @@ const ProfilePage = () => {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-white/70 bg-white/86 p-6 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.4)] backdrop-blur">
+          <section className="rounded-xl bg-card p-6 text-card-foreground shadow-lg">
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                   Session Archive
                 </p>
-                <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
                   Your recorded sessions
                 </h2>
               </div>
               <Button
                 onClick={() => router.push("/practice-timer")}
-                className="h-11 rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
+                className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
               >
                 Start Another Session
               </Button>
@@ -295,7 +290,7 @@ const ProfilePage = () => {
 
             <div className="mt-6 grid gap-4">
               {sessions.length === 0 ? (
-                <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600">
+                <div className="rounded-xl border border-dashed border-border bg-secondary p-8 text-center text-muted-foreground">
                   No sessions yet. Start your first practice session and your history will show up here.
                 </div>
               ) : (
@@ -309,32 +304,32 @@ const ProfilePage = () => {
                   .map((session) => (
                     <div
                       key={session.session_id}
-                      className="grid gap-4 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 transition hover:bg-white md:grid-cols-[110px_1fr_120px_140px]"
+                      className="grid gap-4 rounded-xl border border-border bg-secondary p-5 transition hover:bg-secondary/80 md:grid-cols-[110px_1fr_120px_140px]"
                     >
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                           Session
                         </p>
-                        <p className="mt-2 text-2xl font-black text-slate-950">
+                        <p className="mt-2 text-2xl font-black text-foreground">
                           #{session.display_id ?? session.session_id}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-foreground">
                           {session.instrument}
                         </p>
-                        <p className="mt-1 text-sm text-slate-600">
+                        <p className="mt-1 text-sm text-muted-foreground">
                           {session.description || "No description recorded"}
                         </p>
-                        <p className="mt-2 text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                           {session.session_date}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                           Duration
                         </p>
-                        <p className="mt-2 font-mono text-sm font-semibold text-slate-900">
+                        <p className="mt-2 font-mono text-sm font-semibold text-foreground">
                           {session.duration}
                         </p>
                       </div>
@@ -344,13 +339,13 @@ const ProfilePage = () => {
                             href={session.youtube_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+                            className="inline-flex items-center rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary/80"
                           >
-                            <Youtube className="mr-2 h-4 w-4 text-red-500" />
+                            <Youtube className="mr-2 h-4 w-4 text-destructive" />
                             View Source
                           </a>
                         ) : (
-                          <span className="text-sm text-slate-500">No video saved</span>
+                          <span className="text-sm text-muted-foreground">No video saved</span>
                         )}
                       </div>
                     </div>
