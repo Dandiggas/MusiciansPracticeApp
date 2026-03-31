@@ -1,0 +1,5 @@
+[variables]
+NODE_OPTIONS = "--max-old-space-size=2048"
+
+[start]
+cmd = "node .next/standalone/server.js"
