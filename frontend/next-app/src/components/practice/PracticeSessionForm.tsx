@@ -42,6 +42,7 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
   useEffect(() => {
     fetchSessions();
     fetchUserDetails();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchSessions = async () => {
@@ -52,7 +53,7 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
           headers: { Authorization: `Token ${token}` }
         });
         setAllSessions(response.data);
-      } catch (error) {
+      } catch {
         setError('Failed to fetch sessions');
       }
     }
@@ -69,7 +70,7 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
           ...currentFormData,
           user: response.data.id
         }));
-      } catch (error) {
+      } catch {
         setError('Failed to fetch user details');
       }
     }
@@ -168,7 +169,7 @@ const PracticeSessionForm: React.FC<PracticeSessionFormProps> = ({ practiceSessi
         setPracticeSessions(prev => prev.filter(s => s.session_id !== selectedSessionIdForDeletion));
         setSelectedSessionIdForDeletion('');
         window.location.reload();
-      } catch (error) {
+      } catch {
         setError('Failed to delete the session');
       } finally {
         setIsSubmitting(false);

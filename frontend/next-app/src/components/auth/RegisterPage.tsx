@@ -32,7 +32,7 @@ const RegisterPage = () => {
   const router = useRouter();
 
   const validate = () => {
-    let tempErrors: FormErrors = {};
+    const tempErrors: FormErrors = {};
     tempErrors.username = formData.username ? "" : "Username is required.";
     tempErrors.email = formData.email.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i) ? "" : "Email is not valid.";
     tempErrors.password1 = formData.password1.length > 5 ? "" : "Password must be at least 6 characters.";
@@ -59,7 +59,7 @@ const RegisterPage = () => {
       } catch (error) {
         console.error('Registration error', error);
         if (axios.isAxiosError(error)) {
-          const axiosError = error as AxiosError<any>;
+          const axiosError = error as AxiosError<Record<string, string>>;
           if (axiosError.response?.data) {
             setErrors(axiosError.response.data);
           }
