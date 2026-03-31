@@ -22,8 +22,6 @@ interface CalendarHeatmapProps {
   apiBaseUrl: string;
 }
 
-declare module "react-calendar-heatmap";
-
 export function PracticeCalendarHeatmap({
   token,
   apiBaseUrl,
@@ -140,19 +138,19 @@ export function PracticeCalendarHeatmap({
           startDate={startDate}
           endDate={today}
           values={data}
-          classForValue={(value: HeatmapValue | undefined) => {
-            if (!value || value.count === 0) return "color-empty";
+          classForValue={(value) => {
+            if (!value || !value.count) return "color-empty";
             if (value.count < 20) return "color-scale-1";
             if (value.count < 45) return "color-scale-2";
             if (value.count < 75) return "color-scale-3";
             return "color-scale-4";
           }}
-          tooltipDataAttrs={(value?: HeatmapValue) => {
+          tooltipDataAttrs={((value: { date?: string; count?: number }) => {
             if (!value?.date) return {};
             return {
               "data-tip": `${format(new Date(value.date), "MMM d, yyyy")}: ${value.count || 0} minutes`,
             };
-          }}
+          }) as never}
           showWeekdayLabels
         />
 
