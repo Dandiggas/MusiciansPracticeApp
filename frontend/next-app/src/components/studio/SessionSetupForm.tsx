@@ -29,6 +29,9 @@ interface SessionSetupFormProps {
   onStart: () => void;
 }
 
+const inputClass =
+  "h-11 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
 export default function SessionSetupForm({
   instrument,
   songTitle,
@@ -65,7 +68,7 @@ export default function SessionSetupForm({
             value={instrument}
             onChange={(e) => onInstrumentChange(e.target.value)}
             required
-            className="flex h-11 w-full rounded-lg bg-secondary px-4 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className={`flex w-full px-4 text-sm ${inputClass}`}
           >
             <option value="">Select an instrument</option>
             {INSTRUMENTS.map((inst) => (
@@ -82,7 +85,7 @@ export default function SessionSetupForm({
             value={songTitle}
             onChange={(e) => onSongTitleChange(e.target.value)}
             placeholder="e.g., All The Things You Are"
-            className="h-11 rounded-lg bg-secondary border-0"
+            className={inputClass}
           />
         </div>
       </div>
@@ -96,7 +99,7 @@ export default function SessionSetupForm({
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           placeholder="e.g., Chord melody arrangement"
-          className="h-11 rounded-lg bg-secondary border-0"
+          className={inputClass}
         />
       </div>
 
@@ -110,7 +113,7 @@ export default function SessionSetupForm({
           onChange={(e) => onNotesChange(e.target.value)}
           placeholder="What are you focusing on this session?"
           rows={2}
-          className="flex w-full rounded-lg bg-secondary px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+          className="flex w-full rounded-lg bg-secondary border border-border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
         />
       </div>
 
@@ -147,7 +150,7 @@ export default function SessionSetupForm({
             value={youtubeUrl}
             onChange={(e) => onYoutubeUrlChange(e.target.value)}
             placeholder="https://www.youtube.com/watch?v=..."
-            className="h-11 rounded-lg bg-secondary border-0"
+            className={inputClass}
           />
         ) : (
           <div className="space-y-2">
