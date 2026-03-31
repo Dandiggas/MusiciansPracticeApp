@@ -70,18 +70,19 @@ const RegisterPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm bg-card text-card-foreground rounded-xl border border-border">
         <CardHeader>
-          <CardTitle className="text-2xl">Register</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl text-foreground">Join The Shed</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Create a new account to get started.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground" htmlFor="username">Username</Label>
               <Input
+                className="bg-secondary border border-border rounded-lg"
                 id="username"
                 type="text"
                 name="username"
@@ -97,8 +98,9 @@ const RegisterPage = () => {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground" htmlFor="email">Email</Label>
               <Input
+                className="bg-secondary border border-border rounded-lg"
                 id="email"
                 type="text"
                 name="email"
@@ -114,8 +116,9 @@ const RegisterPage = () => {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password1">Password</Label>
+              <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground" htmlFor="password1">Password</Label>
               <Input
+                className="bg-secondary border border-border rounded-lg"
                 id="password1"
                 type="password"
                 name="password1"
@@ -131,8 +134,9 @@ const RegisterPage = () => {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password2">Confirm Password</Label>
+              <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground" htmlFor="password2">Confirm Password</Label>
               <Input
+                className="bg-secondary border border-border rounded-lg"
                 id="password2"
                 type="password"
                 name="password2"
@@ -147,9 +151,15 @@ const RegisterPage = () => {
                 </div>
               )}
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground rounded-lg">
               Register
             </Button>
+            <p className="text-center text-sm text-muted-foreground mt-4">
+              Already have an account?{" "}
+              <a href="/login" className="text-primary hover:underline">
+                Sign in
+              </a>
+            </p>
           </form>
         </CardContent>
       </Card>

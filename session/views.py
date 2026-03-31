@@ -3,7 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import Throttled
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from .models import Session, Tag
 from .permissions import IsAdminOrOwner
 from .serializers import SessionSerializer, TagSerializer
@@ -12,6 +14,17 @@ from django.utils import timezone
 from datetime import timedelta, datetime
 from openai import OpenAI
 import os
+import json
+import hashlib
+import logging
+from .throttles import RecommendationRateThrottle
+
+
+logger = logging.getLogger(__name__)
+RECOMMENDATION_GOALS_MAX_CHARS = int(os.getenv("OPENAI_RECOMMENDATIONS_GOALS_MAX_CHARS", "240"))
+RECOMMENDATION_CACHE_TTL = int(os.getenv("OPENAI_RECOMMENDATIONS_CACHE_TTL_SECONDS", "3600"))
+RECOMMENDATION_MAX_TOKENS = int(os.getenv("OPENAI_RECOMMENDATIONS_MAX_TOKENS", "350"))
+RECOMMENDATION_TIMEOUT_SECONDS = float(os.getenv("OPENAI_RECOMMENDATIONS_TIMEOUT_SECONDS", "20"))
 
 class SessionList(generics.ListCreateAPIView):
     permission_classes = (IsAdminOrOwner,)
@@ -37,14 +50,39 @@ class SessionDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class PracticeRecommendationView(APIView):
     permission_classes = (IsAdminOrOwner,)
+    throttle_classes = [RecommendationRateThrottle]
+
+    def throttled(self, request, wait):
+        retry_message = "Too many recommendation requests. Please wait a bit before generating another one."
+        if wait is not None:
+            retry_message = f"{retry_message} Try again in about {int(wait) + 1} seconds."
+        raise Throttled(detail=retry_message, wait=wait)
+
+    def _build_cache_key(self, user_id, instrument, skill_level, goals):
+        payload = json.dumps(
+            {
+                "user_id": user_id,
+                "instrument": instrument,
+                "skill_level": skill_level,
+                "goals": goals.strip().lower(),
+            },
+            sort_keys=True,
+        )
+        return f"recommendation:{hashlib.sha256(payload.encode('utf-8')).hexdigest()}"
 
     def post(self, request):
         skill_level = request.data.get('skill_level')
         instrument = request.data.get('instrument')
-        goals = request.data.get('goals')
+        goals = (request.data.get('goals') or '').strip()
 
         if not skill_level or not instrument or not goals:
             return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(goals) > RECOMMENDATION_GOALS_MAX_CHARS:
+            return Response(
+                {'error': f'Goals must be {RECOMMENDATION_GOALS_MAX_CHARS} characters or fewer.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         valid_skill_levels = [choice[0] for choice in Session.SKILL_LEVEL_CHOICES]
         if skill_level not in valid_skill_levels:
@@ -54,6 +92,23 @@ class PracticeRecommendationView(APIView):
         if instrument not in valid_instruments:
             return Response({'error': f'Invalid instrument. Must be one of: {", ".join(valid_instruments)}'}, status=status.HTTP_400_BAD_REQUEST)
 
+        cache_key = self._build_cache_key(request.user.id, instrument, skill_level, goals)
+        cached_recommendation = cache.get(cache_key)
+        if cached_recommendation:
+            logger.info(
+                "Recommendation cache hit for user=%s instrument=%s skill_level=%s",
+                request.user.id,
+                instrument,
+                skill_level,
+            )
+            return Response({
+                'recommendation': cached_recommendation,
+                'instrument': instrument,
+                'skill_level': skill_level,
+                'goals': goals,
+                'cached': True,
+            }, status=status.HTTP_200_OK)
+
         try:
             client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
             response = client.chat.completions.create(
@@ -62,20 +117,39 @@ class PracticeRecommendationView(APIView):
                     {'role': 'system', 'content': 'You are an experienced music teacher who provides detailed, actionable practice recommendations.'},
                     {'role': 'user', 'content': f'Generate a practice recommendation for a {skill_level} level {instrument} player who wants to focus on {goals}.'}
                 ],
-                max_tokens=1000,
+                max_tokens=RECOMMENDATION_MAX_TOKENS,
                 temperature=0.7,
+                timeout=RECOMMENDATION_TIMEOUT_SECONDS,
             )
             recommendation = response.choices[0].message.content.strip()
+            cache.set(cache_key, recommendation, timeout=RECOMMENDATION_CACHE_TTL)
+            logger.info(
+                "Recommendation generated for user=%s instrument=%s skill_level=%s cached_for=%ss",
+                request.user.id,
+                instrument,
+                skill_level,
+                RECOMMENDATION_CACHE_TTL,
+            )
 
             return Response({
                 'recommendation': recommendation,
                 'instrument': instrument,
                 'skill_level': skill_level,
                 'goals': goals,
+                'cached': False,
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.exception(
+                "Recommendation generation failed for user=%s instrument=%s skill_level=%s",
+                request.user.id,
+                instrument,
+                skill_level,
+            )
+            return Response(
+                {'error': 'Recommendation service is temporarily unavailable. Please try again shortly.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 # Tag CRUD Views

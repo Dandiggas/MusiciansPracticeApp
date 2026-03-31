@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.core.cache import cache
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -9,6 +10,7 @@ from datetime import timedelta, date, datetime
 from unittest.mock import patch, MagicMock
 
 from .models import Session, Tag
+from .throttles import RecommendationRateThrottle
 
 
 class SessionModelTests(TestCase):
@@ -584,6 +586,7 @@ class RecommendationAPITests(APITestCase):
     """Test cases for Practice Recommendation endpoint"""
 
     def setUp(self):
+        cache.clear()
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             username="testuser",
@@ -599,9 +602,19 @@ class RecommendationAPITests(APITestCase):
             'goals': 'improve finger picking technique'
         }
 
+    def tearDown(self):
+        cache.clear()
+
     def test_missing_fields_returns_400(self):
         """Test that missing required fields returns 400"""
         response = self.client.post(self.url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error', response.data)
+
+    def test_goals_over_limit_returns_400(self):
+        """Test that overly long goals are rejected before calling OpenAI"""
+        data = {**self.valid_data, 'goals': 'a' * 241}
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('error', response.data)
 
@@ -636,6 +649,27 @@ class RecommendationAPITests(APITestCase):
         self.assertEqual(response.data['instrument'], 'guitar')
         self.assertEqual(response.data['skill_level'], 'beginner')
         self.assertEqual(response.data['goals'], 'improve finger picking technique')
+        self.assertFalse(response.data['cached'])
+        mock_client.chat.completions.create.assert_called_once()
+
+    @patch('session.views.OpenAI')
+    def test_identical_recommendation_requests_are_cached(self, mock_openai_cls):
+        """Test that identical recommendation requests reuse the cached result"""
+        mock_client = MagicMock()
+        mock_openai_cls.return_value = mock_client
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = 'Practice scales for 15 minutes daily.'
+        mock_client.chat.completions.create.return_value = mock_response
+
+        first_response = self.client.post(self.url, self.valid_data, format='json')
+        second_response = self.client.post(self.url, self.valid_data, format='json')
+
+        self.assertEqual(first_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(second_response.status_code, status.HTTP_200_OK)
+        self.assertFalse(first_response.data['cached'])
+        self.assertTrue(second_response.data['cached'])
+        mock_client.chat.completions.create.assert_called_once()
 
     def test_unauthenticated_returns_401_or_403(self):
         """Test that unauthenticated requests are rejected"""
@@ -654,3 +688,25 @@ class RecommendationAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn('error', response.data)
+        self.assertEqual(
+            response.data['error'],
+            'Recommendation service is temporarily unavailable. Please try again shortly.'
+        )
+
+    @patch.object(RecommendationRateThrottle, 'get_rate', return_value='1/day')
+    @patch('session.views.OpenAI')
+    def test_recommendations_are_rate_limited(self, mock_openai_cls, _mock_rate):
+        """Test that repeated recommendation requests are throttled"""
+        mock_client = MagicMock()
+        mock_openai_cls.return_value = mock_client
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = 'Practice scales for 15 minutes daily.'
+        mock_client.chat.completions.create.return_value = mock_response
+
+        first_response = self.client.post(self.url, self.valid_data, format='json')
+        second_response = self.client.post(self.url, self.valid_data, format='json')
+
+        self.assertEqual(first_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(second_response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+        self.assertIn('detail', second_response.data)

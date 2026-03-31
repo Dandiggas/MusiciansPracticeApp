@@ -3,11 +3,26 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles, ArrowRight } from "lucide-react";
+import { saveStoredRecommendation } from "@/lib/practice-session-store";
+
+const GOAL_PRESETS = [
+  "Tighten rhythm and timing",
+  "Memorize a song section",
+  "Clean up chord changes",
+  "Improve improvisation ideas",
+];
+const GOALS_MAX_CHARS = 240;
 
 export default function RecommendationsPage() {
   const router = useRouter();
@@ -15,10 +30,12 @@ export default function RecommendationsPage() {
   const [skillLevel, setSkillLevel] = useState("");
   const [goals, setGoals] = useState("");
   const [recommendation, setRecommendation] = useState("");
+  const [isCachedResult, setIsCachedResult] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+  const apiBaseUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,11 +48,18 @@ export default function RecommendationsPage() {
     e.preventDefault();
     setError("");
     setRecommendation("");
+    setIsCachedResult(false);
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/login");
+      return;
+    }
+
+    if (goals.trim().length > GOALS_MAX_CHARS) {
+      setError(`Keep your goal to ${GOALS_MAX_CHARS} characters or fewer.`);
+      setIsLoading(false);
       return;
     }
 
@@ -46,9 +70,25 @@ export default function RecommendationsPage() {
         { headers: { Authorization: `Token ${token}` } }
       );
       setRecommendation(response.data.recommendation);
+      setIsCachedResult(Boolean(response.data.cached));
+      saveStoredRecommendation({
+        instrument,
+        skillLevel,
+        goals: goals.trim(),
+        recommendation: response.data.recommendation,
+        cached: Boolean(response.data.cached),
+      });
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data?.error) {
-        setError(err.response.data.error);
+      if (axios.isAxiosError(err)) {
+        if (typeof err.response?.data?.detail === "string") {
+          setError(err.response.data.detail);
+        } else if (typeof err.response?.data?.error === "string") {
+          setError(err.response.data.error);
+        } else if (err.code === "ECONNABORTED") {
+          setError("The recommendation request timed out. Please try again.");
+        } else {
+          setError("Failed to get recommendation. Please try again.");
+        }
       } else {
         setError("Failed to get recommendation. Please try again.");
       }
@@ -58,105 +98,169 @@ export default function RecommendationsPage() {
   };
 
   const selectClassName =
-    "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+    "flex h-12 w-full rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/40";
 
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-          Practice Recommendations
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Get AI-powered practice suggestions tailored to your skill level and goals
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Get a Recommendation</CardTitle>
-          <CardDescription>
-            Fill in your details and we&apos;ll generate a personalized practice plan
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="instrument">Instrument</Label>
-              <select
-                id="instrument"
-                value={instrument}
-                onChange={(e) => setInstrument(e.target.value)}
-                className={selectClassName}
-                required
-                disabled={isLoading}
-              >
-                <option value="">Select an instrument</option>
-                <option value="guitar">Guitar</option>
-                <option value="piano">Piano</option>
-                <option value="drums">Drums</option>
-                <option value="bass">Bass</option>
-              </select>
+    <div className="min-h-screen bg-background">
+      <div className="container relative mx-auto max-w-6xl p-4 md:p-8">
+        <div className="grid gap-6 lg:grid-cols-[0.96fr_1.04fr]">
+          <div className="rounded-xl border border-border bg-card p-8 text-card-foreground">
+            <div className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+              Session Planning
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="skillLevel">Skill Level</Label>
-              <select
-                id="skillLevel"
-                value={skillLevel}
-                onChange={(e) => setSkillLevel(e.target.value)}
-                className={selectClassName}
-                required
-                disabled={isLoading}
-              >
-                <option value="">Select your level</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="goals">Goals</Label>
-              <Input
-                id="goals"
-                placeholder="e.g., improve finger picking, learn jazz chords..."
-                value={goals}
-                onChange={(e) => setGoals(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
-
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
-
-            <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                "Get Recommendation"
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      {recommendation && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Your Practice Recommendation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">
-              {recommendation}
+            <h1 className="mt-5 text-4xl font-black tracking-tight text-foreground md:text-5xl">
+              Decide what matters before you press play.
+            </h1>
+            <p className="mt-4 text-base leading-7 text-muted-foreground">
+              Recommendations belong before the session starts. Use this page to
+              turn vague intention into a focused plan, then step straight into
+              the practice workspace with a clear target.
             </p>
-          </CardContent>
-        </Card>
-      )}
+
+            <div className="mt-8 space-y-3">
+              {GOAL_PRESETS.map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setGoals(preset)}
+                  className="flex w-full items-center justify-between rounded-lg border border-border bg-secondary px-4 py-3 text-left text-sm text-foreground transition hover:bg-secondary/80"
+                >
+                  <span>{preset}</span>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <Card className="rounded-xl border-border bg-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl text-card-foreground">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Build Your Recommendation
+                </CardTitle>
+                <CardDescription className="text-base text-muted-foreground">
+                  Give the assistant just enough context to shape the next session.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="instrument" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                      Instrument
+                    </Label>
+                    <select
+                      id="instrument"
+                      value={instrument}
+                      onChange={(e) => setInstrument(e.target.value)}
+                      className={selectClassName}
+                      required
+                      disabled={isLoading}
+                    >
+                      <option value="">Select an instrument</option>
+                      <option value="guitar">Guitar</option>
+                      <option value="piano">Piano</option>
+                      <option value="drums">Drums</option>
+                      <option value="bass">Bass</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="skillLevel" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                      Skill Level
+                    </Label>
+                    <select
+                      id="skillLevel"
+                      value={skillLevel}
+                      onChange={(e) => setSkillLevel(e.target.value)}
+                      className={selectClassName}
+                      required
+                      disabled={isLoading}
+                    >
+                      <option value="">Select your level</option>
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="goals" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                      What do you want from this session?
+                    </Label>
+                    <Input
+                      id="goals"
+                      placeholder="e.g., get the bridge cleaner at 70 bpm, improve voicing changes..."
+                      value={goals}
+                      onChange={(e) => setGoals(e.target.value)}
+                      required
+                      disabled={isLoading}
+                      className="h-12 rounded-lg border-border bg-secondary px-4"
+                    />
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">
+                        Short and specific gets better recommendations.
+                      </span>
+                      <span className={goals.length > GOALS_MAX_CHARS ? "font-semibold text-destructive" : "text-muted-foreground"}>
+                        {goals.length}/{GOALS_MAX_CHARS}
+                      </span>
+                    </div>
+                  </div>
+
+                  {error && <p className="text-sm text-destructive">{error}</p>}
+
+                  <p className="text-xs text-muted-foreground">
+                    Identical requests are cached, and recommendation generation is rate-limited to control API spend.
+                  </p>
+
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="h-12 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      "Get Recommendation"
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            {recommendation && (
+              <Card className="rounded-xl border-border bg-card">
+                <CardHeader>
+                  <CardTitle className="text-xl text-card-foreground">
+                    Your Practice Recommendation
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    {isCachedResult
+                      ? "This matched a recent request, so we reused the saved recommendation."
+                      : "Use this as the plan for your next focused session."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="rounded-xl border border-border bg-secondary p-5">
+                    <p className="whitespace-pre-wrap text-sm leading-7 text-foreground">
+                      {recommendation}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => router.push("/practice-timer")}
+                    className="h-11 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                  >
+                    Take This Into Practice Session
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

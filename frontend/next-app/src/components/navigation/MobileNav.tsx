@@ -6,20 +6,17 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import LogoutButton from "@/components/practice/LogoutButton";
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
   const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "Profile", href: "/profilepage" },
-    { name: "Practice Timer", href: "/practice-timer" },
-    { name: "Metronome", href: "/metronome" },
-    { name: "Tuner", href: "/tuner" },
-    { name: "Recommendations", href: "/recommendations" },
-    { name: "YouTube Practice", href: "/youtube-practice" },
+    { name: "The Shed", href: "/dashboard" },
+    { name: "Studio", href: "/practice-timer" },
+    { name: "AI Tutor", href: "/recommendations" },
+    { name: "Analytics", href: "/profilepage" },
   ];
 
   // Don't show on login/register pages
@@ -62,6 +59,10 @@ export function MobileNav() {
                   {item.name}
                 </Link>
               ))}
+              <LogoutButton
+                label="Log Out"
+                className="mt-2 h-11 w-full justify-center rounded-xl border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
+              />
             </div>
           </nav>
         </>
