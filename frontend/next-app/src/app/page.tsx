@@ -1,17 +1,33 @@
-import Link from 'next/link';
-import { Button } from "@/components/ui/button";
+"use client";
+
+import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    router.replace(token ? "/dashboard" : "/login");
+  }, [router]);
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-5xl font-bold text-center my-10">Welcome to the Musician&apos;s Practice App</h1>
-      <div className="flex justify-center items-center gap-4">
-        <Button asChild size="lg">
-          <Link href="/register">Sign Up</Link>
-        </Button>
-        <Button asChild size="lg" variant="secondary">
-          <Link href="/login">Login</Link>
-        </Button>
+    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+      <div className="text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+          The Shed
+        </p>
+        <h1 className="mt-3 text-3xl font-black tracking-tight text-foreground">
+          Opening your workspace...
+        </h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          If nothing happens, head to{" "}
+          <Link href="/login" className="font-semibold text-primary underline underline-offset-4">
+            login
+          </Link>
+          .
+        </p>
       </div>
     </div>
   );

@@ -1,11 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-
-ChartJS.register(ArcElement, Tooltip, Legend);
+import React, { useState, useEffect, useMemo } from "react";
+import axios from "axios";
 
 interface InstrumentData {
   instrument: string;
@@ -19,7 +15,13 @@ interface InstrumentBreakdownProps {
   days?: number;
 }
 
-export function InstrumentBreakdown({ token, apiBaseUrl, days = 30 }: InstrumentBreakdownProps) {
+const COLORS = ["#ba9eff", "#9bffce", "#8455ef", "#58e7ab", "#6e3bd7", "#ff6e84"];
+
+export function InstrumentBreakdown({
+  token,
+  apiBaseUrl,
+  days = 30,
+}: InstrumentBreakdownProps) {
   const [data, setData] = useState<InstrumentData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -27,111 +29,100 @@ export function InstrumentBreakdown({ token, apiBaseUrl, days = 30 }: Instrument
     const fetchInstrumentData = async () => {
       try {
         const response = await axios.get(`${apiBaseUrl}/by-instrument/?days=${days}`, {
-          headers: { 'Authorization': `Token ${token}` }
+          headers: { Authorization: `Token ${token}` },
         });
         setData(response.data);
-      } catch (error) {
-        console.error('Error fetching instrument data', error);
+      } catch (requestError) {
+        console.error("Error fetching instrument data", requestError);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchInstrumentData();
+    void fetchInstrumentData();
   }, [token, apiBaseUrl, days]);
+
+  const maxHours = useMemo(() => {
+    if (!data.length) return 0;
+    return Math.max(...data.map((item) => item.duration_hours));
+  }, [data]);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     );
   }
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-muted-foreground">
+      <div className="flex h-64 items-center justify-center text-muted-foreground">
         No practice data for the selected period
       </div>
     );
   }
 
-  const colors = [
-    '#FF6384',
-    '#36A2EB',
-    '#FFCE56',
-    '#4BC0C0',
-    '#9966FF',
-    '#FF9F40',
-  ];
-
-  const chartData = {
-    labels: data.map(item => item.instrument),
-    datasets: [
-      {
-        label: 'Practice Hours',
-        data: data.map(item => item.duration_hours),
-        backgroundColor: colors.slice(0, data.length),
-        borderColor: colors.slice(0, data.length).map(color => color),
-        borderWidth: 2,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom' as const,
-        labels: {
-          color: 'hsl(var(--foreground))',
-          padding: 15,
-          font: {
-            size: 12,
-          },
-        },
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context: any) {
-            const label = context.label || '';
-            const value = context.parsed || 0;
-            const item = data[context.dataIndex];
-            return [
-              `${label}: ${value.toFixed(1)} hours`,
-              `Sessions: ${item.session_count}`,
-            ];
-          },
-        },
-      },
-    },
-  };
-
   return (
     <div className="w-full">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-2">Practice Distribution</h3>
-        <p className="text-sm text-muted-foreground">
-          Time spent on each instrument (last {days} days)
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Instrument Mix
+          </p>
+          <h3 className="mt-1 text-lg font-bold text-foreground">
+            Where your time went in the last {days} days
+          </h3>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {data.length} instrument{data.length === 1 ? "" : "s"}
         </p>
       </div>
-      <div className="h-64 md:h-80">
-        <Doughnut data={chartData} options={options} />
-      </div>
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-        {data.map((item, index) => (
-          <div key={item.instrument} className="text-center p-3 rounded-lg border">
-            <div
-              className="w-4 h-4 rounded-full mx-auto mb-2"
-              style={{ backgroundColor: colors[index] }}
-            ></div>
-            <p className="font-medium text-sm">{item.instrument}</p>
-            <p className="text-xs text-muted-foreground">
-              {item.duration_hours.toFixed(1)}h ({item.session_count} sessions)
-            </p>
-          </div>
-        ))}
+
+      <div className="rounded-[1.5rem] border border-border bg-secondary p-4">
+        <div className="space-y-4">
+          {data.map((item, index) => {
+            const width = maxHours > 0 ? (item.duration_hours / maxHours) * 100 : 0;
+            const color = COLORS[index % COLORS.length];
+
+            return (
+              <div key={item.instrument} className="rounded-2xl border border-border bg-card p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-3 w-3 rounded-full"
+                        style={{ backgroundColor: color }}
+                      />
+                      <p className="text-sm font-semibold capitalize text-foreground">
+                        {item.instrument}
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {item.session_count} session{item.session_count === 1 ? "" : "s"}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-black text-foreground">
+                      {item.duration_hours.toFixed(1)}h
+                    </p>
+                    <p className="text-xs text-muted-foreground">practice time</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${width}%`,
+                      background: `linear-gradient(90deg, ${color}, ${color}cc)`,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
