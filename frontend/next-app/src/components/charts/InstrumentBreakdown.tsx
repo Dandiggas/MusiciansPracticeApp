@@ -15,7 +15,7 @@ interface InstrumentBreakdownProps {
   days?: number;
 }
 
-const COLORS = ["#f59e0b", "#0f172a", "#14b8a6", "#fb7185", "#38bdf8", "#8b5cf6"];
+const COLORS = ["#ba9eff", "#9bffce", "#8455ef", "#58e7ab", "#6e3bd7", "#ff6e84"];
 
 export function InstrumentBreakdown({
   token,
@@ -67,26 +67,26 @@ export function InstrumentBreakdown({
     <div className="w-full">
       <div className="mb-5 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Instrument Mix
           </p>
-          <h3 className="mt-1 text-lg font-bold text-slate-950">
+          <h3 className="mt-1 text-lg font-bold text-foreground">
             Where your time went in the last {days} days
           </h3>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-muted-foreground">
           {data.length} instrument{data.length === 1 ? "" : "s"}
         </p>
       </div>
 
-      <div className="rounded-[1.5rem] border border-slate-200 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(248,250,252,0.96))] p-4">
+      <div className="rounded-[1.5rem] border border-border bg-secondary p-4">
         <div className="space-y-4">
           {data.map((item, index) => {
             const width = maxHours > 0 ? (item.duration_hours / maxHours) * 100 : 0;
             const color = COLORS[index % COLORS.length];
 
             return (
-              <div key={item.instrument} className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div key={item.instrument} className="rounded-2xl border border-border bg-card p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
@@ -94,23 +94,23 @@ export function InstrumentBreakdown({
                         className="h-3 w-3 rounded-full"
                         style={{ backgroundColor: color }}
                       />
-                      <p className="text-sm font-semibold capitalize text-slate-950">
+                      <p className="text-sm font-semibold capitalize text-foreground">
                         {item.instrument}
                       </p>
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {item.session_count} session{item.session_count === 1 ? "" : "s"}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-black text-slate-950">
+                    <p className="text-lg font-black text-foreground">
                       {item.duration_hours.toFixed(1)}h
                     </p>
-                    <p className="text-xs text-slate-500">practice time</p>
+                    <p className="text-xs text-muted-foreground">practice time</p>
                   </div>
                 </div>
 
-                <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full"
                     style={{
