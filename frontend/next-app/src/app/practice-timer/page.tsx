@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Play, Square, Pause } from "lucide-react";
@@ -41,6 +41,14 @@ interface RecentSession {
 }
 
 export default function PracticeTimerPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" /></div>}>
+      <PracticeTimerContent />
+    </Suspense>
+  );
+}
+
+function PracticeTimerContent() {
   // ─── Core session state ──────────────────────────────────────────────
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
