@@ -100,6 +100,7 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy to Railway
+        working-directory: frontend/next-app
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service frontend frontend/next-app
+        run: railway up --service frontend
