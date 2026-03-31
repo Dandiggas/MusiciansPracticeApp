@@ -2,7 +2,7 @@
 // Replace it with a no-op stub before any modules load.
 export async function register() {
   if (typeof window === "undefined" && typeof globalThis.localStorage !== "undefined") {
-    (globalThis as any).localStorage = {
+    (globalThis as unknown as { localStorage: Storage }).localStorage = {
       getItem: () => null,
       setItem: () => {},
       removeItem: () => {},

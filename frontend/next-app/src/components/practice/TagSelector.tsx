@@ -29,6 +29,7 @@ export function TagSelector({ selectedTags, onTagsChange, apiBaseUrl, token }: T
 
   useEffect(() => {
     fetchTags();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchTags = async () => {
