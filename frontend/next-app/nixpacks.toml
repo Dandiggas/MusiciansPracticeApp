@@ -1,5 +1,6 @@
 [variables]
 NODE_OPTIONS = "--max-old-space-size=2048"
+NPM_CONFIG_PRODUCTION = "false"
 
 [start]
 cmd = "node .next/standalone/server.js"
