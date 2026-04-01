@@ -207,9 +207,12 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
 ).split(",")
 
 # Security settings for production
+# Railway (and similar PaaS) terminates SSL at the proxy level,
+# so we trust the X-Forwarded-Proto header instead of redirecting ourselves.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 if not DEBUG:
-    # Force HTTPS in production (can be disabled for CI testing via env var)
-    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
+    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
