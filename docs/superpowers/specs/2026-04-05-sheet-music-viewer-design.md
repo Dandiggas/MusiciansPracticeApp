@@ -75,8 +75,9 @@ Apply a throttle of 10 uploads per hour per user on the `POST` endpoint. Reuse t
 ## File Storage
 
 - **Development:** Django's default `FileSystemStorage`, files at `MEDIA_ROOT/sheet_music/{user_id}/`
-- **Production:** S3-compatible storage via `django-storages` + `boto3`. Bucket configured via `AWS_STORAGE_BUCKET_NAME` env var. Private ACL — files served via signed URLs with short expiry.
+- **Production:** Same `FileSystemStorage`, backed by a Railway persistent volume mounted at `MEDIA_ROOT`. Survives redeploys, no external services needed.
 - **File naming:** `{user_id}/{uuid4}.pdf` to avoid collisions and hide original filenames in storage.
+- **Serving:** Django serves files directly in development. In production, WhiteNoise handles static files but not media — add a simple view that checks auth and streams the file, or configure nginx. For MVP, Django can serve media directly behind auth since traffic is low.
 
 ## UI: In-Session Widget
 
@@ -182,7 +183,6 @@ When a practice session starts from a Launch Pad project that has a `sheet_music
 
 ### Backend
 - `pikepdf` or `PyPDF2` — PDF page count extraction + validation
-- `django-storages` + `boto3` — S3 file storage in production
 - `hashlib` (stdlib) — SHA256 content hashing
 
 ### Frontend
