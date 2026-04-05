@@ -123,6 +123,8 @@ export interface InstrumentProject {
   notes: string;
   mediaSource: StoredMediaSource;
   audioFileName: string | null;
+  sheetMusicId: number | null;
+  sheetMusicTitle: string | null;
   lastPracticedAt: string;
 }
 
