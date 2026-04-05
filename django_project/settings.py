@@ -163,6 +163,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Media files (user-uploaded content like sheet music PDFs)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.getenv("MEDIA_ROOT", str(BASE_DIR / "media"))
+
 # WhiteNoise configuration for serving static files in production
 STORAGES = {
     "default": {
