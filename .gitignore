@@ -6,3 +6,10 @@ db.sqlite3
 DJANGO_CHEATSHEET.md
 PRODUCTION_SECURITY_SUMMARY.md
 RAILWAY_DEPLOYMENT.md
+.gstack/
+
+# Superpowers brainstorming sessions
+.superpowers/
+
+# User-uploaded media files
+media/
