@@ -318,6 +318,22 @@ export default function DashboardPage() {
                           {project.description}
                         </p>
                       )}
+                      {project.youtubeUrl && (
+                        <p className="text-xs text-muted-foreground truncate">
+                          {project.youtubeUrl}
+                        </p>
+                      )}
+                      {project.mediaSource === "audio" && project.audioFileName && (
+                        <p className="text-xs text-muted-foreground truncate">
+                          {project.audioFileName}
+                        </p>
+                      )}
+                      {project.sheetMusicTitle && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span className="text-primary">♩</span>
+                          {project.sheetMusicTitle}
+                        </p>
+                      )}
                       <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                         {formatRelativeDate(project.lastPracticedAt)}
                       </p>
