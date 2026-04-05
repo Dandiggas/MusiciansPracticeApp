@@ -8,8 +8,11 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from datetime import timedelta, date, datetime
 from unittest.mock import patch, MagicMock
+from io import BytesIO
+from django.core.files.uploadedfile import SimpleUploadedFile
+import pikepdf
 
-from .models import Session, Tag
+from .models import Session, Tag, SheetMusic
 from .throttles import RecommendationRateThrottle
 
 
@@ -710,3 +713,186 @@ class RecommendationAPITests(APITestCase):
         self.assertEqual(first_response.status_code, status.HTTP_200_OK)
         self.assertEqual(second_response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
         self.assertIn('detail', second_response.data)
+
+
+def make_test_pdf(pages=3):
+    """Create a minimal valid PDF with the given number of pages."""
+    buf = BytesIO()
+    pdf = pikepdf.new()
+    for _ in range(pages):
+        pdf.add_blank_page(page_size=(612, 792))
+    pdf.save(buf)
+    buf.seek(0)
+    return buf
+
+
+class SheetMusicModelTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = get_user_model().objects.create_user(
+            username="sheetuser", email="sheet@test.com", password="secret"
+        )
+
+    def test_sheet_music_creation(self):
+        pdf_data = make_test_pdf(3)
+        sheet = SheetMusic.objects.create(
+            user=self.user,
+            title="Test Sheet",
+            file=SimpleUploadedFile("test.pdf", pdf_data.read(), content_type="application/pdf"),
+            file_size=1024,
+            page_count=3,
+            file_hash="a" * 64,
+        )
+        self.assertEqual(sheet.title, "Test Sheet")
+        self.assertEqual(sheet.page_count, 3)
+        self.assertEqual(sheet.last_page_viewed, 1)
+        self.assertEqual(sheet.user, self.user)
+
+    def test_duplicate_title_rejected(self):
+        pdf1 = make_test_pdf(1)
+        pdf2 = make_test_pdf(1)
+        SheetMusic.objects.create(
+            user=self.user,
+            title="Duplicate",
+            file=SimpleUploadedFile("a.pdf", pdf1.read(), content_type="application/pdf"),
+            file_size=500,
+            page_count=1,
+            file_hash="b" * 64,
+        )
+        from django.db import IntegrityError
+        with self.assertRaises(IntegrityError):
+            SheetMusic.objects.create(
+                user=self.user,
+                title="Duplicate",
+                file=SimpleUploadedFile("b.pdf", pdf2.read(), content_type="application/pdf"),
+                file_size=500,
+                page_count=1,
+                file_hash="c" * 64,
+            )
+
+    def test_duplicate_hash_rejected(self):
+        pdf1 = make_test_pdf(1)
+        pdf2 = make_test_pdf(1)
+        SheetMusic.objects.create(
+            user=self.user,
+            title="Sheet A",
+            file=SimpleUploadedFile("a.pdf", pdf1.read(), content_type="application/pdf"),
+            file_size=500,
+            page_count=1,
+            file_hash="d" * 64,
+        )
+        from django.db import IntegrityError
+        with self.assertRaises(IntegrityError):
+            SheetMusic.objects.create(
+                user=self.user,
+                title="Sheet B",
+                file=SimpleUploadedFile("b.pdf", pdf2.read(), content_type="application/pdf"),
+                file_size=500,
+                page_count=1,
+                file_hash="d" * 64,
+            )
+
+
+class SheetMusicAPITests(APITestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="apiuser", email="api@test.com", password="secret"
+        )
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
+
+    def _upload_pdf(self, title="Test Sheet", pages=3):
+        pdf_data = make_test_pdf(pages)
+        pdf_file = SimpleUploadedFile("test.pdf", pdf_data.read(), content_type="application/pdf")
+        return self.client.post(
+            reverse("sheet-music-list"),
+            {"title": title, "file": pdf_file},
+            format="multipart",
+        )
+
+    def test_upload_valid_pdf(self):
+        response = self._upload_pdf()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], "Test Sheet")
+        self.assertEqual(response.data["page_count"], 3)
+        self.assertGreater(response.data["file_size"], 0)
+        self.assertEqual(len(response.data["file_hash"]), 64)
+
+    def test_upload_non_pdf_rejected(self):
+        fake_file = SimpleUploadedFile("test.txt", b"not a pdf", content_type="text/plain")
+        response = self.client.post(
+            reverse("sheet-music-list"),
+            {"title": "Bad File", "file": fake_file},
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_upload_too_many_pages_rejected(self):
+        response = self._upload_pdf(title="Big PDF", pages=51)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_upload_duplicate_content_rejected(self):
+        pdf_bytes = make_test_pdf(2).read()
+        file1 = SimpleUploadedFile("a.pdf", pdf_bytes, content_type="application/pdf")
+        self.client.post(
+            reverse("sheet-music-list"),
+            {"title": "First", "file": file1},
+            format="multipart",
+        )
+        file2 = SimpleUploadedFile("b.pdf", pdf_bytes, content_type="application/pdf")
+        response = self.client.post(
+            reverse("sheet-music-list"),
+            {"title": "Second", "file": file2},
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_list_sheet_music(self):
+        self._upload_pdf(title="Sheet A")
+        response = self.client.get(reverse("sheet-music-list"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["title"], "Sheet A")
+
+    def test_update_bookmark(self):
+        upload_resp = self._upload_pdf()
+        sheet_id = upload_resp.data["id"]
+        response = self.client.patch(
+            reverse("sheet-music-detail", args=[sheet_id]),
+            {"last_page_viewed": 2},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["last_page_viewed"], 2)
+
+    def test_delete_sheet_music(self):
+        upload_resp = self._upload_pdf()
+        sheet_id = upload_resp.data["id"]
+        response = self.client.delete(reverse("sheet-music-detail", args=[sheet_id]))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(SheetMusic.objects.count(), 0)
+
+    def test_serve_file(self):
+        upload_resp = self._upload_pdf()
+        sheet_id = upload_resp.data["id"]
+        response = self.client.get(reverse("sheet-music-file", args=[sheet_id]))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+
+    def test_other_user_cannot_access(self):
+        upload_resp = self._upload_pdf()
+        sheet_id = upload_resp.data["id"]
+
+        other_user = get_user_model().objects.create_user(
+            username="other", email="other@test.com", password="secret"
+        )
+        other_token = Token.objects.create(user=other_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {other_token.key}")
+
+        response = self.client.get(reverse("sheet-music-detail", args=[sheet_id]))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_unauthenticated_rejected(self):
+        self.client.credentials()
+        response = self.client.get(reverse("sheet-music-list"))
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
