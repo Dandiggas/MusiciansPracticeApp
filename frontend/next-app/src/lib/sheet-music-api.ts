@@ -49,7 +49,7 @@ export async function uploadSheetMusic(
   const res = await axios.post<SheetMusicRecord>(
     `${apiBaseUrl}/sheet-music/`,
     form,
-    { headers: { ...authHeaders(), "Content-Type": "multipart/form-data" } }
+    { headers: authHeaders() }
   );
   return res.data;
 }
