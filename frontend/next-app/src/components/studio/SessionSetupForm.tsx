@@ -26,6 +26,10 @@ interface SessionSetupFormProps {
   onYoutubeUrlChange: (value: string) => void;
   onMediaSourceChange: (value: MediaSource) => void;
   onAudioFileSelect: (file: File) => void;
+  sheetMusicId: number | null;
+  sheetMusicTitle: string | null;
+  onSheetMusicDetach: () => void;
+  onOpenSheetMusicPicker: () => void;
   onStart: () => void;
 }
 
@@ -49,6 +53,10 @@ export default function SessionSetupForm({
   onYoutubeUrlChange,
   onMediaSourceChange,
   onAudioFileSelect,
+  sheetMusicId,
+  sheetMusicTitle,
+  onSheetMusicDetach,
+  onOpenSheetMusicPicker,
   onStart,
 }: SessionSetupFormProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,6 +172,40 @@ export default function SessionSetupForm({
               <p className="text-sm text-muted-foreground">{audioFileName}</p>
             )}
           </div>
+        )}
+      </div>
+
+      {/* Sheet Music */}
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+          Sheet Music
+        </p>
+        {sheetMusicId && sheetMusicTitle ? (
+          <div className="flex items-center justify-between rounded-lg bg-primary/5 border border-primary/20 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span className="text-primary">♩</span>
+              <span className="text-sm font-semibold text-foreground">
+                {sheetMusicTitle}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={onSheetMusicDetach}
+              className="text-muted-foreground hover:text-foreground text-sm"
+            >
+              ✕
+            </button>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={onOpenSheetMusicPicker}
+            className="rounded-lg"
+          >
+            Attach PDF
+          </Button>
         )}
       </div>
 
