@@ -110,6 +110,7 @@ function PracticeTimerContent() {
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
   const shouldAutoResume = searchParams.get("resume") === "1";
+  const isNewSession = searchParams.get("new") === "1";
   const instrumentParam = searchParams.get("instrument") as InstrumentName | null;
 
   // ─── Helpers ─────────────────────────────────────────────────────────
@@ -241,7 +242,7 @@ function PracticeTimerContent() {
 
         // Priority: instrument param from Launch Pad > recent session > stored setup
         if (instrumentParam && INSTRUMENTS.includes(instrumentParam)) {
-          const project = getProject(instrumentParam);
+          const project = isNewSession ? null : getProject(instrumentParam);
           if (project) {
             setInstrument(project.instrument);
             setSongTitle(project.songTitle || "");
