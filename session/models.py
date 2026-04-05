@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 import datetime
+import uuid
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -18,6 +19,36 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
+def sheet_music_upload_path(instance, filename):
+    return f"sheet_music/{instance.user_id}/{uuid.uuid4()}.pdf"
+
+
+class SheetMusic(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sheet_music",
+    )
+    title = models.CharField(max_length=200)
+    file = models.FileField(upload_to=sheet_music_upload_path)
+    file_size = models.PositiveIntegerField(help_text="File size in bytes")
+    page_count = models.PositiveSmallIntegerField()
+    file_hash = models.CharField(max_length=64, help_text="SHA256 hash of file content")
+    last_page_viewed = models.PositiveSmallIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = [
+            ("user", "title"),
+            ("user", "file_hash"),
+        ]
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return f"{self.title} ({self.user})"
 
 
 class Session(models.Model):
