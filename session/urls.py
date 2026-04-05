@@ -3,7 +3,8 @@ from .views import (
     SessionList, SessionDetail, PracticeRecommendationView,
     TagList, TagDetail, StatsView, PracticeCalendarView,
     PracticeByInstrumentView, start_timer, stop_timer, get_active_timer,
-    pause_timer, resume_timer
+    pause_timer, resume_timer,
+    SheetMusicList, SheetMusicDetail, serve_sheet_music_file,
 )
 
 
@@ -16,6 +17,11 @@ urlpatterns = [
     # Tag endpoints
     path('tags/', TagList.as_view(), name='tag-list'),
     path('tags/<int:pk>/', TagDetail.as_view(), name='tag-detail'),
+
+    # Sheet music endpoints
+    path('sheet-music/', SheetMusicList.as_view(), name='sheet-music-list'),
+    path('sheet-music/<int:pk>/', SheetMusicDetail.as_view(), name='sheet-music-detail'),
+    path('sheet-music/<int:pk>/file/', serve_sheet_music_file, name='sheet-music-file'),
 
     # Stats and analytics
     path('stats/', StatsView.as_view(), name='stats'),
