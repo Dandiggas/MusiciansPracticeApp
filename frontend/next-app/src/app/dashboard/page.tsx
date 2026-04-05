@@ -275,18 +275,9 @@ export default function DashboardPage() {
                 activeSession?.instrument?.toLowerCase() === instrument.toLowerCase();
 
               return (
-                <a
+                <div
                   key={instrument}
-                  href={`/practice-timer?instrument=${instrument}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(
-                      isActive
-                        ? "/practice-timer"
-                        : `/practice-timer?instrument=${instrument}`
-                    );
-                  }}
-                  className={`group relative rounded-xl bg-card p-5 transition-all hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                  className={`group relative rounded-xl bg-card p-5 transition-all ${
                     isMostRecent
                       ? "ring-1 ring-primary/30 shadow-md"
                       : ""
@@ -340,17 +331,39 @@ export default function DashboardPage() {
                     </div>
                   ) : (
                     <p className="mt-3 text-sm text-muted-foreground">
-                      Tap to start your first {instrument.toLowerCase()} session.
+                      Start your first {instrument.toLowerCase()} session.
                     </p>
                   )}
 
-                  <div className="mt-4">
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:underline">
-                      {project ? "Resume" : "Start"}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </span>
+                  <div className="mt-4 flex gap-2">
+                    {project && (
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          router.push(
+                            isActive
+                              ? "/practice-timer"
+                              : `/practice-timer?instrument=${instrument}`
+                          )
+                        }
+                        className="rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground text-xs h-8"
+                      >
+                        {isActive ? "Return" : "Resume"}
+                        <ArrowRight className="ml-1 h-3 w-3" />
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant={project ? "secondary" : "default"}
+                      onClick={() => router.push(`/practice-timer?instrument=${instrument}&new=1`)}
+                      className={`rounded-lg text-xs h-8 ${
+                        !project ? "bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground" : ""
+                      }`}
+                    >
+                      New Session
+                    </Button>
                   </div>
-                </a>
+                </div>
               );
             })}
           </div>
