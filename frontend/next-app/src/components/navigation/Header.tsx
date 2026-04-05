@@ -14,6 +14,7 @@ export function Header() {
   const navigation = [
     { name: "The Shed", href: "/dashboard" },
     { name: "Studio", href: "/practice-timer" },
+    { name: "Sheet Music", href: "/sheet-music" },
     { name: "AI Tutor", href: "/recommendations" },
     { name: "Analytics", href: "/profilepage" },
   ];
