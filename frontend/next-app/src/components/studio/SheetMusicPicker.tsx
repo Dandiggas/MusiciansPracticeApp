@@ -96,6 +96,12 @@ export default function SheetMusicPicker({
               ref={fileRef}
               type="file"
               accept="application/pdf"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file && !uploadTitle.trim()) {
+                  setUploadTitle(file.name.replace(/\.pdf$/i, ""));
+                }
+              }}
               className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
             />
             <div className="flex gap-2">
