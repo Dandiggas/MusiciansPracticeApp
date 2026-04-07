@@ -237,6 +237,31 @@ function PracticeTimerContent() {
           const startTime = new Date(session.started_at).getTime();
           const now = Date.now();
           setElapsedSeconds(Math.floor((now - startTime) / 1000));
+
+          // On resume from Launch Pad, load project data (BPM, song title, sheet music, etc.)
+          if (shouldAutoResume && instrumentParam && INSTRUMENTS.includes(instrumentParam)) {
+            const project = getProject(instrumentParam);
+            if (project) {
+              setSongTitle(project.songTitle || "");
+              setNotes(project.notes || "");
+              setBpm(project.bpm || 120);
+              setMediaSource(project.mediaSource || "youtube");
+              setAudioFileName(project.audioFileName);
+              if (project.sheetMusicId) {
+                setSheetMusicId(project.sheetMusicId);
+                setSheetMusicTitle(project.sheetMusicTitle);
+                getSheetMusic(project.sheetMusicId)
+                  .then((sm) => {
+                    setSheetMusicPageCount(sm.page_count);
+                    setSheetMusicInitialPage(sm.last_page_viewed);
+                  })
+                  .catch(() => {
+                    setSheetMusicId(null);
+                    setSheetMusicTitle(null);
+                  });
+              }
+            }
+          }
           return;
         }
 
@@ -1004,6 +1029,7 @@ function PracticeTimerContent() {
                 title={sheetMusicTitle}
                 pageCount={sheetMusicPageCount}
                 initialPage={sheetMusicInitialPage}
+                initialExpanded={shouldAutoResume}
               />
             )}
 

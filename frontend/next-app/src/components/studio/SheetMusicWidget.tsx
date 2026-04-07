@@ -25,6 +25,7 @@ interface SheetMusicWidgetProps {
   title: string;
   pageCount: number;
   initialPage?: number;
+  initialExpanded?: boolean;
   standalone?: boolean;
   onTitleChange?: (newTitle: string) => void;
   onDelete?: () => void;
@@ -35,11 +36,12 @@ export default function SheetMusicWidget({
   title,
   pageCount,
   initialPage = 1,
+  initialExpanded = false,
   standalone = false,
   onTitleChange,
   onDelete,
 }: SheetMusicWidgetProps) {
-  const [collapsed, setCollapsed] = useState(!standalone);
+  const [collapsed, setCollapsed] = useState(!standalone && !initialExpanded);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [scale, setScale] = useState(1.0);
   const [containerWidth, setContainerWidth] = useState(0);

@@ -16,6 +16,7 @@ import {
 import {
   getAllProjects,
   migrateFromLegacySetup,
+  saveStoredSessionSnapshot,
   INSTRUMENTS,
   type InstrumentName,
   type InstrumentProject,
@@ -61,6 +62,7 @@ export default function DashboardPage() {
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(null);
   const [projects, setProjects] = useState<Partial<Record<InstrumentName, InstrumentProject>>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [resumingInstrument, setResumingInstrument] = useState<string | null>(null);
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -339,16 +341,47 @@ export default function DashboardPage() {
                     {project && (
                       <Button
                         size="sm"
-                        onClick={() =>
-                          router.push(
-                            isActive
-                              ? "/practice-timer"
-                              : `/practice-timer?instrument=${instrument}`
-                          )
-                        }
+                        disabled={resumingInstrument === instrument}
+                        onClick={async () => {
+                          if (isActive) {
+                            router.push("/practice-timer");
+                            return;
+                          }
+                          setResumingInstrument(instrument);
+                          setError("");
+                          const token = localStorage.getItem("token");
+                          try {
+                            const res = await axios.post(
+                              `${apiBaseUrl}/timer/start/`,
+                              {
+                                instrument: project.instrument,
+                                description: project.description || "",
+                                youtube_url: project.youtubeUrl || "",
+                              },
+                              { headers: { Authorization: `Token ${token}` } }
+                            );
+                            saveStoredSessionSnapshot({
+                              status: "active",
+                              sessionId: res.data.session_id,
+                              instrument: project.instrument,
+                              description: project.description || "",
+                              mediaSource: project.mediaSource || "youtube",
+                              youtubeUrl: project.youtubeUrl || "",
+                              audioFileName: project.audioFileName,
+                            });
+                            router.push(`/practice-timer?resume=1&instrument=${instrument}`);
+                          } catch (err) {
+                            if (axios.isAxiosError(err) && err.response?.data?.error) {
+                              setError(err.response.data.error);
+                            } else {
+                              setError("Failed to start session. Please try again.");
+                            }
+                            setResumingInstrument(null);
+                          }
+                        }}
                         className="rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground text-xs h-8"
                       >
-                        {isActive ? "Return" : "Resume"}
+                        {resumingInstrument === instrument ? "Starting..." : isActive ? "Return" : "Resume"}
                         <ArrowRight className="ml-1 h-3 w-3" />
                       </Button>
                     )}
