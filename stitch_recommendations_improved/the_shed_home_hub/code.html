@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Shed - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed-dim": "#a27cff",
+              "on-primary-container": "#2b006e",
+              "surface-container-lowest": "#000000",
+              "tertiary-dim": "#58e7ab",
+              "surface": "#060e20",
+              "primary-container": "#ae8dff",
+              "surface-bright": "#1f2b49",
+              "tertiary-container": "#69f6b8",
+              "inverse-primary": "#6e3bd7",
+              "on-error-container": "#ffb2b9",
+              "background": "#060e20",
+              "on-tertiary-fixed-variant": "#006544",
+              "on-secondary": "#455367",
+              "surface-container-low": "#091328",
+              "primary-dim": "#8455ef",
+              "error": "#ff6e84",
+              "inverse-on-surface": "#4d556b",
+              "secondary-container": "#3a485b",
+              "primary-fixed": "#ae8dff",
+              "on-secondary-fixed-variant": "#4e5c71",
+              "error-container": "#a70138",
+              "surface-tint": "#ba9eff",
+              "surface-variant": "#192540",
+              "outline": "#6d758c",
+              "surface-dim": "#060e20",
+              "on-background": "#dee5ff",
+              "on-tertiary-fixed": "#00452d",
+              "on-primary-fixed": "#000000",
+              "on-primary": "#39008c",
+              "surface-container-highest": "#192540",
+              "on-tertiary": "#006443",
+              "tertiary-fixed-dim": "#58e7ab",
+              "on-secondary-container": "#c3d1e9",
+              "secondary-fixed-dim": "#c7d5ed",
+              "outline-variant": "#40485d",
+              "tertiary": "#9bffce",
+              "secondary-dim": "#c7d5ed",
+              "surface-container-high": "#141f38",
+              "secondary-fixed": "#d5e3fc",
+              "inverse-surface": "#faf8ff",
+              "error-dim": "#d73357",
+              "on-error": "#490013",
+              "on-surface": "#dee5ff",
+              "on-primary-fixed-variant": "#370086",
+              "surface-container": "#0f1930",
+              "secondary": "#d5e3fc",
+              "tertiary-fixed": "#69f6b8",
+              "on-tertiary-container": "#005a3c",
+              "on-surface-variant": "#a3aac4",
+              "primary": "#ba9eff",
+              "on-secondary-fixed": "#324053"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Plus Jakarta Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(15, 25, 48, 0.7);
+            backdrop-filter: blur(16px);
+        }
+        .tonal-shift { background-color: #091328; }
+        .gradient-primary {
+            background: linear-gradient(135deg, #ba9eff 0%, #8455ef 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary/30 min-h-screen pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-50 bg-[#060e20] dark:bg-[#060e20] flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-[#dee5ff] font-['Plus_Jakarta_Sans']">The Shed</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#ba9eff] font-semibold font-['Plus_Jakarta_Sans'] tracking-tight hover:text-[#ba9eff] transition-colors duration-200" href="#">The Shed</a>
+<a class="text-[#a3aac4] font-['Plus_Jakarta_Sans'] tracking-tight hover:text-[#ba9eff] transition-colors duration-200" href="#">Studio</a>
+<a class="text-[#a3aac4] font-['Plus_Jakarta_Sans'] tracking-tight hover:text-[#ba9eff] transition-colors duration-200" href="#">AI Tutor</a>
+<a class="text-[#a3aac4] font-['Plus_Jakarta_Sans'] tracking-tight hover:text-[#ba9eff] transition-colors duration-200" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#a3aac4] hover:text-[#ba9eff] transition-transform scale-95 active:scale-90">account_circle</button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-8">
+<!-- Hero Section: Asymmetrical Layout -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+<div class="lg:col-span-8 flex flex-col justify-center">
+<p class="text-primary font-label text-sm tracking-[0.05em] uppercase mb-4">Welcome back, Maestro</p>
+<h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter mb-6 leading-[0.9] text-on-surface">
+                    Practice makes permanent, but <span class="text-primary">perfect</span> practice makes perfect.
+                </h1>
+<div class="flex flex-wrap gap-4 mt-4">
+<button class="gradient-primary text-on-primary-fixed px-8 py-4 rounded-xl font-bold flex items-center gap-3 shadow-[0_8px_30px_rgb(110,59,215,0.2)] hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                        Resume Previous Session
+                    </button>
+<button class="bg-surface-bright text-on-surface px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:bg-surface-container-highest transition-all active:scale-95">
+<span class="material-symbols-outlined">add_circle</span>
+                        New Recording
+                    </button>
+</div>
+</div>
+<div class="lg:col-span-4">
+<!-- Performance Streak Widget -->
+<div class="bg-surface-container-high rounded-3xl p-8 relative overflow-hidden h-full flex flex-col justify-between">
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-on-surface-variant font-label text-xs tracking-widest uppercase">Current Streak</h3>
+<p class="text-5xl font-extrabold text-on-surface mt-1">12 Days</p>
+</div>
+<div class="bg-tertiary/10 p-3 rounded-2xl">
+<span class="material-symbols-outlined text-tertiary text-3xl" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Weekly Goal</span>
+<span class="text-on-surface">85%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden">
+<div class="h-full gradient-primary w-[85%]"></div>
+</div>
+</div>
+</div>
+<!-- Decorative background glow -->
+<div class="absolute -bottom-12 -right-12 w-48 h-48 bg-primary/10 blur-[80px] rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Bento Grid: Focus & Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+<!-- Today's Focus Section -->
+<div class="md:col-span-3 bg-surface-container-low rounded-3xl p-8">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold text-on-surface tracking-tight">Today's Focus</h2>
+<span class="text-on-surface-variant text-sm font-medium">May 24, 2024</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Drill Card 1 -->
+<div class="group bg-surface-container-high p-6 rounded-2xl hover:bg-surface-bright transition-all cursor-pointer">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-xl">vibration</span>
+</div>
+<h4 class="text-on-surface font-bold mb-2">Finger Independence</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">Focus on 3rd and 4th finger synchronization at 90 BPM.</p>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-label tracking-widest text-primary bg-primary/5 px-2 py-1 rounded">15 MIN</span>
+<span class="text-[10px] font-label tracking-widest text-tertiary bg-tertiary/5 px-2 py-1 rounded">TECHNIQUE</span>
+</div>
+</div>
+<!-- Drill Card 2 -->
+<div class="group bg-surface-container-high p-6 rounded-2xl hover:bg-surface-bright transition-all cursor-pointer">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-xl">account_tree</span>
+</div>
+<h4 class="text-on-surface font-bold mb-2">Dorian Mode Mapping</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">Horizontal visualization across all six strings in G minor.</p>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-label tracking-widest text-primary bg-primary/5 px-2 py-1 rounded">20 MIN</span>
+<span class="text-[10px] font-label tracking-widest text-tertiary bg-tertiary/5 px-2 py-1 rounded">THEORY</span>
+</div>
+</div>
+<!-- Drill Card 3 -->
+<div class="group bg-surface-container-high p-6 rounded-2xl hover:bg-surface-bright transition-all cursor-pointer">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-xl">graphic_eq</span>
+</div>
+<h4 class="text-on-surface font-bold mb-2">Rhythmic Subdivision</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">Switching between triplets and sixteenth notes cleanly.</p>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-label tracking-widest text-primary bg-primary/5 px-2 py-1 rounded">10 MIN</span>
+<span class="text-[10px] font-label tracking-widest text-tertiary bg-tertiary/5 px-2 py-1 rounded">RHYTHM</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Widget: Quick Actions/Session Stats -->
+<div class="md:col-span-1 flex flex-col gap-6">
+<!-- Recording Insight Card -->
+<div class="bg-surface-container-highest rounded-3xl p-6 flex-1">
+<h3 class="text-on-surface-variant font-label text-xs tracking-widest uppercase mb-4">Recent Studio</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover opacity-60" data-alt="close up of electric guitar pickups and strings in a professional dark studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDigN_E1L3CG8L82BU6w70mQyo92aPVMqXvJFErU9BW9mCWsF4C0BUCtBK7tK40797817TzhV5f-4aYP11hQInG1oJXoFIzWtlDvvCQXEEBZE4qjoYRMvH13smPO_EggcaM3RKzBk7LsTTiBfiPGbo9rSeJAVf46N_x7rOWkVIefUBJvECk1m7ilgaPhRIUGXGDA1tEWAGJP0jZ-KlHl6kZhKDn9LbeDDQ7Jhi5kOx1HQ7OKwEmW5Rg5J0ODl0IOc9yRIFbq_UN67EP"/>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Midnight Jam 04</p>
+<p class="text-[10px] text-on-surface-variant">Last edited 2h ago</p>
+</div>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded-xl flex items-center justify-between">
+<span class="material-symbols-outlined text-tertiary text-lg">mic</span>
+<span class="text-xs font-mono text-tertiary">04:22:15</span>
+<span class="material-symbols-outlined text-on-surface-variant text-lg">more_vert</span>
+</div>
+</div>
+</div>
+<!-- AI Quick Tip -->
+<div class="bg-[#141f38] border border-primary/10 rounded-3xl p-6">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-sm">psychology</span>
+<span class="text-[10px] font-label tracking-widest text-primary uppercase">AI Insight</span>
+</div>
+<p class="text-sm text-on-surface leading-snug">"Your accuracy drops during string skips in the Dorian drill. Try anchoring your thumb slightly lower."</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe bg-[#091328]/80 backdrop-blur-xl z-50 rounded-t-2xl border-t border-[#40485d]/15 shadow-[0_-8px_30px_rgb(110,59,215,0.08)]">
+<a class="flex flex-col items-center justify-center text-[#ba9eff] bg-[#141f38] rounded-xl px-3 py-1" href="#">
+<span class="material-symbols-outlined mb-0.5">home</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-[0.05em] font-medium">The Shed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a3aac4] px-3 py-1 hover:bg-[#1f2b49] transition-all" href="#">
+<span class="material-symbols-outlined mb-0.5">mic_external_on</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-[0.05em] font-medium">Studio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a3aac4] px-3 py-1 hover:bg-[#1f2b49] transition-all" href="#">
+<span class="material-symbols-outlined mb-0.5">psychology</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-[0.05em] font-medium">AI Tutor</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a3aac4] px-3 py-1 hover:bg-[#1f2b49] transition-all" href="#">
+<span class="material-symbols-outlined mb-0.5">leaderboard</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-[0.05em] font-medium">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a3aac4] px-3 py-1 hover:bg-[#1f2b49] transition-all" href="#">
+<span class="material-symbols-outlined mb-0.5">settings</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-[0.05em] font-medium">Settings</span>
+</a>
+</nav>
+</body></html>

@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Sparkles, ArrowRight } from "lucide-react";
+import { SpinnerGap, Sparkle, ArrowRight } from "@phosphor-icons/react";
 import { saveStoredRecommendation } from "@/lib/practice-session-store";
 
 const GOAL_PRESETS = [
@@ -126,7 +126,7 @@ export default function RecommendationsPage() {
                   className="flex w-full items-center justify-between rounded-lg border border-border bg-secondary px-4 py-3 text-left text-sm text-foreground transition hover:bg-secondary/80"
                 >
                   <span>{preset}</span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  <ArrowRight size={20} weight="regular" className="text-muted-foreground" />
                 </button>
               ))}
             </div>
@@ -136,7 +136,7 @@ export default function RecommendationsPage() {
             <Card className="rounded-xl border-border bg-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-2xl text-card-foreground">
-                  <Sparkles className="h-5 w-5 text-primary" />
+                  <Sparkle size={20} weight="regular" className="text-primary" />
                   Build Your Recommendation
                 </CardTitle>
                 <CardDescription className="text-base text-muted-foreground">
@@ -220,7 +220,7 @@ export default function RecommendationsPage() {
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <SpinnerGap size={20} weight="regular" className="mr-2 animate-spin" />
                         Generating...
                       </>
                     ) : (

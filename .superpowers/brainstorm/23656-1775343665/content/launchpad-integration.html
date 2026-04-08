@@ -1,0 +1,108 @@
+<h2>Section 4: Launch Pad Integration</h2>
+<p class="subtitle">How sheet music attaches to your instrument projects on the dashboard</p>
+
+<div class="split">
+  <!-- Launch Pad card - with sheet music -->
+  <div class="mockup">
+    <div class="mockup-header">Guitar Project Card &mdash; Sheet Music Attached</div>
+    <div class="mockup-body" style="background: #0f172a; padding: 16px;">
+      <div style="background: #1a1d27; border: 1px solid #2a2d37; border-radius: 16px; padding: 24px; width: 100%;">
+        <!-- Instrument header -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <div style="font-size: 28px;">&#127928;</div>
+          <div>
+            <div style="color: #e2e8f0; font-size: 16px; font-weight: 700;">Guitar</div>
+            <div style="color: #64748b; font-size: 11px;">Last practiced 2h ago</div>
+          </div>
+        </div>
+        <!-- Existing fields -->
+        <div style="margin-bottom: 10px;">
+          <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Song</div>
+          <div style="color: #cbd5e1; font-size: 13px;">All of Me</div>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">YouTube</div>
+          <div style="color: #7c3aed; font-size: 13px; text-decoration: underline;">youtube.com/watch?v=...</div>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">BPM</div>
+          <div style="color: #cbd5e1; font-size: 13px;">126</div>
+        </div>
+        <!-- NEW: Sheet music field -->
+        <div style="margin-bottom: 10px; padding: 10px 12px; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); border-radius: 10px;">
+          <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Sheet Music</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #7c3aed;">&#9833;</span>
+              <span style="color: #cbd5e1; font-size: 13px;">All of Me - Lead Sheet</span>
+              <span style="color: #64748b; font-size: 11px;">p.3</span>
+            </div>
+            <span style="color: #94a3b8; font-size: 12px; cursor: pointer;">&#10005;</span>
+          </div>
+        </div>
+        <!-- Start button -->
+        <div style="margin-top: 16px; background: linear-gradient(to right, #7c3aed, #8455ef); border-radius: 10px; padding: 10px; text-align: center; color: white; font-size: 13px; font-weight: 600; cursor: pointer;">
+          Start Practicing
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Launch Pad card - no sheet music, attach flow -->
+  <div class="mockup">
+    <div class="mockup-header">Bass Project Card &mdash; Attaching Sheet Music</div>
+    <div class="mockup-body" style="background: #0f172a; padding: 16px;">
+      <div style="background: #1a1d27; border: 1px solid #2a2d37; border-radius: 16px; padding: 24px; width: 100%;">
+        <!-- Instrument header -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <div style="font-size: 28px;">&#127928;</div>
+          <div>
+            <div style="color: #e2e8f0; font-size: 16px; font-weight: 700;">Bass</div>
+            <div style="color: #64748b; font-size: 11px;">Last practiced yesterday</div>
+          </div>
+        </div>
+        <!-- Existing fields -->
+        <div style="margin-bottom: 10px;">
+          <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Song</div>
+          <div style="color: #cbd5e1; font-size: 13px;">Superstition</div>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">YouTube</div>
+          <div style="color: #7c3aed; font-size: 13px; text-decoration: underline;">youtube.com/watch?v=...</div>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">BPM</div>
+          <div style="color: #cbd5e1; font-size: 13px;">100</div>
+        </div>
+        <!-- NEW: Sheet music attach options -->
+        <div style="margin-bottom: 10px; padding: 10px 12px; border: 1px dashed #334155; border-radius: 10px;">
+          <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Sheet Music</div>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <div style="flex: 1; background: rgba(124,58,237,0.12); border-radius: 8px; padding: 8px; text-align: center; cursor: pointer;">
+              <div style="color: #a78bfa; font-size: 16px;">&#8593;</div>
+              <div style="color: #a78bfa; font-size: 11px; font-weight: 600;">Upload New</div>
+            </div>
+            <div style="flex: 1; background: #1e293b; border-radius: 8px; padding: 8px; text-align: center; cursor: pointer;">
+              <div style="color: #94a3b8; font-size: 16px;">&#9776;</div>
+              <div style="color: #94a3b8; font-size: 11px; font-weight: 600;">From Library</div>
+            </div>
+          </div>
+        </div>
+        <!-- Start button -->
+        <div style="margin-top: 16px; background: linear-gradient(to right, #7c3aed, #8455ef); border-radius: 10px; padding: 10px; text-align: center; color: white; font-size: 13px; font-weight: 600; cursor: pointer;">
+          Start Practicing
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 20px; padding: 16px; background: rgba(124,58,237,0.08); border-radius: 12px; border: 1px solid rgba(124,58,237,0.2);">
+  <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #e2e8f0;">The flow</h3>
+  <ul style="margin: 0; padding-left: 20px; color: #94a3b8; font-size: 13px; line-height: 1.8;">
+    <li><strong>First time:</strong> "Upload New" or "From Library" buttons appear in the project card</li>
+    <li><strong>After attach:</strong> Shows title + bookmark page, with an X to detach</li>
+    <li><strong>Start Practicing:</strong> The sheet music auto-loads in the session viewer, already on your bookmarked page</li>
+    <li><strong>One sheet, many projects:</strong> Same PDF can be attached to Guitar and Keys projects simultaneously</li>
+  </ul>
+</div>

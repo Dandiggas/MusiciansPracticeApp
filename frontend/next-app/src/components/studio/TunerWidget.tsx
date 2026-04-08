@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff } from "lucide-react";
+import { Microphone, MicrophoneSlash } from "@phosphor-icons/react";
 import type { NoteInfo } from "@/lib/audio/note-utils";
 
 interface TunerWidgetProps {
@@ -86,9 +86,9 @@ export default function TunerWidget({
         }`}
       >
         {isActive ? (
-          <><MicOff className="mr-1.5 h-4 w-4" /> Stop</>
+          <><MicrophoneSlash size={20} weight="regular" className="mr-1.5" /> Stop</>
         ) : (
-          <><Mic className="mr-1.5 h-4 w-4" /> Start Tuner</>
+          <><Microphone size={20} weight="regular" className="mr-1.5" /> Start Tuner</>
         )}
       </Button>
     </div>

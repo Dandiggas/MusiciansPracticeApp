@@ -1,0 +1,256 @@
+<h2>iOS App — Tab Structure</h2>
+<p class="subtitle">Four tabs, with the Studio tab showing two states</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Studio — Ready (auto-resume last session)</div>
+    <div class="mockup-body" style="background: #0f1729; color: #e2e8f0; font-family: -apple-system, system-ui; padding: 0;">
+      <!-- Status bar -->
+      <div style="padding: 8px 20px; font-size: 11px; display: flex; justify-content: space-between; color: #94a3b8;">
+        <span>9:41</span>
+        <span>100%</span>
+      </div>
+      <!-- Content -->
+      <div style="padding: 16px 20px;">
+        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #8b5cf6;">Pick up where you left off</div>
+        <div style="font-size: 22px; font-weight: 700; color: #f8fafc; margin-top: 6px;">Guitar</div>
+        <div style="font-size: 13px; color: #94a3b8; margin-top: 2px;">All The Things You Are — Chord melody</div>
+
+        <div style="background: #1a1d27; border-radius: 16px; padding: 20px; margin-top: 20px; border: 1px solid rgba(124,58,237,0.15);">
+          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8;">Session Clock</div>
+          <div style="font-size: 48px; font-weight: 200; color: #f8fafc; margin-top: 4px; text-align: center; font-variant-numeric: tabular-nums;">00:00:00</div>
+          <div style="text-align: center; font-size: 12px; color: #64748b; margin-top: 4px;">Ready to start</div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #7c3aed, #8455ef); border-radius: 12px; padding: 16px; text-align: center; font-size: 17px; font-weight: 600; color: white; margin-top: 16px;">
+          Start Session
+        </div>
+
+        <div style="margin-top: 20px; font-size: 12px; color: #64748b;">
+          <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b;">
+            <span>Instrument</span>
+            <span style="color: #e2e8f0;">Guitar ›</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b;">
+            <span>Song</span>
+            <span style="color: #e2e8f0;">All The Things You Are ›</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e293b;">
+            <span>Focus</span>
+            <span style="color: #94a3b8;">Add focus points ›</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+            <span>Sheet Music</span>
+            <span style="color: #94a3b8;">Add PDF ›</span>
+          </div>
+        </div>
+      </div>
+      <!-- Tab bar -->
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #1e293b; padding: 8px 0 24px; display: flex; justify-content: space-around;">
+        <div style="text-align: center; font-size: 10px; color: #8b5cf6;"><div style="font-size: 20px; margin-bottom: 2px;">🎵</div>Studio</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">🔧</div>Tools</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">✨</div>AI Tutor</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">📊</div>Analytics</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Studio — Session Active</div>
+    <div class="mockup-body" style="background: #0f1729; color: #e2e8f0; font-family: -apple-system, system-ui; padding: 0;">
+      <!-- Status bar -->
+      <div style="padding: 8px 20px; font-size: 11px; display: flex; justify-content: space-between; color: #94a3b8;">
+        <span>9:41</span>
+        <span>100%</span>
+      </div>
+      <!-- Content -->
+      <div style="padding: 16px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #22c55e;">● Session Active</div>
+            <div style="font-size: 18px; font-weight: 700; color: #f8fafc; margin-top: 2px;">Guitar</div>
+          </div>
+        </div>
+
+        <div style="background: #1a1d27; border-radius: 16px; padding: 20px; margin-top: 16px; border: 1px solid rgba(34,197,94,0.2);">
+          <div style="font-size: 48px; font-weight: 200; color: #f8fafc; text-align: center; font-variant-numeric: tabular-nums;">00:12:34</div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <div style="flex:1; background: #7c3aed; border-radius: 10px; padding: 12px; text-align: center; font-size: 15px; font-weight: 600; color: white;">Pause</div>
+          <div style="flex:1; background: #dc2626; border-radius: 10px; padding: 12px; text-align: center; font-size: 15px; font-weight: 600; color: white;">Stop & Save</div>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 13px; color: #94a3b8;">
+          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #64748b; margin-bottom: 8px;">Workspace</div>
+          <div style="background: #1a1d27; border-radius: 10px; padding: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #e2e8f0;">🎸 Metronome</span>
+            <span style="color: #64748b; font-size: 12px;">120 BPM ›</span>
+          </div>
+          <div style="background: #1a1d27; border-radius: 10px; padding: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #e2e8f0;">🎯 Tuner</span>
+            <span style="color: #64748b; font-size: 12px;">Off ›</span>
+          </div>
+          <div style="background: #1a1d27; border-radius: 10px; padding: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #e2e8f0;">🎙 Recorder</span>
+            <span style="color: #64748b; font-size: 12px;">Ready ›</span>
+          </div>
+          <div style="background: #1a1d27; border-radius: 10px; padding: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #e2e8f0;">▶️ YouTube</span>
+            <span style="color: #64748b; font-size: 12px;">Add URL ›</span>
+          </div>
+          <div style="background: #1a1d27; border-radius: 10px; padding: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #e2e8f0;">📄 Sheet Music</span>
+            <span style="color: #64748b; font-size: 12px;">Add PDF ›</span>
+          </div>
+        </div>
+      </div>
+      <!-- Tab bar -->
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #1e293b; padding: 8px 0 24px; display: flex; justify-content: space-around;">
+        <div style="text-align: center; font-size: 10px; color: #22c55e;"><div style="font-size: 20px; margin-bottom: 2px;">🎵</div>Studio</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">🔧</div>Tools</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">✨</div>AI Tutor</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">📊</div>Analytics</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 32px;"></div>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Tools — Standalone Access</div>
+    <div class="mockup-body" style="background: #0f1729; color: #e2e8f0; font-family: -apple-system, system-ui; padding: 0;">
+      <div style="padding: 8px 20px; font-size: 11px; display: flex; justify-content: space-between; color: #94a3b8;">
+        <span>9:41</span>
+        <span>100%</span>
+      </div>
+      <div style="padding: 16px 20px;">
+        <div style="font-size: 28px; font-weight: 700; color: #f8fafc;">Tools</div>
+        <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Use without starting a session</div>
+
+        <div style="margin-top: 24px;">
+          <div style="background: #1a1d27; border-radius: 16px; padding: 20px; margin-bottom: 12px; border: 1px solid #2d3748;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 44px; height: 44px; background: #7c3aed22; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px;">🎸</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">Metronome</div>
+                <div style="font-size: 12px; color: #94a3b8;">Tap tempo, time signatures</div>
+              </div>
+              <div style="margin-left: auto; color: #64748b;">›</div>
+            </div>
+          </div>
+
+          <div style="background: #1a1d27; border-radius: 16px; padding: 20px; margin-bottom: 12px; border: 1px solid #2d3748;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 44px; height: 44px; background: #7c3aed22; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px;">🎯</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">Tuner</div>
+                <div style="font-size: 12px; color: #94a3b8;">Chromatic pitch detection</div>
+              </div>
+              <div style="margin-left: auto; color: #64748b;">›</div>
+            </div>
+          </div>
+
+          <div style="background: #1a1d27; border-radius: 16px; padding: 20px; margin-bottom: 12px; border: 1px solid #2d3748;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 44px; height: 44px; background: #7c3aed22; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px;">🎙</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">Recorder</div>
+                <div style="font-size: 12px; color: #94a3b8;">Audio takes with playback</div>
+              </div>
+              <div style="margin-left: auto; color: #64748b;">›</div>
+            </div>
+          </div>
+
+          <div style="background: #1a1d27; border-radius: 16px; padding: 20px; margin-bottom: 12px; border: 1px solid #2d3748;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 44px; height: 44px; background: #7c3aed22; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px;">📄</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">Sheet Music</div>
+                <div style="font-size: 12px; color: #94a3b8;">Import and view PDF scores</div>
+              </div>
+              <div style="margin-left: auto; color: #64748b;">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #1e293b; padding: 8px 0 24px; display: flex; justify-content: space-around;">
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">🎵</div>Studio</div>
+        <div style="text-align: center; font-size: 10px; color: #8b5cf6;"><div style="font-size: 20px; margin-bottom: 2px;">🔧</div>Tools</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">✨</div>AI Tutor</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">📊</div>Analytics</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Analytics — Stats & History</div>
+    <div class="mockup-body" style="background: #0f1729; color: #e2e8f0; font-family: -apple-system, system-ui; padding: 0;">
+      <div style="padding: 8px 20px; font-size: 11px; display: flex; justify-content: space-between; color: #94a3b8;">
+        <span>9:41</span>
+        <span>100%</span>
+      </div>
+      <div style="padding: 16px 20px;">
+        <div style="font-size: 28px; font-weight: 700; color: #f8fafc;">Analytics</div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <div style="flex: 1; background: #1a1d27; border-radius: 12px; padding: 14px; border: 1px solid #2d3748;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">Streak</div>
+            <div style="font-size: 24px; font-weight: 700; color: #f8fafc; margin-top: 4px;">5 <span style="font-size: 12px; color: #94a3b8; font-weight: 400;">days</span></div>
+          </div>
+          <div style="flex: 1; background: #1a1d27; border-radius: 12px; padding: 14px; border: 1px solid #2d3748;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">This Week</div>
+            <div style="font-size: 24px; font-weight: 700; color: #f8fafc; margin-top: 4px;">3.2<span style="font-size: 12px; color: #94a3b8; font-weight: 400;">h</span></div>
+          </div>
+          <div style="flex: 1; background: #1a1d27; border-radius: 12px; padding: 14px; border: 1px solid #2d3748;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">Total</div>
+            <div style="font-size: 24px; font-weight: 700; color: #f8fafc; margin-top: 4px;">42.5<span style="font-size: 12px; color: #94a3b8; font-weight: 400;">h</span></div>
+          </div>
+        </div>
+
+        <div style="background: #1a1d27; border-radius: 12px; padding: 16px; margin-top: 16px; border: 1px solid #2d3748;">
+          <div style="font-size: 13px; font-weight: 600; color: #f8fafc; margin-bottom: 12px;">Weekly Goal</div>
+          <div style="background: #2d3748; border-radius: 6px; height: 8px; overflow: hidden;">
+            <div style="background: linear-gradient(90deg, #7c3aed, #8455ef); height: 100%; width: 46%; border-radius: 6px;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 6px;">
+            <span>3.2h</span><span>7h goal</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <div style="font-size: 13px; font-weight: 600; color: #f8fafc; margin-bottom: 10px;">Recent Sessions</div>
+          <div style="background: #1a1d27; border-radius: 10px; padding: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; border: 1px solid #2d3748;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: #f8fafc;">Guitar</div>
+              <div style="font-size: 11px; color: #94a3b8;">Scales practice · today</div>
+            </div>
+            <div style="font-size: 14px; color: #8b5cf6; font-weight: 500;">30m</div>
+          </div>
+          <div style="background: #1a1d27; border-radius: 10px; padding: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; border: 1px solid #2d3748;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: #f8fafc;">Piano</div>
+              <div style="font-size: 11px; color: #94a3b8;">Chord progressions · yesterday</div>
+            </div>
+            <div style="font-size: 14px; color: #8b5cf6; font-weight: 500;">45m</div>
+          </div>
+          <div style="background: #1a1d27; border-radius: 10px; padding: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; border: 1px solid #2d3748;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: #f8fafc;">Drums</div>
+              <div style="font-size: 11px; color: #94a3b8;">Paradiddles · 2d ago</div>
+            </div>
+            <div style="font-size: 14px; color: #8b5cf6; font-weight: 500;">20m</div>
+          </div>
+        </div>
+      </div>
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #1e293b; padding: 8px 0 24px; display: flex; justify-content: space-around;">
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">🎵</div>Studio</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">🔧</div>Tools</div>
+        <div style="text-align: center; font-size: 10px; color: #64748b;"><div style="font-size: 20px; margin-bottom: 2px;">✨</div>AI Tutor</div>
+        <div style="text-align: center; font-size: 10px; color: #8b5cf6;"><div style="font-size: 20px; margin-bottom: 2px;">📊</div>Analytics</div>
+      </div>
+    </div>
+  </div>
+</div>

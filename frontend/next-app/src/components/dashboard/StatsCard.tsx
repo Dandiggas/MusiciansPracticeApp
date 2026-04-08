@@ -1,12 +1,12 @@
 import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
+import { type IconProps } from "@phosphor-icons/react";
 
 interface StatsCardProps {
   title: string;
   value: string | number;
   description?: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<IconProps>;
   trend?: {
     value: number;
     isPositive: boolean;
@@ -23,7 +23,7 @@ export function StatsCard({ title, value, description, icon: Icon, trend }: Stat
           </p>
         </div>
         <div className="rounded-full bg-slate-100 p-2 text-slate-700">
-          <Icon className="h-4 w-4" />
+          <Icon size={20} weight="regular" />
         </div>
       </CardHeader>
       <CardContent>

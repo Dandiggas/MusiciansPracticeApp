@@ -9,10 +9,10 @@ import {
   Clock,
   Flame,
   Guitar,
-  Music,
-  Piano,
-  Drum,
-} from "lucide-react";
+  MusicNote,
+  PianoKeys,
+  type IconProps,
+} from "@phosphor-icons/react";
 import {
   getAllProjects,
   migrateFromLegacySetup,
@@ -36,11 +36,11 @@ interface ActiveSession {
   is_paused: boolean;
 }
 
-const INSTRUMENT_ICONS: Record<InstrumentName, typeof Guitar> = {
+const INSTRUMENT_ICONS: Record<InstrumentName, React.ComponentType<IconProps>> = {
   Guitar: Guitar,
   Bass: Guitar,
-  Drums: Drum,
-  Keys: Piano,
+  Drums: MusicNote,
+  Keys: PianoKeys,
 };
 
 const formatRelativeDate = (isoDate: string): string => {
@@ -181,7 +181,7 @@ export default function DashboardPage() {
                   className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
                 >
                   Return to Session
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight size={20} weight="regular" className="ml-2" />
                 </Button>
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function DashboardPage() {
                         className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
                       >
                         {activeSession ? "Resume Session" : "Resume Previous Session"}
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        <ArrowRight size={20} weight="regular" className="ml-2" />
                       </Button>
                     )}
                     <Button
@@ -245,7 +245,7 @@ export default function DashboardPage() {
                   Current Streak
                 </p>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <Flame className="h-5 w-5 text-primary" />
+                  <Flame size={20} weight="regular" className="text-primary" />
                   <span className="text-3xl font-bold text-foreground">{stats.current_streak}</span>
                   <span className="text-sm text-muted-foreground">days</span>
                 </div>
@@ -299,7 +299,7 @@ export default function DashboardPage() {
                   )}
 
                   <div className="inline-flex rounded-lg bg-muted p-3">
-                    <Icon className="h-6 w-6 text-primary" />
+                    <Icon size={20} weight="regular" className="text-primary" />
                   </div>
 
                   <h2 className="mt-4 text-lg font-bold tracking-tight text-foreground">
@@ -331,7 +331,7 @@ export default function DashboardPage() {
                   <div className="mt-4">
                     <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:underline">
                       {project ? "Resume" : "Start"}
-                      <ArrowRight className="h-3.5 w-3.5" />
+                      <ArrowRight size={20} weight="regular" />
                     </span>
                   </div>
                 </a>
@@ -343,19 +343,19 @@ export default function DashboardPage() {
           {stats && (
             <div className="flex flex-wrap items-center justify-center gap-6 rounded-xl bg-card px-6 py-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock size={20} weight="regular" className="text-muted-foreground" />
                 <span className="font-semibold text-foreground">{stats.total_hours.toFixed(1)}h</span>
                 total
               </div>
               <div className="h-4 w-px bg-muted" />
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Flame className="h-4 w-4 text-muted-foreground" />
+                <Flame size={20} weight="regular" className="text-muted-foreground" />
                 <span className="font-semibold text-foreground">{stats.current_streak}</span>
                 day streak
               </div>
               <div className="h-4 w-px bg-muted" />
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Music className="h-4 w-4 text-muted-foreground" />
+                <MusicNote size={20} weight="regular" className="text-muted-foreground" />
                 Favorite:
                 <span className="font-semibold text-foreground">{stats.favorite_instrument || "\u2014"}</span>
               </div>

@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Music, Pause, Play, Upload } from "lucide-react";
+import { MusicNote, Pause, Play, UploadSimple } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -82,7 +82,7 @@ const LocalAudioPlayer = forwardRef<LocalAudioPlayerHandle, LocalAudioPlayerProp
           {audioUrl ? (
             <div className="flex w-full max-w-xl flex-col items-center gap-4 px-6 text-center">
               <div className="rounded-full bg-white/10 p-4">
-                <Music className="h-10 w-10" />
+                <MusicNote size={20} weight="regular" />
               </div>
               <div className="space-y-1">
                 <p className="text-lg font-semibold">Local Audio Practice</p>
@@ -99,15 +99,15 @@ const LocalAudioPlayer = forwardRef<LocalAudioPlayerHandle, LocalAudioPlayerProp
                 className="min-w-32"
               >
                 {isPlaying ? (
-                  <><Pause className="mr-2 h-4 w-4" /> Pause</>
+                  <><Pause size={20} weight="regular" className="mr-2" /> Pause</>
                 ) : (
-                  <><Play className="mr-2 h-4 w-4" /> Play</>
+                  <><Play size={20} weight="regular" className="mr-2" /> Play</>
                 )}
               </Button>
             </div>
           ) : (
             <div className="space-y-3 px-6 text-center">
-              <Upload className="mx-auto h-10 w-10 text-slate-400" />
+              <UploadSimple size={20} weight="regular" className="mx-auto text-slate-400" />
               <div>
                 <p className="font-semibold">Upload an MP3 to start practicing</p>
                 <p className="text-sm text-slate-300">

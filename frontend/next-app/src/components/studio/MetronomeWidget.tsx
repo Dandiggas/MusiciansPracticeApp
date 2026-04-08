@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "@phosphor-icons/react";
 
 const TIME_SIGNATURES = [
   { label: "2/4", beats: 2 },
@@ -55,7 +55,7 @@ export default function MetronomeWidget({
 
       <div className="flex items-center gap-3">
         <Button variant="secondary" size="icon" className="rounded-lg h-9 w-9" onClick={() => handleBpmChange(bpm - 1)}>
-          <Minus className="h-4 w-4" />
+          <Minus size={16} weight="regular" />
         </Button>
         <input
           type="range"
@@ -66,7 +66,7 @@ export default function MetronomeWidget({
           className="flex-1 h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
         />
         <Button variant="secondary" size="icon" className="rounded-lg h-9 w-9" onClick={() => handleBpmChange(bpm + 1)}>
-          <Plus className="h-4 w-4" />
+          <Plus size={16} weight="regular" />
         </Button>
       </div>
 

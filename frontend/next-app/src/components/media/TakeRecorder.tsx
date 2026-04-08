@@ -5,11 +5,11 @@ import {
   Camera,
   Circle,
   Download,
-  Mic,
-  RefreshCcw,
+  Microphone,
+  ArrowCounterClockwise,
   Square,
   Video,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -209,7 +209,7 @@ export default function TakeRecorder() {
           onClick={() => setMode("audio")}
           disabled={isRecording || isPreparing}
         >
-          <Mic className="mr-2 h-4 w-4" />
+          <Microphone size={20} weight="regular" className="mr-2" />
           Audio Only
         </Button>
         <Button
@@ -224,7 +224,7 @@ export default function TakeRecorder() {
           onClick={() => setMode("video")}
           disabled={isRecording || isPreparing}
         >
-          <Camera className="mr-2 h-4 w-4" />
+          <Camera size={20} weight="regular" className="mr-2" />
           Video + Audio
         </Button>
       </div>
@@ -253,7 +253,7 @@ export default function TakeRecorder() {
             <div className="space-y-4 rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4">
               <div className="flex items-center gap-3">
                 <div className="rounded-full bg-slate-950 p-3 text-white">
-                  <Mic className="h-5 w-5" />
+                  <Microphone size={20} weight="regular" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
@@ -279,9 +279,9 @@ export default function TakeRecorder() {
             <div className="space-y-3">
               <div className="mx-auto w-fit rounded-full bg-slate-950 p-4 text-white">
                 {isVideoMode ? (
-                  <Video className="h-7 w-7" />
+                  <Video size={20} weight="regular" />
                 ) : (
-                  <Mic className="h-7 w-7" />
+                  <Microphone size={20} weight="regular" />
                 )}
               </div>
               <div>
@@ -332,7 +332,7 @@ export default function TakeRecorder() {
               variant="destructive"
               className="h-11 rounded-2xl"
             >
-              <Square className="mr-2 h-4 w-4" />
+              <Square size={20} weight="regular" className="mr-2" />
               Stop Recording
             </Button>
           ) : (
@@ -344,7 +344,7 @@ export default function TakeRecorder() {
               disabled={isPreparing}
               className="h-11 rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
             >
-              <Circle className="mr-2 h-4 w-4" />
+              <Circle size={20} weight="regular" className="mr-2" />
               {isPreparing ? "Preparing..." : "Start Recording"}
             </Button>
           )}
@@ -357,7 +357,7 @@ export default function TakeRecorder() {
                 onClick={resetRecording}
                 className="h-11 rounded-2xl border border-slate-200 bg-slate-100 text-slate-800 shadow-none hover:bg-slate-200"
               >
-                <RefreshCcw className="mr-2 h-4 w-4" />
+                <ArrowCounterClockwise size={20} weight="regular" className="mr-2" />
                 Record Another Take
               </Button>
               <Button
@@ -370,7 +370,7 @@ export default function TakeRecorder() {
                   href={recordingUrl}
                   download={`practice-take-${mode}.${downloadExtension}`}
                 >
-                  <Download className="mr-2 h-4 w-4" />
+                  <Download size={20} weight="regular" className="mr-2" />
                   Download Take
                 </a>
               </Button>

@@ -2,7 +2,7 @@
 
 import React, { type RefObject } from "react";
 import { Button } from "@/components/ui/button";
-import { Youtube, Upload } from "lucide-react";
+import { YoutubeLogo, UploadSimple } from "@phosphor-icons/react";
 import YouTubePlayer, { extractVideoId, type YouTubePlayerHandle } from "@/components/youtube/YouTubePlayer";
 import PlaybackSpeedControl from "@/components/youtube/PlaybackSpeedControl";
 import ABLoopControl, { type LoopableMediaController } from "@/components/youtube/ABLoopControl";
@@ -59,7 +59,7 @@ export default function PracticeMedia({
             className="rounded-lg text-xs h-7"
             onClick={() => onMediaSourceChange("youtube")}
           >
-            <Youtube className="mr-1 h-3 w-3" /> YouTube
+            <YoutubeLogo size={20} weight="regular" className="mr-1" /> YouTube
           </Button>
           <Button
             variant={mediaSource === "audio" ? "default" : "secondary"}
@@ -67,7 +67,7 @@ export default function PracticeMedia({
             className="rounded-lg text-xs h-7"
             onClick={() => onMediaSourceChange("audio")}
           >
-            <Upload className="mr-1 h-3 w-3" /> MP3
+            <UploadSimple size={20} weight="regular" className="mr-1" /> MP3
           </Button>
         </div>
       </div>

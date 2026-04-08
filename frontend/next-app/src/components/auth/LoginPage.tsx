@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowRight, Clock3, Music2, Sparkles } from "lucide-react";
+import { ArrowRight, Clock, MusicNote, Sparkle } from "@phosphor-icons/react";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -89,7 +89,7 @@ const LoginPage = () => {
 
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <div className="rounded-2xl border border-border bg-secondary p-4">
-                <Music2 className="h-5 w-5 text-primary" />
+                <MusicNote size={20} weight="regular" className="text-primary" />
                 <p className="mt-3 text-sm font-semibold text-foreground">
                   Resume your setup
                 </p>
@@ -98,7 +98,7 @@ const LoginPage = () => {
                 </p>
               </div>
               <div className="rounded-2xl border border-border bg-secondary p-4">
-                <Clock3 className="h-5 w-5 text-primary" />
+                <Clock size={20} weight="regular" className="text-primary" />
                 <p className="mt-3 text-sm font-semibold text-foreground">
                   Build consistency
                 </p>
@@ -107,7 +107,7 @@ const LoginPage = () => {
                 </p>
               </div>
               <div className="rounded-2xl border border-border bg-secondary p-4">
-                <Sparkles className="h-5 w-5 text-primary" />
+                <Sparkle size={20} weight="regular" className="text-primary" />
                 <p className="mt-3 text-sm font-semibold text-foreground">
                   Plan when you need it
                 </p>
@@ -179,7 +179,7 @@ const LoginPage = () => {
                   className="h-12 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-base text-primary-foreground hover:opacity-90"
                 >
                   {isLoading ? "Logging in..." : "Open The Shed"}
-                  {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
+                  {!isLoading && <ArrowRight size={20} weight="regular" className="ml-2" />}
                 </Button>
               </form>
 
