@@ -13,14 +13,14 @@ import {
 } from "lucide-react";
 import { updateSheetMusic, getSheetMusicFileUrl } from "@/lib/sheet-music-api";
 
-// react-pdf uses canvas/DOMMatrix APIs that don't exist during SSR build.
-// Dynamic import ensures it only loads client-side.
+// react-pdf uses canvas/DOMMatrix APIs that don't exist during SSR.
+// Dynamic import with ssr:false ensures it only loads client-side.
+// Worker loaded from CDN to avoid bundling the 40MB pdfjs-dist worker
+// which causes OOM on Railway's Docker builder.
 const Document = dynamic(
   () => import("react-pdf").then((mod) => {
-    mod.pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-      "pdfjs-dist/build/pdf.worker.min.mjs",
-      import.meta.url
-    ).toString();
+    mod.pdfjs.GlobalWorkerOptions.workerSrc =
+      "https://unpkg.com/pdfjs-dist@5.4.296/build/pdf.worker.min.mjs";
     return { default: mod.Document };
   }),
   { ssr: false }
