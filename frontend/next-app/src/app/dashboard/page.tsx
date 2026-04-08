@@ -20,6 +20,8 @@ import {
   type InstrumentName,
   type InstrumentProject,
 } from "@/lib/practice-session-store";
+import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
+import { springs } from "@/lib/motion";
 
 interface Stats {
   total_hours: number;
@@ -55,6 +57,85 @@ const formatRelativeDate = (isoDate: string): string => {
   if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(date);
 };
+
+function InstrumentCard({
+  instrument,
+  project,
+  isMostRecent,
+  isActive,
+  isLarge,
+  router,
+}: {
+  instrument: InstrumentName;
+  project?: InstrumentProject;
+  isMostRecent: boolean;
+  isActive: boolean;
+  isLarge?: boolean;
+  router: ReturnType<typeof useRouter>;
+}) {
+  const Icon = INSTRUMENT_ICONS[instrument];
+  return (
+    <a
+      href={`/practice-timer?instrument=${instrument}`}
+      onClick={(e) => {
+        e.preventDefault();
+        router.push(
+          isActive
+            ? "/practice-timer"
+            : `/practice-timer?instrument=${instrument}`
+        );
+      }}
+      className={`group relative flex flex-col rounded-xl bg-card transition-all hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+        isLarge ? "p-6 md:p-8" : "p-5"
+      } ${
+        isMostRecent ? "ring-1 ring-primary/30 shadow-md" : ""
+      } h-full`}
+    >
+      {isActive && (
+        <span className="absolute right-4 top-4 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
+          In Progress
+        </span>
+      )}
+
+      <div className={`inline-flex rounded-lg bg-muted ${isLarge ? "p-4" : "p-3"}`}>
+        <Icon size={isLarge ? 28 : 20} weight="regular" className="text-primary" />
+      </div>
+
+      <h2 className={`mt-4 font-bold tracking-tight text-foreground ${isLarge ? "text-2xl" : "text-lg"}`}>
+        {instrument}
+      </h2>
+
+      {project ? (
+        <div className="mt-3 space-y-1">
+          {project.songTitle && (
+            <p className={`font-semibold text-foreground ${isLarge ? "text-base" : "text-sm"}`}>
+              {project.songTitle}
+            </p>
+          )}
+          {project.description && (
+            <p className={`text-muted-foreground ${isLarge ? "text-sm line-clamp-3" : "text-sm line-clamp-1"}`}>
+              {project.description}
+            </p>
+          )}
+          <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+            {formatRelativeDate(project.lastPracticedAt)}
+          </p>
+        </div>
+      ) : (
+        <p className={`mt-3 text-muted-foreground ${isLarge ? "text-base" : "text-sm"}`}>
+          Tap to start your first {instrument.toLowerCase()} session.
+        </p>
+      )}
+
+      <div className="mt-auto pt-4">
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:underline">
+          {project ? "Resume" : "Start"}
+          <ArrowRight size={20} weight="regular" />
+        </span>
+      </div>
+    </a>
+  );
+}
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -133,7 +214,7 @@ export default function DashboardPage() {
   /* ---------- Loading state ---------- */
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-background">
         <div className="space-y-6">
           <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[...Array(4)].map((_, i) => (
@@ -149,47 +230,56 @@ export default function DashboardPage() {
   /* ---------- Error state ---------- */
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-background">
         <p className="text-destructive">{error}</p>
       </div>
     );
   }
 
+  // Prepare instrument data for bento grid
+  const [firstInstrument, ...restInstruments] = INSTRUMENTS;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <div className="container relative mx-auto p-4 md:p-8">
         <div className="mx-auto max-w-5xl space-y-8">
 
           {/* Active session banner */}
           {activeSession && (
-            <div
-              role="alert"
-              className="rounded-xl bg-card p-5"
+            <MotionDiv
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={springs.default}
             >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
-                    Session in Progress
-                  </p>
-                  <p className="mt-1 text-lg font-bold text-foreground">
-                    {activeSession.instrument}
-                    {activeSession.is_paused && " (paused)"}
-                  </p>
+              <div
+                role="alert"
+                className="rounded-xl bg-card p-5"
+              >
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
+                      Session in Progress
+                    </p>
+                    <p className="mt-1 text-lg font-bold text-foreground">
+                      {activeSession.instrument}
+                      {activeSession.is_paused && " (paused)"}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => router.push("/practice-timer")}
+                    className="h-11 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Return to Session
+                    <ArrowRight size={20} weight="regular" className="ml-2" />
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => router.push("/practice-timer")}
-                  className="h-11 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Return to Session
-                  <ArrowRight size={20} weight="regular" className="ml-2" />
-                </Button>
               </div>
-            </div>
+            </MotionDiv>
           )}
 
-          {/* Header section with streak widget */}
-          <div className="grid gap-6 lg:grid-cols-[1fr_auto]">
-            <div>
+          {/* Hero section — left-aligned with streak widget on the right */}
+          <StaggerReveal className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
+            <StaggerItem className="md:max-w-[60%]">
               <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                 {isFirstTime ? "Welcome to The Shed" : "Welcome back, Maestro"}
               </p>
@@ -236,137 +326,107 @@ export default function DashboardPage() {
                   </div>
                 </>
               )}
-            </div>
+            </StaggerItem>
 
             {/* Streak widget */}
             {stats && !isFirstTime && (
-              <div className="flex-shrink-0 rounded-xl bg-card p-5 lg:w-56">
-                <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                  Current Streak
-                </p>
-                <div className="mt-2 flex items-baseline gap-2">
-                  <Flame size={20} weight="regular" className="text-primary" />
-                  <span className="text-3xl font-bold text-foreground">{stats.current_streak}</span>
-                  <span className="text-sm text-muted-foreground">days</span>
-                </div>
-                <div className="mt-4">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Weekly goal</span>
-                    <span>{stats.week_hours.toFixed(1)}h / {weeklyGoalHours}h</span>
+              <StaggerItem className="flex-shrink-0">
+                <div className="rounded-xl bg-card p-5 lg:w-56">
+                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                    Current Streak
+                  </p>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <Flame size={20} weight="regular" className="text-primary" />
+                    <span className="font-mono tabular-nums text-3xl font-bold text-foreground">{stats.current_streak}</span>
+                    <span className="text-sm text-muted-foreground">days</span>
                   </div>
-                  <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all"
-                      style={{ width: `${weekProgress}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Instrument cards */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {INSTRUMENTS.map((instrument) => {
-              const project = projects[instrument];
-              const Icon = INSTRUMENT_ICONS[instrument];
-              const isMostRecent = instrument === mostRecentInstrument;
-              const isActive =
-                activeSession?.instrument?.toLowerCase() === instrument.toLowerCase();
-
-              return (
-                <a
-                  key={instrument}
-                  href={`/practice-timer?instrument=${instrument}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(
-                      isActive
-                        ? "/practice-timer"
-                        : `/practice-timer?instrument=${instrument}`
-                    );
-                  }}
-                  className={`group relative rounded-xl bg-card p-5 transition-all hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-                    isMostRecent
-                      ? "ring-1 ring-primary/30 shadow-md"
-                      : ""
-                  }`}
-                >
-                  {isActive && (
-                    <span className="absolute right-4 top-4 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                      In Progress
-                    </span>
-                  )}
-
-                  <div className="inline-flex rounded-lg bg-muted p-3">
-                    <Icon size={20} weight="regular" className="text-primary" />
-                  </div>
-
-                  <h2 className="mt-4 text-lg font-bold tracking-tight text-foreground">
-                    {instrument}
-                  </h2>
-
-                  {project ? (
-                    <div className="mt-3 space-y-1">
-                      {project.songTitle && (
-                        <p className="text-sm font-semibold text-foreground">
-                          {project.songTitle}
-                        </p>
-                      )}
-                      {project.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          {project.description}
-                        </p>
-                      )}
-                      <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                        {formatRelativeDate(project.lastPracticedAt)}
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="mt-3 text-sm text-muted-foreground">
-                      Tap to start your first {instrument.toLowerCase()} session.
-                    </p>
-                  )}
-
                   <div className="mt-4">
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:underline">
-                      {project ? "Resume" : "Start"}
-                      <ArrowRight size={20} weight="regular" />
-                    </span>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Weekly goal</span>
+                      <span className="font-mono tabular-nums">{stats.week_hours.toFixed(1)}h / {weeklyGoalHours}h</span>
+                    </div>
+                    <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all"
+                        style={{ width: `${weekProgress}%` }}
+                      />
+                    </div>
                   </div>
-                </a>
-              );
-            })}
-          </div>
+                </div>
+              </StaggerItem>
+            )}
+          </StaggerReveal>
 
-          {/* Stats row */}
+          {/* Instrument cards — asymmetric bento grid */}
+          <StaggerReveal className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* First instrument gets large card spanning 2 rows */}
+            <StaggerItem className="md:row-span-2">
+              <InstrumentCard
+                instrument={firstInstrument}
+                project={projects[firstInstrument]}
+                isMostRecent={firstInstrument === mostRecentInstrument}
+                isActive={activeSession?.instrument?.toLowerCase() === firstInstrument.toLowerCase()}
+                isLarge
+                router={router}
+              />
+            </StaggerItem>
+            {/* Remaining instruments in smaller cards */}
+            {restInstruments.slice(0, 2).map((instrument) => (
+              <StaggerItem key={instrument}>
+                <InstrumentCard
+                  instrument={instrument}
+                  project={projects[instrument]}
+                  isMostRecent={instrument === mostRecentInstrument}
+                  isActive={activeSession?.instrument?.toLowerCase() === instrument.toLowerCase()}
+                  router={router}
+                />
+              </StaggerItem>
+            ))}
+            {/* Fourth instrument spans bottom 2 columns */}
+            {restInstruments[2] && (
+              <StaggerItem className="md:col-span-2">
+                <InstrumentCard
+                  instrument={restInstruments[2]}
+                  project={projects[restInstruments[2]]}
+                  isMostRecent={restInstruments[2] === mostRecentInstrument}
+                  isActive={activeSession?.instrument?.toLowerCase() === restInstruments[2].toLowerCase()}
+                  router={router}
+                />
+              </StaggerItem>
+            )}
+          </StaggerReveal>
+
+          {/* Stats footer — asymmetric grid */}
           {stats && (
-            <div className="flex flex-wrap items-center justify-center gap-6 rounded-xl bg-card px-6 py-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock size={20} weight="regular" className="text-muted-foreground" />
-                <span className="font-semibold text-foreground">{stats.total_hours.toFixed(1)}h</span>
-                total
-              </div>
-              <div className="h-4 w-px bg-muted" />
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Flame size={20} weight="regular" className="text-muted-foreground" />
-                <span className="font-semibold text-foreground">{stats.current_streak}</span>
-                day streak
-              </div>
-              <div className="h-4 w-px bg-muted" />
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MusicNote size={20} weight="regular" className="text-muted-foreground" />
-                Favorite:
-                <span className="font-semibold text-foreground">{stats.favorite_instrument || "\u2014"}</span>
-              </div>
-              <div className="hidden h-4 w-px bg-muted sm:block" />
-              <button
-                onClick={() => router.push("/profilepage")}
-                className="text-sm font-semibold text-primary hover:underline"
-              >
-                View history
-              </button>
-            </div>
+            <StaggerReveal className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-4 mt-8">
+              <StaggerItem>
+                <div className="flex items-center gap-3 rounded-xl bg-card px-6 py-4">
+                  <Clock size={20} weight="regular" className="text-muted-foreground" />
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-mono tabular-nums text-2xl font-bold text-foreground">{stats.total_hours.toFixed(1)}h</span>
+                    <span className="ml-2">total practice</span>
+                  </div>
+                </div>
+              </StaggerItem>
+              <StaggerItem>
+                <div className="flex items-center gap-3 rounded-xl bg-card px-6 py-4">
+                  <Flame size={20} weight="regular" className="text-muted-foreground" />
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-mono tabular-nums text-lg font-bold text-foreground">{stats.current_streak}</span>
+                    <span className="ml-1">day streak</span>
+                  </div>
+                </div>
+              </StaggerItem>
+              <StaggerItem>
+                <div className="flex items-center gap-3 rounded-xl bg-card px-6 py-4">
+                  <MusicNote size={20} weight="regular" className="text-muted-foreground" />
+                  <div className="text-sm text-muted-foreground">
+                    <span>Favorite: </span>
+                    <span className="font-semibold text-foreground">{stats.favorite_instrument || "\u2014"}</span>
+                  </div>
+                </div>
+              </StaggerItem>
+            </StaggerReveal>
           )}
         </div>
       </div>
