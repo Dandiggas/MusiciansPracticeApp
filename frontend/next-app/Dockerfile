@@ -3,7 +3,7 @@ FROM node:20-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --production=false
 
 FROM base AS builder
 WORKDIR /app
@@ -11,8 +11,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NODE_OPTIONS="--max-old-space-size=1024"
+ENV NODE_OPTIONS="--max-old-space-size=512"
 ENV NEXT_TELEMETRY_DISABLED=1
+# Remove heavy pdfjs-dist files not needed at build time.
+# react-pdf loads the worker from CDN at runtime.
+RUN rm -rf node_modules/pdfjs-dist/build node_modules/pdfjs-dist/legacy node_modules/pdfjs-dist/web
 RUN npm run build
 
 FROM base AS runner
