@@ -4,6 +4,8 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Microphone, MicrophoneSlash } from "@phosphor-icons/react";
 import type { NoteInfo } from "@/lib/audio/note-utils";
+import { MotionDiv } from "@/components/ui/motion-wrapper";
+import { AnimatePresence } from "framer-motion";
 
 interface TunerWidgetProps {
   isActive: boolean;
@@ -31,19 +33,34 @@ export default function TunerWidget({
       </p>
 
       <div className="text-center py-2">
-        <span
-          className={`text-5xl font-mono font-bold tracking-tighter transition-colors ${
-            !note
-              ? "text-muted-foreground/30"
-              : isInTune
-                ? "text-accent"
-                : isClose
-                  ? "text-yellow-400"
-                  : "text-destructive"
-          }`}
-        >
-          {note ? `${note.name}${note.octave}` : "--"}
-        </span>
+        <AnimatePresence mode="wait">
+          <MotionDiv
+            key={note ? `${note.name}${note.octave}` : "none"}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
+          >
+            <MotionDiv
+              animate={isInTune ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+              transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+            >
+              <span
+                className={`text-5xl font-mono font-bold tracking-tighter transition-colors duration-300 ${
+                  !note
+                    ? "text-muted-foreground/30"
+                    : isInTune
+                      ? "text-accent"
+                      : isClose
+                        ? "text-yellow-400"
+                        : "text-destructive"
+                }`}
+              >
+                {note ? `${note.name}${note.octave}` : "--"}
+              </span>
+            </MotionDiv>
+          </MotionDiv>
+        </AnimatePresence>
         <p className="mt-1">
           {note
             ? <span className="text-sm font-mono text-muted-foreground tabular-nums">{note.frequency.toFixed(1)} Hz</span>
@@ -60,12 +77,12 @@ export default function TunerWidget({
         <div className="relative h-2.5 bg-muted rounded-full overflow-hidden">
           <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-accent z-10" />
           <div
-            className={`absolute top-0 bottom-0 w-2 rounded-full -translate-x-1/2 ${
+            className={`absolute top-0 bottom-0 w-2 rounded-full -translate-x-1/2 transition-colors duration-300 ${
               isInTune ? "bg-accent" : isClose ? "bg-yellow-400" : "bg-destructive"
             }`}
             style={{
               left: `${gaugePercent}%`,
-              transition: "left 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              transition: "left 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 300ms ease",
             }}
           />
         </div>
