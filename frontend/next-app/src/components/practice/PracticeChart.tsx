@@ -76,15 +76,16 @@ export default function PracticeChart({ sessions }: PracticeChartProps) {
       {
         label: "Session Length",
         data: chartState.durations,
+        // Rose/stone palette matching design-system chart tokens
         backgroundColor: [
-          "rgba(186, 158, 255, 0.92)",
-          "rgba(132, 85, 239, 0.88)",
-          "rgba(110, 59, 215, 0.85)",
-          "rgba(155, 255, 206, 0.72)",
-          "rgba(88, 231, 171, 0.74)",
-          "rgba(186, 158, 255, 0.84)",
-          "rgba(132, 85, 239, 0.9)",
-          "rgba(110, 59, 215, 0.82)",
+          "rgba(251, 113, 133, 0.92)", // chart-1 / primary (rose-400)
+          "rgba(159, 18, 57, 0.88)",   // chart-5 (rose-900)
+          "rgba(253, 164, 175, 0.85)", // chart-3 (rose-300)
+          "rgba(168, 162, 158, 0.72)", // chart-2 (stone-400)
+          "rgba(214, 211, 209, 0.74)", // chart-4 (stone-300)
+          "rgba(251, 113, 133, 0.84)", // chart-1 repeat
+          "rgba(159, 18, 57, 0.90)",   // chart-5 repeat
+          "rgba(253, 164, 175, 0.82)", // chart-3 repeat
         ],
         borderRadius: {
           topLeft: 24,
@@ -97,7 +98,7 @@ export default function PracticeChart({ sessions }: PracticeChartProps) {
         categoryPercentage: 0.72,
         barPercentage: 0.72,
         clip: 8,
-        hoverBackgroundColor: "#ba9eff",
+        hoverBackgroundColor: "#fb7185", // primary (rose-400 dark)
       },
     ],
   };
