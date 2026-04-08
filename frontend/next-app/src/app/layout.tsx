@@ -28,6 +28,16 @@ export default function RootLayout({
           <main className="min-h-[100dvh]">
             {children}
           </main>
+          {/* Grain texture overlay — fixed, pointer-events-none, GPU-safe */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed inset-0 z-50 opacity-[0.025]"
+            style={{
+              backgroundImage: 'url("/noise.svg")',
+              backgroundRepeat: 'repeat',
+              backgroundSize: '256px 256px',
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

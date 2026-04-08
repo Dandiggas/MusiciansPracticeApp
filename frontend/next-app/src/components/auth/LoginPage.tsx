@@ -7,16 +7,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ArrowRight, Clock, MusicNote, Sparkle } from "@phosphor-icons/react";
 import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
-import { springs } from "@/lib/motion";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -68,92 +60,110 @@ const LoginPage = () => {
     }
   };
 
+  const features = [
+    {
+      icon: MusicNote,
+      title: "Resume your setup",
+      desc: "Jump back into the last instrument, media source, and flow.",
+    },
+    {
+      icon: Clock,
+      title: "Build consistency",
+      desc: "Short sessions still matter when the setup is ready the moment you sit down.",
+    },
+    {
+      icon: Sparkle,
+      title: "Plan when you need it",
+      desc: "Recommendations stay available without getting in the way of practice.",
+    },
+  ];
+
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-background">
-      <div className="container relative mx-auto flex min-h-[100dvh] items-center px-4 py-10 md:px-8">
-        <div className="mx-auto grid w-full max-w-6xl gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      {/* Subtle radial glow in dark mode */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[800px] rounded-full bg-primary/[0.04] blur-[120px]" />
+      </div>
+
+      <div className="container relative mx-auto flex min-h-[100dvh] items-center px-4 py-24 md:px-8">
+        <div className="mx-auto grid w-full max-w-6xl gap-8 xl:grid-cols-[1.1fr_0.9fr]">
+
+          {/* Left — Marketing panel */}
           <MotionDiv
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={springs.smooth}
-            className="rounded-[2rem] border border-border bg-card p-8 text-card-foreground shadow-lg"
+            transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+            className="flex flex-col justify-center"
           >
-            <div className="inline-flex items-center rounded-full border border-border bg-secondary px-4 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            {/* Eyebrow tag */}
+            <div className="inline-flex w-fit items-center rounded-full bg-primary/[0.08] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-primary">
               Welcome Back
             </div>
-            <h1 className="mt-5 text-4xl font-black tracking-tight text-foreground md:text-6xl">
-              Practice makes permanent. Intentional practice makes progress.
+
+            <h1 className="mt-6 text-4xl font-bold tracking-tighter leading-[0.95] text-foreground md:text-6xl">
+              Practice makes permanent.{" "}
+              <span className="text-muted-foreground">Intentional practice makes progress.</span>
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+
+            <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground">
               Log in, reopen your last session, and get back to focused work
               without rebuilding your setup from scratch.
             </p>
 
-            <StaggerReveal className="mt-8 space-y-4">
-              <StaggerItem>
-                <div className="rounded-2xl border border-border bg-secondary p-4">
-                  <MusicNote size={20} weight="regular" className="text-primary" />
-                  <p className="mt-3 text-sm font-semibold text-foreground">
-                    Resume your setup
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Jump back into the last instrument, media source, and flow.
-                  </p>
-                </div>
-              </StaggerItem>
-              <StaggerItem>
-                <div className="rounded-2xl border border-border bg-secondary p-4">
-                  <Clock size={20} weight="regular" className="text-primary" />
-                  <p className="mt-3 text-sm font-semibold text-foreground">
-                    Build consistency
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Short sessions still matter when the setup is ready the moment you sit down.
-                  </p>
-                </div>
-              </StaggerItem>
-              <StaggerItem>
-                <div className="rounded-2xl border border-border bg-secondary p-4">
-                  <Sparkle size={20} weight="regular" className="text-primary" />
-                  <p className="mt-3 text-sm font-semibold text-foreground">
-                    Plan when you need it
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Recommendations stay available without getting in the way of practice.
-                  </p>
-                </div>
-              </StaggerItem>
+            {/* Feature cards — double-bezel style */}
+            <StaggerReveal className="mt-12 space-y-3">
+              {features.map((f) => (
+                <StaggerItem key={f.title}>
+                  {/* Outer shell */}
+                  <div className="rounded-2xl bg-black/[0.03] p-1 ring-1 ring-black/[0.04] dark:bg-white/[0.03] dark:ring-white/[0.06]">
+                    {/* Inner core */}
+                    <div className="flex items-start gap-4 rounded-[calc(1rem-0.25rem)] bg-card p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]">
+                      <div className="flex-shrink-0 rounded-xl bg-primary/[0.08] p-2.5">
+                        <f.icon size={18} weight="regular" className="text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{f.title}</p>
+                        <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                </StaggerItem>
+              ))}
             </StaggerReveal>
           </MotionDiv>
 
+          {/* Right — Login form (double-bezel card) */}
           <MotionDiv
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ ...springs.smooth, delay: 0.1 }}
+            transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1], delay: 0.12 }}
+            className="flex items-center"
           >
-            <Card className="rounded-[1.25rem] border border-border/50 bg-card p-8 shadow-[0_20px_40px_-15px_rgba(28,25,23,0.05)] dark:bg-card/70 dark:backdrop-blur-xl dark:border-white/10 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] text-card-foreground">
-              <CardHeader className="space-y-3 p-0 pb-6">
-                <div className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+            {/* Outer shell */}
+            <div className="w-full rounded-[2rem] bg-black/[0.03] p-1.5 ring-1 ring-black/[0.04] dark:bg-white/[0.04] dark:ring-white/[0.08]">
+              {/* Inner core */}
+              <div className="rounded-[calc(2rem-0.375rem)] bg-card p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]">
+                {/* Eyebrow */}
+                <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
                   Log In
                 </div>
-                <CardTitle className="text-3xl font-black tracking-tight text-foreground">
+                <h2 className="mt-3 text-2xl font-bold tracking-tight text-foreground">
                   Return to The Shed
-                </CardTitle>
-                <CardDescription className="text-base text-muted-foreground">
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   Your session history, last setup, and practice recommendations
                   live behind your account.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 p-0">
-                <form onSubmit={handleSubmit} className="space-y-5">
+                </p>
+
+                <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                   {error && (
-                    <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+                    <div className="rounded-xl border border-destructive/20 bg-destructive/[0.06] px-4 py-3 text-sm font-medium text-destructive">
                       {error}
                     </div>
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="username" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                    <Label htmlFor="username" className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
                       Username
                     </Label>
                     <Input
@@ -165,12 +175,12 @@ const LoginPage = () => {
                       placeholder="your_username"
                       required
                       disabled={isLoading}
-                      className="h-12 rounded-lg border border-border bg-secondary px-4 shadow-none"
+                      className="h-12 rounded-xl border border-border/60 bg-muted/50 px-4 shadow-none transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] focus:border-primary/40 focus:bg-card"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                    <Label htmlFor="password" className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
                       Password
                     </Label>
                     <Input
@@ -182,37 +192,45 @@ const LoginPage = () => {
                       placeholder="••••••••"
                       required
                       disabled={isLoading}
-                      className="h-12 rounded-lg border border-border bg-secondary px-4 shadow-none"
+                      className="h-12 rounded-xl border border-border/60 bg-muted/50 px-4 shadow-none transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] focus:border-primary/40 focus:bg-card"
                     />
                   </div>
 
+                  {/* Button-in-button CTA */}
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="h-12 w-full rounded-lg bg-primary text-base text-primary-foreground hover:bg-primary/90"
+                    size="lg"
+                    className="group w-full"
                   >
-                    {isLoading ? "Logging in..." : "Open The Shed"}
-                    {!isLoading && <ArrowRight size={20} weight="regular" className="ml-2" />}
+                    <span>{isLoading ? "Logging in..." : "Open The Shed"}</span>
+                    {!isLoading && (
+                      <span className="ml-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-[1px] group-hover:scale-105">
+                        <ArrowRight size={14} weight="bold" />
+                      </span>
+                    )}
                   </Button>
                 </form>
 
-                <div className="rounded-xl border border-border bg-secondary p-4">
-                  <p className="text-sm font-semibold text-foreground">
-                    New here?
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Create an account so your sessions, setup, and history persist.
-                  </p>
-                  <Button
-                    asChild
-                    variant="secondary"
-                    className="mt-4 h-11 w-full rounded-lg border border-border bg-card text-foreground shadow-none hover:bg-secondary"
-                  >
-                    <Link href="/register">Create Account</Link>
-                  </Button>
+                {/* Sign-up CTA — double-bezel nested */}
+                <div className="mt-8 rounded-2xl bg-black/[0.03] p-1 ring-1 ring-black/[0.03] dark:bg-white/[0.03] dark:ring-white/[0.05]">
+                  <div className="rounded-[calc(1rem-0.25rem)] bg-muted/30 p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)]">
+                    <p className="text-sm font-semibold text-foreground">New here?</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Create an account so your sessions, setup, and history persist.
+                    </p>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="default"
+                      className="mt-4 w-full"
+                    >
+                      <Link href="/register">Create Account</Link>
+                    </Button>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </MotionDiv>
         </div>
       </div>
