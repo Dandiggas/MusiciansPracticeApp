@@ -39,7 +39,7 @@ export function MobileNav() {
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xl dark:bg-background/70"
             onClick={() => setIsOpen(false)}
           />
           <nav className="fixed top-14 left-0 right-0 z-50 bg-background border-b border-border p-4">
