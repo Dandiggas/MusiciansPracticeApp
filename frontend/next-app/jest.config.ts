@@ -13,6 +13,8 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^react-pdf$': '<rootDir>/src/__mocks__/react-pdf.ts',
+    '^react-pdf/dist/(.*)$': '<rootDir>/src/__mocks__/react-pdf-empty.ts',
   },
   testMatch: [
     '**/__tests__/**/*.test.[jt]s?(x)',
