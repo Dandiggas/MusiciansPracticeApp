@@ -1,3 +1,9 @@
 [build]
-dockerfilePath = "Dockerfile"
-# Force no cache on next deploy to clear stale react-pdf layers
+builder = "nixpacks"
+
+[build.nixpacks]
+aptPkgs = []
+
+[deploy]
+healthcheckPath = "/"
+restartPolicyType = "ON_FAILURE"
