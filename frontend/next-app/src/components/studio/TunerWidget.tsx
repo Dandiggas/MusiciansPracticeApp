@@ -31,8 +31,8 @@ export default function TunerWidget({
       </p>
 
       <div className="text-center py-2">
-        <div
-          className={`text-5xl font-extrabold tracking-tight transition-colors ${
+        <span
+          className={`text-5xl font-mono font-bold tracking-tighter transition-colors ${
             !note
               ? "text-muted-foreground/30"
               : isInTune
@@ -43,13 +43,11 @@ export default function TunerWidget({
           }`}
         >
           {note ? `${note.name}${note.octave}` : "--"}
-        </div>
-        <p className="text-xs text-muted-foreground mt-1">
+        </span>
+        <p className="mt-1">
           {note
-            ? `${note.frequency.toFixed(1)} Hz`
-            : isActive
-              ? "Play a note..."
-              : "Start to tune"}
+            ? <span className="text-sm font-mono text-muted-foreground tabular-nums">{note.frequency.toFixed(1)} Hz</span>
+            : <span className="text-xs text-muted-foreground">{isActive ? "Play a note..." : "Start to tune"}</span>}
         </p>
       </div>
 
@@ -62,10 +60,13 @@ export default function TunerWidget({
         <div className="relative h-2.5 bg-muted rounded-full overflow-hidden">
           <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-accent z-10" />
           <div
-            className={`absolute top-0 bottom-0 w-2 rounded-full transition-all duration-100 -translate-x-1/2 ${
+            className={`absolute top-0 bottom-0 w-2 rounded-full -translate-x-1/2 ${
               isInTune ? "bg-accent" : isClose ? "bg-yellow-400" : "bg-destructive"
             }`}
-            style={{ left: `${gaugePercent}%` }}
+            style={{
+              left: `${gaugePercent}%`,
+              transition: "left 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            }}
           />
         </div>
         <div className="text-center text-sm font-mono text-foreground">

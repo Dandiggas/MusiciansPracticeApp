@@ -17,6 +17,7 @@ import FocusPoints from "@/components/studio/FocusPoints";
 import { MetronomeEngine } from "@/lib/audio/metronome-engine";
 import { detectPitch } from "@/lib/audio/pitch-detector";
 import { frequencyToNote, type NoteInfo } from "@/lib/audio/note-utils";
+import { StaggerReveal, StaggerItem } from "@/components/ui/motion-wrapper";
 import {
   clearStoredPracticeSetup,
   clearStoredSessionSnapshot,
@@ -42,7 +43,7 @@ interface RecentSession {
 
 export default function PracticeTimerPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" /></div>}>
+    <Suspense fallback={<div className="flex min-h-[100dvh] items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" /></div>}>
       <PracticeTimerContent />
     </Suspense>
   );
@@ -739,14 +740,14 @@ function PracticeTimerContent() {
 
   // ─── Render ──────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-10">
 
         {/* ── Setup Mode ──────────────────────────────────────────── */}
         {!isRunning && (
-          <div className="mx-auto max-w-3xl space-y-6">
+          <StaggerReveal className="mx-auto max-w-3xl space-y-6">
             {/* Session header card */}
-            <div className="rounded-xl bg-card p-6 md:p-8">
+            <StaggerItem><div className="rounded-xl bg-card p-6 md:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                 Session Setup
               </p>
@@ -765,8 +766,10 @@ function PracticeTimerContent() {
                     <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                       Session Clock
                     </p>
-                    <div className="mt-2 text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl">
-                      {formatTime(elapsedSeconds)}
+                    <div className="mt-2">
+                      <span className="text-5xl md:text-7xl font-mono font-bold tracking-tighter tabular-nums text-foreground">
+                        {formatTime(elapsedSeconds)}
+                      </span>
                     </div>
                   </div>
                   <div className="rounded-lg bg-card px-4 py-3">
@@ -779,11 +782,11 @@ function PracticeTimerContent() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div></StaggerItem>
 
             {/* Recent session / stored setup banners */}
             {storedSetup?.mediaSource === "audio" && storedSetup.audioFileName && (
-              <div className="rounded-xl bg-card p-5">
+              <StaggerItem><div className="rounded-xl bg-card p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
                   Last Media Source
                 </p>
@@ -793,11 +796,11 @@ function PracticeTimerContent() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   Your last setup used a local MP3. Re-upload this track to keep the same loop and slowdown workflow.
                 </p>
-              </div>
+              </div></StaggerItem>
             )}
 
             {recentSession && (
-              <div className="rounded-xl bg-card p-5">
+              <StaggerItem><div className="rounded-xl bg-card p-5">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
@@ -838,11 +841,11 @@ function PracticeTimerContent() {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div></StaggerItem>
             )}
 
             {/* Setup form */}
-            <div className="rounded-xl bg-card p-5">
+            <StaggerItem><div className="rounded-xl bg-card p-5">
               <SessionSetupForm
                 instrument={instrument}
                 songTitle={songTitle}
@@ -862,8 +865,8 @@ function PracticeTimerContent() {
                 onAudioFileSelect={handleAudioFileSelect}
                 onStart={handleStart}
               />
-            </div>
-          </div>
+            </div></StaggerItem>
+          </StaggerReveal>
         )}
 
         {/* ── Active Session Mode ─────────────────────────────────── */}
@@ -876,7 +879,7 @@ function PracticeTimerContent() {
                   <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
                     Session Active
                   </p>
-                  <span className="text-3xl font-extrabold tracking-tight text-primary sm:text-4xl">
+                  <span className="text-3xl md:text-4xl font-mono font-bold tracking-tighter tabular-nums text-primary">
                     {formatTime(elapsedSeconds)}
                   </span>
                   {isPaused && (
@@ -927,49 +930,54 @@ function PracticeTimerContent() {
               </div>
             </div>
 
-            {/* Main workspace: media + metronome */}
-            <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-              <PracticeMedia
-                instrument={instrument}
-                songTitle={songTitle}
-                mediaSource={mediaSource}
-                youtubeUrl={youtubeUrl}
-                audioObjectUrl={audioObjectUrl}
-                audioFileName={audioFileName}
-                playbackSpeed={playbackSpeed}
-                youtubePlayerRef={youtubePlayerRef}
-                audioPlayerRef={audioPlayerRef}
-                getLoopController={getLoopController}
-                onMediaSourceChange={setMediaSource}
-                onPlaybackSpeedChange={handleSpeedChange}
-              />
-              <MetronomeWidget
-                bpm={bpm}
-                isActive={metronomeActive}
-                currentBeat={currentBeat}
-                beatsPerMeasure={beatsPerMeasure}
-                onBpmChange={handleBpmChange}
-                onBeatsPerMeasureChange={setBeatsPerMeasure}
-                onToggle={handleMetronomeToggle}
-                onTapTempo={handleTapTempo}
-              />
-            </div>
-
-            {/* Tools row: recorder + tuner + performance */}
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              <div className="rounded-xl bg-card p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-4">
-                  Take Recorder
-                </p>
-                <TakeRecorder />
+            {/* Asymmetric bento workspace */}
+            <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-4">
+              <div className="space-y-4">
+                {/* Media player (larger) */}
+                <PracticeMedia
+                  instrument={instrument}
+                  songTitle={songTitle}
+                  mediaSource={mediaSource}
+                  youtubeUrl={youtubeUrl}
+                  audioObjectUrl={audioObjectUrl}
+                  audioFileName={audioFileName}
+                  playbackSpeed={playbackSpeed}
+                  youtubePlayerRef={youtubePlayerRef}
+                  audioPlayerRef={audioPlayerRef}
+                  getLoopController={getLoopController}
+                  onMediaSourceChange={setMediaSource}
+                  onPlaybackSpeedChange={handleSpeedChange}
+                />
+                {/* Metronome widget */}
+                <MetronomeWidget
+                  bpm={bpm}
+                  isActive={metronomeActive}
+                  currentBeat={currentBeat}
+                  beatsPerMeasure={beatsPerMeasure}
+                  onBpmChange={handleBpmChange}
+                  onBeatsPerMeasureChange={setBeatsPerMeasure}
+                  onToggle={handleMetronomeToggle}
+                  onTapTempo={handleTapTempo}
+                />
               </div>
-              <TunerWidget
-                isActive={tunerActive}
-                note={tunerNote}
-                error={tunerError}
-                onToggle={handleTunerToggle}
-              />
-              <SessionPerformance elapsedSeconds={elapsedSeconds} />
+              <div className="space-y-4">
+                {/* Tuner widget */}
+                <TunerWidget
+                  isActive={tunerActive}
+                  note={tunerNote}
+                  error={tunerError}
+                  onToggle={handleTunerToggle}
+                />
+                {/* Take recorder */}
+                <div className="rounded-xl bg-card p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-4">
+                    Take Recorder
+                  </p>
+                  <TakeRecorder />
+                </div>
+                {/* Session performance */}
+                <SessionPerformance elapsedSeconds={elapsedSeconds} />
+              </div>
             </div>
 
             {/* Focus points */}

@@ -2,6 +2,7 @@ export const springs = {
   default: { type: "spring" as const, stiffness: 100, damping: 20 },
   snappy: { type: "spring" as const, stiffness: 300, damping: 30 },
   gentle: { type: "spring" as const, stiffness: 50, damping: 15 },
+  smooth: { type: "spring" as const, stiffness: 80, damping: 20 },
 };
 
 export const fadeUp = {
