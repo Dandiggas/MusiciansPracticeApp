@@ -105,7 +105,7 @@ export default function MetronomeWidget({
           className={`flex-1 h-10 rounded-lg font-semibold ${
             isActive
               ? "bg-destructive text-white hover:bg-destructive/90"
-              : "bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground"
+              : "bg-primary text-primary-foreground hover:bg-primary/90"
           }`}
         >
           {isActive ? "Stop" : "Start Click"}

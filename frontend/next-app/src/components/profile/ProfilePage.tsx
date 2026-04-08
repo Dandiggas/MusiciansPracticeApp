@@ -230,7 +230,7 @@ const ProfilePage = () => {
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Button
                         onClick={() => router.push("/dashboard")}
-                        className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                        className="h-11 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                       >
                         Continue From Dashboard
                         <ArrowRight size={20} weight="regular" className="ml-2" />
@@ -252,7 +252,7 @@ const ProfilePage = () => {
                     </p>
                     <Button
                       onClick={() => router.push("/practice-timer")}
-                      className="h-11 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                      className="h-11 w-full rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       Start First Practice Session
                     </Button>
@@ -323,7 +323,7 @@ const ProfilePage = () => {
               </div>
               <Button
                 onClick={() => router.push("/practice-timer")}
-                className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                className="h-11 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 Start Another Session
               </Button>

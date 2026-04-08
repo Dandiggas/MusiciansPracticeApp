@@ -151,7 +151,7 @@ const RegisterPage = () => {
                 </div>
               )}
             </div>
-            <Button type="submit" className="w-full bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground rounded-lg">
+            <Button type="submit" className="w-full bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
               Register
             </Button>
             <p className="text-center text-sm text-muted-foreground mt-4">
