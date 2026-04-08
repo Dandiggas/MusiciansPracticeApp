@@ -46,10 +46,10 @@ const INSTRUMENT_ICONS: Record<InstrumentName, React.ComponentType<IconProps>> =
 };
 
 const INSTRUMENT_COLORS: Record<InstrumentName, { text: string; bg: string }> = {
-  Guitar: { text: "text-primary", bg: "bg-primary/[0.08]" },
-  Bass: { text: "text-warm", bg: "bg-warm/[0.08]" },
-  Drums: { text: "text-destructive", bg: "bg-destructive/[0.08]" },
-  Keys: { text: "text-success", bg: "bg-success/[0.08]" },
+  Guitar: { text: "text-primary", bg: "bg-primary/[0.1] dark:bg-primary/[0.15]" },
+  Bass: { text: "text-warm", bg: "bg-warm/[0.1] dark:bg-warm/[0.15]" },
+  Drums: { text: "text-destructive", bg: "bg-destructive/[0.1] dark:bg-destructive/[0.15]" },
+  Keys: { text: "text-success", bg: "bg-success/[0.1] dark:bg-success/[0.15]" },
 };
 
 const formatRelativeDate = (isoDate: string): string => {

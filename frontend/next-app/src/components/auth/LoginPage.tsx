@@ -66,21 +66,21 @@ const LoginPage = () => {
       title: "Resume your setup",
       desc: "Jump back into the last instrument, media source, and flow.",
       color: "text-primary",
-      bg: "bg-primary/[0.06]",
+      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
     },
     {
       icon: Clock,
       title: "Build consistency",
       desc: "Short sessions still matter when the setup is ready the moment you sit down.",
       color: "text-warm",
-      bg: "bg-warm/[0.06]",
+      bg: "bg-warm/[0.1] dark:bg-warm/[0.15]",
     },
     {
       icon: Sparkle,
       title: "Plan when you need it",
       desc: "Recommendations stay available without getting in the way of practice.",
       color: "text-success",
-      bg: "bg-success/[0.06]",
+      bg: "bg-success/[0.1] dark:bg-success/[0.15]",
     },
   ];
 

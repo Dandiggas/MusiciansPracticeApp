@@ -3,3 +3,36 @@
 [2026-04-08T17:51:58.653Z] [log] [Fast Refresh] done in 190ms
 [2026-04-08T17:53:59.455Z] [log] [Fast Refresh] rebuilding
 [2026-04-08T17:53:59.482Z] [log] [Fast Refresh] done in 48ms
+[2026-04-08T17:57:11.730Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T17:57:12.054Z] [log] [Fast Refresh] done in 424ms
+[2026-04-08T17:57:12.186Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T17:57:12.212Z] [log] [Fast Refresh] done in 126ms
+[2026-04-08T17:57:18.254Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T17:57:18.266Z] [log] [Fast Refresh] done in 112ms
+[2026-04-08T17:58:52.510Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T17:58:52.520Z] [log] [Fast Refresh] done in 110ms
+[2026-04-08T17:59:38.547Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-04-08T18:02:36.429Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-04-08T18:03:27.337Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:03:27.472Z] [log] [Fast Refresh] done in 236ms
+[2026-04-08T18:03:27.516Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-04-08T18:04:27.362Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:04:27.384Z] [log] [Fast Refresh] done in 65ms
+[2026-04-08T18:04:36.558Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:04:36.582Z] [log] [Fast Refresh] done in 46ms
+[2026-04-08T18:04:42.956Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:04:42.984Z] [log] [Fast Refresh] done in 37ms
+[2026-04-08T18:04:49.123Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:04:49.152Z] [log] [Fast Refresh] done in 38ms
+[2026-04-08T18:04:56.998Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:04:57.024Z] [log] [Fast Refresh] done in 29ms
+[2026-04-08T18:05:03.672Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:05:03.700Z] [log] [Fast Refresh] done in 27ms
+[2026-04-08T18:05:10.718Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:05:10.747Z] [log] [Fast Refresh] done in 30ms
+[2026-04-08T18:05:20.239Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:05:20.267Z] [log] [Fast Refresh] done in 43ms
+[2026-04-08T18:05:34.042Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:05:34.071Z] [log] [Fast Refresh] done in 28ms
+[2026-04-08T18:05:59.180Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T18:05:59.207Z] [log] [Fast Refresh] done in 27ms
