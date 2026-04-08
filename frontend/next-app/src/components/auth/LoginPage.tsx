@@ -88,12 +88,12 @@ const LoginPage = () => {
       <div className="container relative mx-auto flex min-h-[100dvh] items-center px-4 py-24 md:px-8">
         <div className="mx-auto grid w-full max-w-6xl gap-8 xl:grid-cols-[1.1fr_0.9fr]">
 
-          {/* Left — Marketing panel */}
+          {/* Left — Marketing panel (order-2 on mobile so form shows first) */}
           <MotionDiv
             initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
-            className="flex flex-col justify-center"
+            className="order-2 flex flex-col justify-center xl:order-1"
           >
             {/* Eyebrow tag */}
             <div className="inline-flex w-fit items-center rounded-full bg-primary/[0.08] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-primary">
@@ -132,12 +132,12 @@ const LoginPage = () => {
             </StaggerReveal>
           </MotionDiv>
 
-          {/* Right — Login form (double-bezel card) */}
+          {/* Right — Login form (order-1 on mobile so it shows first) */}
           <MotionDiv
             initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1], delay: 0.12 }}
-            className="flex items-center"
+            className="order-1 flex items-center xl:order-2"
           >
             {/* Outer shell */}
             <div className="w-full rounded-[2rem] bg-black/[0.03] p-1.5 ring-1 ring-black/[0.04] dark:bg-white/[0.04] dark:ring-white/[0.08]">
