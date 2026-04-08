@@ -17,7 +17,8 @@ import FocusPoints from "@/components/studio/FocusPoints";
 import { MetronomeEngine } from "@/lib/audio/metronome-engine";
 import { detectPitch } from "@/lib/audio/pitch-detector";
 import { frequencyToNote, type NoteInfo } from "@/lib/audio/note-utils";
-import { StaggerReveal, StaggerItem } from "@/components/ui/motion-wrapper";
+import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
+import { AnimatePresence } from "framer-motion";
 import {
   clearStoredPracticeSetup,
   clearStoredSessionSnapshot,
@@ -742,9 +743,17 @@ function PracticeTimerContent() {
   return (
     <div className="min-h-[100dvh] bg-background">
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-10">
+        <AnimatePresence mode="wait">
 
         {/* ── Setup Mode ──────────────────────────────────────────── */}
         {!isRunning && (
+          <MotionDiv
+            key="setup"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+          >
           <StaggerReveal className="mx-auto max-w-3xl space-y-6">
             {/* Session header card */}
             <StaggerItem><div className="rounded-xl bg-card p-6 md:p-8">
@@ -867,35 +876,69 @@ function PracticeTimerContent() {
               />
             </div></StaggerItem>
           </StaggerReveal>
+          </MotionDiv>
         )}
 
         {/* ── Active Session Mode ─────────────────────────────────── */}
         {isRunning && (
+          <MotionDiv
+            key="active"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+          >
           <div className="space-y-6">
             {/* Status bar */}
             <div className="rounded-xl bg-card p-4 md:p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
-                    Session Active
-                  </p>
-                  <span className="text-3xl md:text-4xl font-mono font-bold tracking-tighter tabular-nums text-primary">
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                    </span>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-primary">
+                      Session Active
+                    </p>
+                  </div>
+                  <span className={`text-3xl md:text-4xl font-mono font-bold tracking-tighter tabular-nums text-primary transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isPaused ? "opacity-50" : "opacity-100"}`}>
                     {formatTime(elapsedSeconds)}
                   </span>
-                  {isPaused && (
-                    <span className="rounded-lg bg-muted px-3 py-1 text-xs font-semibold uppercase text-muted-foreground">
-                      Paused
-                    </span>
-                  )}
+                  <AnimatePresence>
+                    {isPaused && (
+                      <MotionDiv
+                        key="paused-badge"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+                      >
+                        <span className="rounded-full bg-muted px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                          Paused
+                        </span>
+                      </MotionDiv>
+                    )}
+                  </AnimatePresence>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-muted-foreground mr-2">
                     {instrument}{songTitle ? ` \u00B7 ${songTitle}` : ""}
                   </p>
 
-                  {error && (
-                    <p className="text-sm font-medium text-destructive mr-2">{error}</p>
-                  )}
+                  <AnimatePresence>
+                    {error && (
+                      <MotionDiv
+                        key="error-msg"
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -8 }}
+                        transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+                      >
+                        <p className="text-sm font-medium text-destructive mr-2">{error}</p>
+                      </MotionDiv>
+                    )}
+                  </AnimatePresence>
 
                   {isPaused ? (
                     <Button
@@ -983,7 +1026,10 @@ function PracticeTimerContent() {
             {/* Focus points */}
             <FocusPoints notes={notes} onNotesChange={setNotes} />
           </div>
+          </MotionDiv>
         )}
+
+        </AnimatePresence>
       </div>
     </div>
   );
