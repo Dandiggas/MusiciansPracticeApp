@@ -1,0 +1,43 @@
+[2026-04-01T08:14:34.107Z] [error] Failed to load resource: the server responded with a status of 502 ()
+[2026-04-01T08:18:50.820Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.855Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.856Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.857Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.868Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.869Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.869Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.872Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.872Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:50.884Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:18:53.887Z] [warning] The resource https://frontend-production-65a2.up.railway.app/_next/static/media/636a5ac981f94f8b-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-04-01T08:23:25.610Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.695Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.698Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.700Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.703Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.703Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.713Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.721Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.722Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:25.723Z] [error] Failed to load resource: the server responded with a status of 404 ()
+[2026-04-01T08:23:28.725Z] [warning] The resource https://frontend-production-65a2.up.railway.app/_next/static/media/636a5ac981f94f8b-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-04-01T08:27:39.899Z] [warning] The resource https://frontend-production-65a2.up.railway.app/_next/static/css/f80ff8adb8dbefab.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-04-01T08:31:46.324Z] [error] Access to XMLHttpRequest at 'http://localhost:8000/api/v1/dj-rest-auth/registration/' from origin 'https://frontend-production-65a2.up.railway.app' has been blocked by CORS policy: Permission was denied for this request to access the `loopback` address space.
+[2026-04-01T08:31:46.324Z] [error] Registration error AxiosError: Network Error
+    at m.onerror (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:24049)
+    at tt.request (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:32087)
+    at async g (https://frontend-production-65a2.up.railway.app/_next/static/chunks/app/register/page-5464a8ebdc552617.js:1:844)
+[2026-04-01T08:31:46.324Z] [error] Failed to load resource: net::ERR_FAILED
+[2026-04-01T08:36:24.840Z] [error] Access to XMLHttpRequest at 'https://musicianspracticeapp-production.up.railway.app/api/v1/dj-rest-auth/registration/' from origin 'https://frontend-production-65a2.up.railway.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: Redirect is not allowed for a preflight request.
+[2026-04-01T08:36:24.841Z] [error] Registration error AxiosError: Network Error
+    at m.onerror (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:24049)
+    at tt.request (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:32087)
+    at async x (https://frontend-production-65a2.up.railway.app/_next/static/chunks/app/register/page-cc4617d2d9ae7bf0.js:1:769)
+[2026-04-01T08:36:24.841Z] [error] Failed to load resource: net::ERR_FAILED
+[2026-04-01T08:41:04.654Z] [error] Failed to load resource: the server responded with a status of 500 ()
+[2026-04-01T08:41:04.655Z] [error] Registration error AxiosError: Request failed with status code 500
+    at eB (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:19138)
+    at XMLHttpRequest.g (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:23532)
+    at tt.request (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:32087)
+    at async x (https://frontend-production-65a2.up.railway.app/_next/static/chunks/app/register/page-cc4617d2d9ae7bf0.js:1:769)
+[2026-04-01T08:58:56.869Z] [log] {key: d680f6cdcadf83d5da4ea832905f86efe18c6101}

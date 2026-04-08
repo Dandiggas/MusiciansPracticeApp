@@ -10,7 +10,7 @@ import { PracticeCalendarHeatmap } from "../charts/CalendarHeatmap";
 import { InstrumentBreakdown } from "../charts/InstrumentBreakdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, History, PlayCircle, Youtube } from "lucide-react";
+import { ArrowRight, ClockCounterClockwise, PlayCircle, YoutubeLogo } from "@phosphor-icons/react";
 
 interface Session {
   session_id: number;
@@ -194,7 +194,7 @@ const ProfilePage = () => {
                     Continue from your latest work
                   </h2>
                 </div>
-                <PlayCircle className="h-8 w-8 text-primary" />
+                <PlayCircle size={20} weight="regular" className="text-primary" />
               </div>
 
               <div className="mt-6 rounded-xl border border-border bg-secondary p-5">
@@ -216,12 +216,12 @@ const ProfilePage = () => {
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       {latestSession.youtube_url ? (
                         <>
-                          <Youtube className="h-4 w-4 text-destructive" />
+                          <YoutubeLogo size={20} weight="regular" className="text-destructive" />
                           YouTube source saved in that session
                         </>
                       ) : (
                         <>
-                          <History className="h-4 w-4 text-muted-foreground" />
+                          <ClockCounterClockwise size={20} weight="regular" className="text-muted-foreground" />
                           Session notes and setup available to reuse
                         </>
                       )}
@@ -233,7 +233,7 @@ const ProfilePage = () => {
                         className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
                       >
                         Continue From Dashboard
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        <ArrowRight size={20} weight="regular" className="ml-2" />
                       </Button>
                       <Button
                         onClick={() => router.push("/practice-timer")}
@@ -459,7 +459,7 @@ const ProfilePage = () => {
                             rel="noopener noreferrer"
                             className="inline-flex items-center rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary/80"
                           >
-                            <Youtube className="mr-2 h-4 w-4 text-destructive" />
+                            <YoutubeLogo size={20} weight="regular" className="mr-2 text-destructive" />
                             View Source
                           </a>
                         ) : (

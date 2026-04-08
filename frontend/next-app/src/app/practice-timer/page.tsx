@@ -3,7 +3,7 @@
 import React, { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { Play, Square, Pause } from "lucide-react";
+import { Play, Square, Pause } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type YouTubePlayerHandle } from "@/components/youtube/YouTubePlayer";
 import { type LocalAudioPlayerHandle } from "@/components/media/LocalAudioPlayer";
@@ -900,7 +900,7 @@ function PracticeTimerContent() {
                       disabled={isLoading}
                       className="rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground"
                     >
-                      <Play className="mr-1.5 h-4 w-4" />
+                      <Play size={20} weight="fill" className="mr-1.5" />
                       {isLoading ? "Resuming..." : "Resume"}
                     </Button>
                   ) : (
@@ -910,7 +910,7 @@ function PracticeTimerContent() {
                       variant="secondary"
                       className="rounded-lg"
                     >
-                      <Pause className="mr-1.5 h-4 w-4" />
+                      <Pause size={20} weight="fill" className="mr-1.5" />
                       {isLoading ? "Pausing..." : "Pause"}
                     </Button>
                   )}
@@ -920,7 +920,7 @@ function PracticeTimerContent() {
                     variant="destructive"
                     className="rounded-lg"
                   >
-                    <Square className="mr-1.5 h-4 w-4" />
+                    <Square size={20} weight="fill" className="mr-1.5" />
                     {isLoading ? "Stopping..." : "Stop & Save"}
                   </Button>
                 </div>

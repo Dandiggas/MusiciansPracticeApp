@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { List, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import LogoutButton from "@/components/practice/LogoutButton";
@@ -32,7 +32,7 @@ export function MobileNav() {
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle menu"
       >
-        {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        {isOpen ? <X size={20} weight="regular" /> : <List size={20} weight="regular" />}
       </Button>
 
       {/* Mobile Menu Overlay */}
