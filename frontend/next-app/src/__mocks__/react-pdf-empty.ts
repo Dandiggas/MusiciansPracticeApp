@@ -1,2 +1,3 @@
 // Stub for react-pdf CSS imports (AnnotationLayer.css, TextLayer.css)
-export default {};
+const stub = {};
+export default stub;

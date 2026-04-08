@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
-import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +29,6 @@ const RegisterPage = () => {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [registered, setRegistered] = useState(false);
-  const router = useRouter();
 
   const validate = () => {
     const tempErrors: FormErrors = {};
