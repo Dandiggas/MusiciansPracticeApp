@@ -60,8 +60,7 @@ const RegisterPage = () => {
       const apiUrl = `${apiBaseUrl}/dj-rest-auth/registration/`;
 
       try {
-        const response = await axios.post(apiUrl, formData);
-        console.log(response.data);
+        await axios.post(apiUrl, formData);
         router.push("/login");
       } catch (error) {
         console.error("Registration error", error);
@@ -81,21 +80,21 @@ const RegisterPage = () => {
       title: "Per-instrument memory",
       desc: "Each instrument keeps its own song, BPM, notes, and media source.",
       color: "text-primary",
-      bg: "bg-primary/[0.08]",
+      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
     },
     {
       icon: Clock,
       title: "Session history",
       desc: "Track streaks, hours, and progress over time with charts and heatmaps.",
       color: "text-warm",
-      bg: "bg-warm/[0.08]",
+      bg: "bg-warm/[0.1] dark:bg-warm/[0.15]",
     },
     {
       icon: Sparkle,
       title: "AI recommendations",
       desc: "Get practice plans tailored to your instrument and skill level.",
       color: "text-success",
-      bg: "bg-success/[0.08]",
+      bg: "bg-success/[0.1] dark:bg-success/[0.15]",
     },
   ];
 
