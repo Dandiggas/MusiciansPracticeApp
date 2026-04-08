@@ -3,6 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "@phosphor-icons/react";
+import { MotionDiv } from "@/components/ui/motion-wrapper";
 
 const TIME_SIGNATURES = [
   { label: "2/4", beats: 2 },
@@ -45,9 +46,17 @@ export default function MetronomeWidget({
       </p>
 
       <div className="text-center">
-        <span className="text-6xl font-mono font-bold tracking-tighter tabular-nums text-foreground">
-          {bpm}
-        </span>
+        <MotionDiv
+          key={bpm}
+          initial={{ scale: 1.08, opacity: 0.7 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
+          className="inline-block"
+        >
+          <span className="text-6xl font-mono font-bold tracking-tighter tabular-nums text-foreground">
+            {bpm}
+          </span>
+        </MotionDiv>
         <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground mt-1">
           BPM
         </p>
@@ -98,7 +107,7 @@ export default function MetronomeWidget({
             key={ts.label}
             variant={beatsPerMeasure === ts.beats ? "default" : "secondary"}
             size="sm"
-            className="rounded-lg text-xs h-8"
+            className="rounded-lg text-xs h-8 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             onClick={() => onBeatsPerMeasureChange(ts.beats)}
           >
             {ts.label}
@@ -107,16 +116,22 @@ export default function MetronomeWidget({
       </div>
 
       <div className="flex gap-2">
-        <Button
-          onClick={onToggle}
-          className={`flex-1 h-10 rounded-lg font-semibold ${
-            isActive
-              ? "bg-destructive text-white hover:bg-destructive/90"
-              : "bg-primary text-primary-foreground hover:bg-primary/90"
-          }`}
+        <MotionDiv
+          className="flex-1"
+          whileTap={{ scale: 0.96 }}
+          transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1] }}
         >
-          {isActive ? "Stop" : "Start Click"}
-        </Button>
+          <Button
+            onClick={onToggle}
+            className={`w-full h-10 rounded-lg font-semibold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              isActive
+                ? "bg-destructive text-white hover:bg-destructive/90"
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
+            }`}
+          >
+            {isActive ? "Stop" : "Start Click"}
+          </Button>
+        </MotionDiv>
         <Button variant="secondary" className="rounded-lg h-10" onClick={onTapTempo}>
           Tap
         </Button>

@@ -12,6 +12,8 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { MotionDiv } from "@/components/ui/motion-wrapper";
+import { AnimatePresence } from "framer-motion";
 
 type RecordingMode = "audio" | "video";
 
@@ -201,7 +203,7 @@ export default function TakeRecorder() {
           type="button"
           variant={mode === "audio" ? "default" : "outline"}
           className={cn(
-            "h-10 rounded-full px-4",
+            "h-10 rounded-full px-4 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
             mode === "audio"
               ? "bg-slate-950 text-white hover:bg-slate-800"
               : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
@@ -216,7 +218,7 @@ export default function TakeRecorder() {
           type="button"
           variant={mode === "video" ? "default" : "outline"}
           className={cn(
-            "h-10 rounded-full px-4",
+            "h-10 rounded-full px-4 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
             mode === "video"
               ? "bg-slate-950 text-white hover:bg-slate-800"
               : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
@@ -301,17 +303,25 @@ export default function TakeRecorder() {
 
       <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4">
         <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Status
-            </p>
-            <p className="mt-1 text-sm text-slate-700">
-              {isRecording
-                ? "Recording now"
-                : hasRecording
-                  ? "Take captured locally"
-                  : "Ready to record"}
-            </p>
+          <div className="flex items-center gap-2">
+            {isRecording && (
+              <span className="relative flex h-3 w-3 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+              </span>
+            )}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Status
+              </p>
+              <p className="mt-1 text-sm text-slate-700">
+                {isRecording
+                  ? "Recording now"
+                  : hasRecording
+                    ? "Take captured locally"
+                    : "Ready to record"}
+              </p>
+            </div>
           </div>
           <div className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm">
             {formatElapsed(elapsedSeconds)}
@@ -325,31 +335,57 @@ export default function TakeRecorder() {
         )}
 
         <div className="mt-4 grid gap-3">
-          {isRecording ? (
-            <Button
-              type="button"
-              onClick={stopRecording}
-              variant="destructive"
-              className="h-11 rounded-2xl"
-            >
-              <Square size={20} weight="regular" className="mr-2" />
-              Stop Recording
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              onClick={() => {
-                void startRecording();
-              }}
-              disabled={isPreparing}
-              className="h-11 rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
-            >
-              <Circle size={20} weight="regular" className="mr-2" />
-              {isPreparing ? "Preparing..." : "Start Recording"}
-            </Button>
-          )}
+          <AnimatePresence mode="wait">
+            {isRecording ? (
+              <MotionDiv
+                key="stop"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <Button
+                  type="button"
+                  onClick={stopRecording}
+                  variant="destructive"
+                  className="h-11 w-full rounded-2xl"
+                >
+                  <Square size={20} weight="regular" className="mr-2" />
+                  Stop Recording
+                </Button>
+              </MotionDiv>
+            ) : (
+              <MotionDiv
+                key="start"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <Button
+                  type="button"
+                  onClick={() => {
+                    void startRecording();
+                  }}
+                  disabled={isPreparing}
+                  className="h-11 w-full rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
+                >
+                  <Circle size={20} weight="regular" className="mr-2" />
+                  {isPreparing ? "Preparing..." : "Start Recording"}
+                </Button>
+              </MotionDiv>
+            )}
+          </AnimatePresence>
 
+          <AnimatePresence>
           {hasRecording && recordingUrl && (
+            <MotionDiv
+              key="take-actions"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+            >
             <div className="grid gap-3 sm:grid-cols-2">
               <Button
                 type="button"
@@ -375,7 +411,9 @@ export default function TakeRecorder() {
                 </a>
               </Button>
             </div>
+            </MotionDiv>
           )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
