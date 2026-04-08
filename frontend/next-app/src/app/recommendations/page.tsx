@@ -15,7 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SpinnerGap, Sparkle, ArrowRight } from "@phosphor-icons/react";
 import { saveStoredRecommendation } from "@/lib/practice-session-store";
-import { StaggerReveal, StaggerItem } from "@/components/ui/motion-wrapper";
+import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
+import { AnimatePresence } from "framer-motion";
 
 const GOAL_PRESETS = [
   "Tighten rhythm and timing",
@@ -126,7 +127,7 @@ export default function RecommendationsPage() {
                   key={preset}
                   type="button"
                   onClick={() => setGoals(preset)}
-                  className="flex w-full items-center justify-between rounded-lg border border-border bg-secondary px-4 py-3 text-left text-sm text-foreground transition hover:bg-secondary/80"
+                  className="flex w-full items-center justify-between rounded-lg border border-border bg-secondary px-4 py-3 text-left text-sm text-foreground transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-secondary/80 active:scale-[0.97]"
                 >
                   <span>{preset}</span>
                   <ArrowRight size={20} weight="regular" className="text-muted-foreground" />
@@ -223,46 +224,73 @@ export default function RecommendationsPage() {
                     disabled={isLoading}
                     className="h-12 w-full rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                   >
-                    {isLoading ? (
-                      <>
-                        <SpinnerGap size={20} weight="regular" className="mr-2 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      "Get Recommendation"
-                    )}
+                    <AnimatePresence mode="wait" initial={false}>
+                      {isLoading ? (
+                        <MotionDiv
+                          key="loading"
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+                          className="flex items-center"
+                        >
+                          <SpinnerGap size={20} weight="regular" className="mr-2 animate-spin" />
+                          Generating...
+                        </MotionDiv>
+                      ) : (
+                        <MotionDiv
+                          key="idle"
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+                        >
+                          Get Recommendation
+                        </MotionDiv>
+                      )}
+                    </AnimatePresence>
                   </Button>
                 </form>
               </CardContent>
             </Card>
 
-            {recommendation && (
-              <Card className="rounded-xl border-border bg-card">
-                <CardHeader>
-                  <CardTitle className="text-xl text-card-foreground">
-                    Your Practice Recommendation
-                  </CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    {isCachedResult
-                      ? "This matched a recent request, so we reused the saved recommendation."
-                      : "Use this as the plan for your next focused session."}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="rounded-xl border border-border bg-secondary p-5">
-                    <p className="whitespace-pre-wrap text-sm leading-7 text-foreground">
-                      {recommendation}
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => router.push("/practice-timer")}
-                    className="h-11 w-full rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    Take This Into Practice Session
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            <AnimatePresence mode="wait">
+              {recommendation && (
+                <MotionDiv
+                  key="recommendation-result"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                >
+                  <Card className="rounded-xl border-border bg-card">
+                    <CardHeader>
+                      <CardTitle className="text-xl text-card-foreground">
+                        Your Practice Recommendation
+                      </CardTitle>
+                      <CardDescription className="text-muted-foreground">
+                        {isCachedResult
+                          ? "This matched a recent request, so we reused the saved recommendation."
+                          : "Use this as the plan for your next focused session."}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="rounded-xl border border-border bg-secondary p-5">
+                        <p className="whitespace-pre-wrap text-sm leading-7 text-foreground">
+                          {recommendation}
+                        </p>
+                      </div>
+                      <Button
+                        onClick={() => router.push("/practice-timer")}
+                        className="h-11 w-full rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                      >
+                        Take This Into Practice Session
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </MotionDiv>
+              )}
+            </AnimatePresence>
           </div>
           </StaggerItem>
         </div>

@@ -11,7 +11,8 @@ import { InstrumentBreakdown } from "../charts/InstrumentBreakdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ClockCounterClockwise, PlayCircle, YoutubeLogo } from "@phosphor-icons/react";
-import { StaggerReveal, StaggerItem } from "@/components/ui/motion-wrapper";
+import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
+import { AnimatePresence } from "framer-motion";
 
 interface Session {
   session_id: number;
@@ -158,7 +159,7 @@ const ProfilePage = () => {
               </p>
 
               <div className="mt-8 grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-4">
-                <div className="rounded-xl bg-secondary p-4">
+                <div className="rounded-xl bg-secondary p-4 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5">
                   <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                     Sessions
                   </p>
@@ -167,7 +168,7 @@ const ProfilePage = () => {
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">recorded so far</p>
                 </div>
-                <div className="rounded-xl bg-secondary p-4">
+                <div className="rounded-xl bg-secondary p-4 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5">
                   <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                     Latest
                   </p>
@@ -176,7 +177,7 @@ const ProfilePage = () => {
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">most recent focus</p>
                 </div>
-                <div className="rounded-xl bg-secondary p-4">
+                <div className="rounded-xl bg-secondary p-4 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5">
                   <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                     Workflow
                   </p>
@@ -291,9 +292,14 @@ const ProfilePage = () => {
                 </CardHeader>
                 <CardContent className="pt-0">
                   {sessions.length > 0 ? (
-                    <div className="h-80">
+                    <MotionDiv
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                      className="h-80"
+                    >
                       <PracticeChart sessions={sessions} />
-                    </div>
+                    </MotionDiv>
                   ) : (
                     <p className="text-sm text-muted-foreground">
                       No chart data yet. Log a few sessions and this view will come alive.
@@ -425,9 +431,16 @@ const ProfilePage = () => {
                   No sessions match your filters.
                 </div>
               ) : (
-                <StaggerReveal className="space-y-3">
+                <AnimatePresence mode="popLayout">
                   {filteredSessions.map((session) => (
-                    <StaggerItem key={session.session_id}>
+                    <MotionDiv
+                      key={session.session_id}
+                      layout
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+                    >
                       <div
                         className="grid gap-4 rounded-xl border border-border bg-secondary p-5 transition hover:bg-secondary/80 md:grid-cols-[110px_1fr_120px_140px]"
                       >
@@ -474,9 +487,9 @@ const ProfilePage = () => {
                           )}
                         </div>
                       </div>
-                    </StaggerItem>
+                    </MotionDiv>
                   ))}
-                </StaggerReveal>
+                </AnimatePresence>
               )}
             </div>
           </section>
