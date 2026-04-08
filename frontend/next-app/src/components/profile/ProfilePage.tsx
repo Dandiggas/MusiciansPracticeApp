@@ -11,6 +11,7 @@ import { InstrumentBreakdown } from "../charts/InstrumentBreakdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ClockCounterClockwise, PlayCircle, YoutubeLogo } from "@phosphor-icons/react";
+import { StaggerReveal, StaggerItem } from "@/components/ui/motion-wrapper";
 
 interface Session {
   session_id: number;
@@ -117,7 +118,7 @@ const ProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-background">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
           <p className="mt-4 text-muted-foreground">Loading your history...</p>
@@ -128,7 +129,7 @@ const ProfilePage = () => {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-background">
         <div className="text-center">
           <p className="text-destructive">Error: {error}</p>
         </div>
@@ -139,9 +140,10 @@ const ProfilePage = () => {
   const token = localStorage.getItem("token") || "";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="relative min-h-[100dvh] overflow-hidden bg-background">
       <div className="container relative mx-auto p-4 md:p-8">
-        <div className="mx-auto max-w-7xl space-y-8">
+        <StaggerReveal className="mx-auto max-w-7xl space-y-8">
+          <StaggerItem>
           <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="rounded-xl bg-card p-8 text-card-foreground shadow-lg">
               <div className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
@@ -155,12 +157,12 @@ const ProfilePage = () => {
                 the next session without losing context.
               </p>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-4">
                 <div className="rounded-xl bg-secondary p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                     Sessions
                   </p>
-                  <p className="mt-2 text-2xl font-black text-foreground">
+                  <p className="mt-2 font-mono tabular-nums text-2xl font-black text-foreground">
                     {sessions.length}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">recorded so far</p>
@@ -265,7 +267,9 @@ const ProfilePage = () => {
               </div>
             </div>
           </section>
+          </StaggerItem>
 
+          <StaggerItem>
           <section className="grid gap-6">
             <Card className="rounded-xl border-border bg-card text-card-foreground shadow-lg">
               <CardHeader>
@@ -310,7 +314,9 @@ const ProfilePage = () => {
               </Card>
             </div>
           </section>
+          </StaggerItem>
 
+          <StaggerItem>
           <section className="rounded-xl bg-card p-6 text-card-foreground shadow-lg">
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
@@ -402,7 +408,7 @@ const ProfilePage = () => {
                 </div>
 
                 {hasActiveFilters && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-mono tabular-nums text-sm text-muted-foreground">
                     Showing {filteredSessions.length} of {sessions.length} sessions
                   </p>
                 )}
@@ -419,59 +425,63 @@ const ProfilePage = () => {
                   No sessions match your filters.
                 </div>
               ) : (
-                filteredSessions.map((session) => (
-                    <div
-                      key={session.session_id}
-                      className="grid gap-4 rounded-xl border border-border bg-secondary p-5 transition hover:bg-secondary/80 md:grid-cols-[110px_1fr_120px_140px]"
-                    >
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                          Session
-                        </p>
-                        <p className="mt-2 text-2xl font-black text-foreground">
-                          #{session.display_id ?? session.session_id}
-                        </p>
+                <StaggerReveal className="space-y-3">
+                  {filteredSessions.map((session) => (
+                    <StaggerItem key={session.session_id}>
+                      <div
+                        className="grid gap-4 rounded-xl border border-border bg-secondary p-5 transition hover:bg-secondary/80 md:grid-cols-[110px_1fr_120px_140px]"
+                      >
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                            Session
+                          </p>
+                          <p className="mt-2 font-mono tabular-nums text-2xl font-black text-foreground">
+                            #{session.display_id ?? session.session_id}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">
+                            {session.instrument}
+                          </p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {session.description || "No description recorded"}
+                          </p>
+                          <p className="mt-2 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                            {session.session_date}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                            Duration
+                          </p>
+                          <p className="mt-2 font-mono tabular-nums text-sm font-semibold text-foreground">
+                            {session.duration}
+                          </p>
+                        </div>
+                        <div className="flex items-center md:justify-end">
+                          {session.youtube_url ? (
+                            <a
+                              href={session.youtube_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary/80"
+                            >
+                              <YoutubeLogo size={20} weight="regular" className="mr-2 text-destructive" />
+                              View Source
+                            </a>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">No video saved</span>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">
-                          {session.instrument}
-                        </p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {session.description || "No description recorded"}
-                        </p>
-                        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                          {session.session_date}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                          Duration
-                        </p>
-                        <p className="mt-2 font-mono text-sm font-semibold text-foreground">
-                          {session.duration}
-                        </p>
-                      </div>
-                      <div className="flex items-center md:justify-end">
-                        {session.youtube_url ? (
-                          <a
-                            href={session.youtube_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary/80"
-                          >
-                            <YoutubeLogo size={20} weight="regular" className="mr-2 text-destructive" />
-                            View Source
-                          </a>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">No video saved</span>
-                        )}
-                      </div>
-                    </div>
-                  ))
+                    </StaggerItem>
+                  ))}
+                </StaggerReveal>
               )}
             </div>
           </section>
-        </div>
+          </StaggerItem>
+        </StaggerReveal>
       </div>
     </div>
   );
