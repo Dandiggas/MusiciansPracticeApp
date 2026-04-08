@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
+import dynamic from "next/dynamic";
 import {
   ChevronDown,
   ChevronUp,
@@ -15,10 +13,23 @@ import {
 } from "lucide-react";
 import { updateSheetMusic, getSheetMusicFileUrl } from "@/lib/sheet-music-api";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// react-pdf uses canvas/DOMMatrix APIs that don't exist during SSR build.
+// Dynamic import ensures it only loads client-side.
+const Document = dynamic(
+  () => import("react-pdf").then((mod) => {
+    mod.pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      "pdfjs-dist/build/pdf.worker.min.mjs",
+      import.meta.url
+    ).toString();
+    return { default: mod.Document };
+  }),
+  { ssr: false }
+);
+
+const PDFPage = dynamic(
+  () => import("react-pdf").then((mod) => ({ default: mod.Page })),
+  { ssr: false }
+);
 
 interface SheetMusicWidgetProps {
   sheetMusicId: number;
@@ -198,7 +209,7 @@ export default function SheetMusicWidget({
             </div>
           }
         >
-          <Page
+          <PDFPage
             pageNumber={currentPage}
             scale={scale}
             width={containerWidth > 0 ? containerWidth - 40 : undefined}
