@@ -80,16 +80,22 @@ const RegisterPage = () => {
       icon: Guitar,
       title: "Per-instrument memory",
       desc: "Each instrument keeps its own song, BPM, notes, and media source.",
+      color: "text-primary",
+      bg: "bg-primary/[0.08]",
     },
     {
       icon: Clock,
       title: "Session history",
       desc: "Track streaks, hours, and progress over time with charts and heatmaps.",
+      color: "text-warm",
+      bg: "bg-warm/[0.08]",
     },
     {
       icon: Sparkle,
       title: "AI recommendations",
       desc: "Get practice plans tailored to your instrument and skill level.",
+      color: "text-success",
+      bg: "bg-success/[0.08]",
     },
   ];
 
@@ -128,11 +134,11 @@ const RegisterPage = () => {
                 <StaggerItem key={f.title}>
                   <div className="rounded-2xl bg-black/[0.03] p-1 ring-1 ring-black/[0.04] dark:bg-white/[0.03] dark:ring-white/[0.06]">
                     <div className="flex items-start gap-4 rounded-[calc(1rem-0.25rem)] bg-card p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]">
-                      <div className="flex-shrink-0 rounded-xl bg-primary/[0.08] p-2.5">
+                      <div className={`flex-shrink-0 rounded-xl ${f.bg} p-2.5`}>
                         <f.icon
                           size={18}
                           weight="regular"
-                          className="text-primary"
+                          className={f.color}
                         />
                       </div>
                       <div>
