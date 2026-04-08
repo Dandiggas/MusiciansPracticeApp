@@ -1,43 +1,221 @@
-[2026-04-01T08:14:34.107Z] [error] Failed to load resource: the server responded with a status of 502 ()
-[2026-04-01T08:18:50.820Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.855Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.856Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.857Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.868Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.869Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.869Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.872Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.872Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:50.884Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:18:53.887Z] [warning] The resource https://frontend-production-65a2.up.railway.app/_next/static/media/636a5ac981f94f8b-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
-[2026-04-01T08:23:25.610Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.695Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.698Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.700Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.703Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.703Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.713Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.721Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.722Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:25.723Z] [error] Failed to load resource: the server responded with a status of 404 ()
-[2026-04-01T08:23:28.725Z] [warning] The resource https://frontend-production-65a2.up.railway.app/_next/static/media/636a5ac981f94f8b-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
-[2026-04-01T08:27:39.899Z] [warning] The resource https://frontend-production-65a2.up.railway.app/_next/static/css/f80ff8adb8dbefab.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
-[2026-04-01T08:31:46.324Z] [error] Access to XMLHttpRequest at 'http://localhost:8000/api/v1/dj-rest-auth/registration/' from origin 'https://frontend-production-65a2.up.railway.app' has been blocked by CORS policy: Permission was denied for this request to access the `loopback` address space.
-[2026-04-01T08:31:46.324Z] [error] Registration error AxiosError: Network Error
-    at m.onerror (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:24049)
-    at tt.request (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:32087)
-    at async g (https://frontend-production-65a2.up.railway.app/_next/static/chunks/app/register/page-5464a8ebdc552617.js:1:844)
-[2026-04-01T08:31:46.324Z] [error] Failed to load resource: net::ERR_FAILED
-[2026-04-01T08:36:24.840Z] [error] Access to XMLHttpRequest at 'https://musicianspracticeapp-production.up.railway.app/api/v1/dj-rest-auth/registration/' from origin 'https://frontend-production-65a2.up.railway.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: Redirect is not allowed for a preflight request.
-[2026-04-01T08:36:24.841Z] [error] Registration error AxiosError: Network Error
-    at m.onerror (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:24049)
-    at tt.request (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:32087)
-    at async x (https://frontend-production-65a2.up.railway.app/_next/static/chunks/app/register/page-cc4617d2d9ae7bf0.js:1:769)
-[2026-04-01T08:36:24.841Z] [error] Failed to load resource: net::ERR_FAILED
-[2026-04-01T08:41:04.654Z] [error] Failed to load resource: the server responded with a status of 500 ()
-[2026-04-01T08:41:04.655Z] [error] Registration error AxiosError: Request failed with status code 500
-    at eB (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:19138)
-    at XMLHttpRequest.g (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:23532)
-    at tt.request (https://frontend-production-65a2.up.railway.app/_next/static/chunks/64-99414804ed2bda6a.js:1:32087)
-    at async x (https://frontend-production-65a2.up.railway.app/_next/static/chunks/app/register/page-cc4617d2d9ae7bf0.js:1:769)
-[2026-04-01T08:58:56.869Z] [log] {key: d680f6cdcadf83d5da4ea832905f86efe18c6101}
+[2026-04-08T12:09:28.690Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-04-08T12:09:51.517Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-04-08T12:11:04.638Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:11:04.664Z] [log] [Fast Refresh] done in 52ms
+[2026-04-08T12:11:16.101Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:11:16.129Z] [log] [Fast Refresh] done in 53ms
+[2026-04-08T12:11:21.425Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:11:21.453Z] [log] [Fast Refresh] done in 51ms
+[2026-04-08T12:11:29.322Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:11:29.389Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:11:29.394Z] [log] {file: Object}
+[2026-04-08T12:11:56.626Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:11:56.682Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:12:08.999Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:12:09.064Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:12:52.056Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:12:52.092Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:12:57.266Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:12:57.336Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:12:57.375Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:13:11.051Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:13:19.951Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:13:52.650Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:14:07.945Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:14:23.958Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:14:45.626Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:15:09.054Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:15:09.155Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:15:09.509Z] [error] ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: /Users/dandiggas/Desktop/ProgrammingProjects/MusiciansPracticeApp/frontend/next-app/src/app/globals.css:132:3: Unknown word pointer-events-none
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Parser.unknownWord (turbopack:///[project]/node_modules/postcss/lib/parser.js:595:22)]
+    [at Parser.other (turbopack:///[project]/node_modules/postcss/lib/parser.js:437:12)]
+    [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:472:16)]
+    [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)]
+    [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)]
+    [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)]
+    [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[2026-04-08T12:15:09.574Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-04-08T12:15:33.550Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-04-08T12:15:49.882Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-04-08T12:17:06.797Z] [log] [Fast Refresh] rebuilding
+[2026-04-08T12:17:06.825Z] [log] [Fast Refresh] done in 36ms
