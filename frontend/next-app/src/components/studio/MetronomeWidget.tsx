@@ -45,9 +45,9 @@ export default function MetronomeWidget({
       </p>
 
       <div className="text-center">
-        <div className="text-6xl font-extrabold tracking-tight text-foreground">
+        <span className="text-6xl font-mono font-bold tracking-tighter tabular-nums text-foreground">
           {bpm}
-        </div>
+        </span>
         <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground mt-1">
           BPM
         </p>
@@ -71,18 +71,25 @@ export default function MetronomeWidget({
       </div>
 
       <div className="flex justify-center gap-2 py-2">
-        {Array.from({ length: beatsPerMeasure }).map((_, i) => (
-          <div
-            key={i}
-            className={`w-3.5 h-3.5 rounded-full transition-colors duration-75 ${
-              currentBeat === i
-                ? i === 0
-                  ? "bg-accent scale-125"
-                  : "bg-primary"
-                : "bg-muted"
-            }`}
-          />
-        ))}
+        {Array.from({ length: beatsPerMeasure }).map((_, i) => {
+          const isActiveBeat = currentBeat === i;
+          return (
+            <div
+              key={i}
+              className={`w-3.5 h-3.5 rounded-full ${
+                isActiveBeat
+                  ? i === 0
+                    ? "bg-accent"
+                    : "bg-primary"
+                  : "bg-muted"
+              }`}
+              style={{
+                transform: isActiveBeat ? "scale(1.25)" : "scale(1)",
+                transition: "transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              }}
+            />
+          );
+        })}
       </div>
 
       <div className="flex flex-wrap gap-1.5">
