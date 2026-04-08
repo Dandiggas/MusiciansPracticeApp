@@ -123,8 +123,6 @@ export interface InstrumentProject {
   notes: string;
   mediaSource: StoredMediaSource;
   audioFileName: string | null;
-  sheetMusicId: number | null;
-  sheetMusicTitle: string | null;
   lastPracticedAt: string;
 }
 
@@ -171,8 +169,6 @@ export const migrateFromLegacySetup = (): void => {
       notes: "",
       mediaSource: legacy.mediaSource || "youtube",
       audioFileName: legacy.audioFileName ?? null,
-      sheetMusicId: null,
-      sheetMusicTitle: null,
       lastPracticedAt: legacy.updatedAt || new Date().toISOString(),
     });
   }

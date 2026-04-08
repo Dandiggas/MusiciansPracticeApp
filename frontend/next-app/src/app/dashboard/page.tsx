@@ -16,7 +16,6 @@ import {
 import {
   getAllProjects,
   migrateFromLegacySetup,
-  saveStoredSessionSnapshot,
   INSTRUMENTS,
   type InstrumentName,
   type InstrumentProject,
@@ -62,7 +61,6 @@ export default function DashboardPage() {
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(null);
   const [projects, setProjects] = useState<Partial<Record<InstrumentName, InstrumentProject>>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [resumingInstrument, setResumingInstrument] = useState<string | null>(null);
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -277,9 +275,18 @@ export default function DashboardPage() {
                 activeSession?.instrument?.toLowerCase() === instrument.toLowerCase();
 
               return (
-                <div
+                <a
                   key={instrument}
-                  className={`group relative rounded-xl bg-card p-5 transition-all ${
+                  href={`/practice-timer?instrument=${instrument}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push(
+                      isActive
+                        ? "/practice-timer"
+                        : `/practice-timer?instrument=${instrument}`
+                    );
+                  }}
+                  className={`group relative rounded-xl bg-card p-5 transition-all hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                     isMostRecent
                       ? "ring-1 ring-primary/30 shadow-md"
                       : ""
@@ -311,92 +318,23 @@ export default function DashboardPage() {
                           {project.description}
                         </p>
                       )}
-                      {project.youtubeUrl && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {project.youtubeUrl}
-                        </p>
-                      )}
-                      {project.mediaSource === "audio" && project.audioFileName && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {project.audioFileName}
-                        </p>
-                      )}
-                      {project.sheetMusicTitle && (
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <span className="text-primary">♩</span>
-                          {project.sheetMusicTitle}
-                        </p>
-                      )}
                       <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                         {formatRelativeDate(project.lastPracticedAt)}
                       </p>
                     </div>
                   ) : (
                     <p className="mt-3 text-sm text-muted-foreground">
-                      Start your first {instrument.toLowerCase()} session.
+                      Tap to start your first {instrument.toLowerCase()} session.
                     </p>
                   )}
 
-                  <div className="mt-4 flex gap-2">
-                    {project && (
-                      <Button
-                        size="sm"
-                        disabled={resumingInstrument === instrument}
-                        onClick={async () => {
-                          if (isActive) {
-                            router.push("/practice-timer");
-                            return;
-                          }
-                          setResumingInstrument(instrument);
-                          setError("");
-                          const token = localStorage.getItem("token");
-                          try {
-                            const res = await axios.post(
-                              `${apiBaseUrl}/timer/start/`,
-                              {
-                                instrument: project.instrument,
-                                description: project.description || "",
-                                youtube_url: project.youtubeUrl || "",
-                              },
-                              { headers: { Authorization: `Token ${token}` } }
-                            );
-                            saveStoredSessionSnapshot({
-                              status: "active",
-                              sessionId: res.data.session_id,
-                              instrument: project.instrument,
-                              description: project.description || "",
-                              mediaSource: project.mediaSource || "youtube",
-                              youtubeUrl: project.youtubeUrl || "",
-                              audioFileName: project.audioFileName,
-                            });
-                            router.push(`/practice-timer?resume=1&instrument=${instrument}`);
-                          } catch (err) {
-                            if (axios.isAxiosError(err) && err.response?.data?.error) {
-                              setError(err.response.data.error);
-                            } else {
-                              setError("Failed to start session. Please try again.");
-                            }
-                            setResumingInstrument(null);
-                          }
-                        }}
-                        className="rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground text-xs h-8"
-                      >
-                        {resumingInstrument === instrument ? "Starting..." : isActive ? "Return" : "Resume"}
-                        <ArrowRight className="ml-1 h-3 w-3" />
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant={project ? "secondary" : "default"}
-                      onClick={() => router.push(`/practice-timer?instrument=${instrument}&new=1`)}
-                      className={`rounded-lg text-xs h-8 ${
-                        !project ? "bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground" : ""
-                      }`}
-                    >
-                      New Session
-                    </Button>
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:underline">
+                      {project ? "Resume" : "Start"}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
                   </div>
-                </div>
+                </a>
               );
             })}
           </div>

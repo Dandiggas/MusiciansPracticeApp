@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,7 @@ const RegisterPage = () => {
     password2: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [registered, setRegistered] = useState(false);
+  const router = useRouter();
 
   const validate = () => {
     const tempErrors: FormErrors = {};
@@ -52,8 +53,9 @@ const RegisterPage = () => {
       const apiUrl = `${apiBaseUrl}/dj-rest-auth/registration/`;
 
       try {
-        await axios.post(apiUrl, formData);
-        setRegistered(true);
+        const response = await axios.post(apiUrl, formData);
+        console.log(response.data);
+        router.push('/login');
       } catch (error) {
         console.error('Registration error', error);
         if (axios.isAxiosError(error)) {
@@ -64,33 +66,6 @@ const RegisterPage = () => {
         }
       }
     }
-  }
-
-  if (registered) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <Card className="w-full max-w-sm bg-card text-card-foreground rounded-xl border border-border">
-          <CardHeader>
-            <CardTitle className="text-2xl text-foreground">Check Your Email</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              We&apos;ve sent a confirmation link to <strong>{formData.email}</strong>. Click the link to verify your account, then sign in.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-center text-sm text-muted-foreground">
-              Didn&apos;t get the email? Check your spam folder or{" "}
-              <button
-                onClick={() => setRegistered(false)}
-                className="text-primary hover:underline"
-              >
-                try again
-              </button>
-              .
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
   }
 
   return (
