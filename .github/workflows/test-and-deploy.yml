@@ -103,4 +103,4 @@ jobs:
         working-directory: frontend/next-app
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service frontend
+        run: railway up --service frontend --no-cache
