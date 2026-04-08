@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SpinnerGap, Sparkle, ArrowRight } from "@phosphor-icons/react";
 import { saveStoredRecommendation } from "@/lib/practice-session-store";
+import { StaggerReveal, StaggerItem } from "@/components/ui/motion-wrapper";
 
 const GOAL_PRESETS = [
   "Tighten rhythm and timing",
@@ -101,9 +102,11 @@ export default function RecommendationsPage() {
     "flex h-12 w-full rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/40";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <div className="container relative mx-auto max-w-6xl p-4 md:p-8">
-        <div className="grid gap-6 lg:grid-cols-[0.96fr_1.04fr]">
+        <StaggerReveal>
+        <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-6">
+          <StaggerItem>
           <div className="rounded-xl border border-border bg-card p-8 text-card-foreground">
             <div className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
               Session Planning
@@ -131,7 +134,9 @@ export default function RecommendationsPage() {
               ))}
             </div>
           </div>
+          </StaggerItem>
 
+          <StaggerItem>
           <div className="space-y-6">
             <Card className="rounded-xl border-border bg-card">
               <CardHeader>
@@ -259,7 +264,9 @@ export default function RecommendationsPage() {
               </Card>
             )}
           </div>
+          </StaggerItem>
         </div>
+        </StaggerReveal>
       </div>
     </div>
   );
