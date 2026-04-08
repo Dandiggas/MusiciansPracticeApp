@@ -45,6 +45,13 @@ const INSTRUMENT_ICONS: Record<InstrumentName, React.ComponentType<IconProps>> =
   Keys: PianoKeys,
 };
 
+const INSTRUMENT_COLORS: Record<InstrumentName, { text: string; bg: string }> = {
+  Guitar: { text: "text-primary", bg: "bg-primary/[0.08]" },
+  Bass: { text: "text-warm", bg: "bg-warm/[0.08]" },
+  Drums: { text: "text-destructive", bg: "bg-destructive/[0.08]" },
+  Keys: { text: "text-success", bg: "bg-success/[0.08]" },
+};
+
 const formatRelativeDate = (isoDate: string): string => {
   const date = new Date(isoDate);
   const now = new Date();
@@ -75,6 +82,7 @@ function InstrumentCard({
   router: ReturnType<typeof useRouter>;
 }) {
   const Icon = INSTRUMENT_ICONS[instrument];
+  const colors = INSTRUMENT_COLORS[instrument];
   return (
     <a
       href={`/practice-timer?instrument=${instrument}`}
@@ -104,8 +112,8 @@ function InstrumentCard({
             </span>
           )}
 
-          <div className={`inline-flex rounded-xl bg-primary/[0.08] ${isLarge ? "p-3.5" : "p-2.5"}`}>
-            <Icon size={isLarge ? 24 : 18} weight="regular" className="text-primary" />
+          <div className={`inline-flex rounded-xl ${colors.bg} ${isLarge ? "p-3.5" : "p-2.5"}`}>
+            <Icon size={isLarge ? 24 : 18} weight="regular" className={colors.text} />
           </div>
 
           <h2 className={`mt-4 font-bold tracking-tight text-foreground ${isLarge ? "text-2xl" : "text-lg"}`}>
@@ -351,7 +359,7 @@ export default function DashboardPage() {
                       Current Streak
                     </p>
                     <div className="mt-3 flex items-baseline gap-2">
-                      <Flame size={18} weight="regular" className="text-primary" />
+                      <Flame size={18} weight="regular" className="text-warm" />
                       <span className="font-mono tabular-nums text-3xl font-bold text-foreground">{stats.current_streak}</span>
                       <span className="text-sm text-muted-foreground">days</span>
                     </div>
@@ -415,7 +423,7 @@ export default function DashboardPage() {
               <StaggerItem>
                 <div className="rounded-2xl bg-black/[0.03] p-1 ring-1 ring-black/[0.04] dark:bg-white/[0.03] dark:ring-white/[0.06]">
                   <div className="flex items-center gap-3 rounded-[calc(1rem-0.25rem)] bg-card px-6 py-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]">
-                    <Clock size={18} weight="regular" className="text-muted-foreground" />
+                    <Clock size={18} weight="regular" className="text-primary" />
                     <div className="text-sm text-muted-foreground">
                       <span className="font-mono tabular-nums text-2xl font-bold text-foreground">{stats.total_hours.toFixed(1)}h</span>
                       <span className="ml-2">total practice</span>

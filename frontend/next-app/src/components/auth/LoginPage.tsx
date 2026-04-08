@@ -65,16 +65,22 @@ const LoginPage = () => {
       icon: MusicNote,
       title: "Resume your setup",
       desc: "Jump back into the last instrument, media source, and flow.",
+      color: "text-primary",
+      bg: "bg-primary/[0.08]",
     },
     {
       icon: Clock,
       title: "Build consistency",
       desc: "Short sessions still matter when the setup is ready the moment you sit down.",
+      color: "text-warm",
+      bg: "bg-warm/[0.08]",
     },
     {
       icon: Sparkle,
       title: "Plan when you need it",
       desc: "Recommendations stay available without getting in the way of practice.",
+      color: "text-success",
+      bg: "bg-success/[0.08]",
     },
   ];
 
@@ -118,8 +124,8 @@ const LoginPage = () => {
                   <div className="rounded-2xl bg-black/[0.03] p-1 ring-1 ring-black/[0.04] dark:bg-white/[0.03] dark:ring-white/[0.06]">
                     {/* Inner core */}
                     <div className="flex items-start gap-4 rounded-[calc(1rem-0.25rem)] bg-card p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]">
-                      <div className="flex-shrink-0 rounded-xl bg-primary/[0.08] p-2.5">
-                        <f.icon size={18} weight="regular" className="text-primary" />
+                      <div className={`flex-shrink-0 rounded-xl ${f.bg} p-2.5`}>
+                        <f.icon size={18} weight="regular" className={f.color} />
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-foreground">{f.title}</p>
