@@ -11,9 +11,6 @@ import TakeRecorder from "@/components/media/TakeRecorder";
 import SessionSetupForm from "@/components/studio/SessionSetupForm";
 import PracticeMedia from "@/components/studio/PracticeMedia";
 import MetronomeWidget from "@/components/studio/MetronomeWidget";
-import SheetMusicWidget from "@/components/studio/SheetMusicWidget";
-import SheetMusicPicker from "@/components/studio/SheetMusicPicker";
-import { getSheetMusic } from "@/lib/sheet-music-api";
 import TunerWidget from "@/components/studio/TunerWidget";
 import SessionPerformance from "@/components/studio/SessionPerformance";
 import FocusPoints from "@/components/studio/FocusPoints";
@@ -72,13 +69,6 @@ function PracticeTimerContent() {
   const [storedSetup, setStoredSetup] = useState<StoredPracticeSetup | null>(null);
   const [restoredFromRecent, setRestoredFromRecent] = useState(false);
 
-  // ─── Sheet music state ──────────────────────────────────────────────
-  const [sheetMusicId, setSheetMusicId] = useState<number | null>(null);
-  const [sheetMusicTitle, setSheetMusicTitle] = useState<string | null>(null);
-  const [sheetMusicPageCount, setSheetMusicPageCount] = useState(0);
-  const [sheetMusicInitialPage, setSheetMusicInitialPage] = useState(1);
-  const [showSheetMusicPicker, setShowSheetMusicPicker] = useState(false);
-
   // ─── Metronome state ─────────────────────────────────────────────────
   const [bpm, setBpm] = useState(120);
   const [metronomeActive, setMetronomeActive] = useState(false);
@@ -110,7 +100,6 @@ function PracticeTimerContent() {
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
   const shouldAutoResume = searchParams.get("resume") === "1";
-  const isNewSession = searchParams.get("new") === "1";
   const instrumentParam = searchParams.get("instrument") as InstrumentName | null;
 
   // ─── Helpers ─────────────────────────────────────────────────────────
@@ -237,37 +226,12 @@ function PracticeTimerContent() {
           const startTime = new Date(session.started_at).getTime();
           const now = Date.now();
           setElapsedSeconds(Math.floor((now - startTime) / 1000));
-
-          // On resume from Launch Pad, load project data (BPM, song title, sheet music, etc.)
-          if (shouldAutoResume && instrumentParam && INSTRUMENTS.includes(instrumentParam)) {
-            const project = getProject(instrumentParam);
-            if (project) {
-              setSongTitle(project.songTitle || "");
-              setNotes(project.notes || "");
-              setBpm(project.bpm || 120);
-              setMediaSource(project.mediaSource || "youtube");
-              setAudioFileName(project.audioFileName);
-              if (project.sheetMusicId) {
-                setSheetMusicId(project.sheetMusicId);
-                setSheetMusicTitle(project.sheetMusicTitle);
-                getSheetMusic(project.sheetMusicId)
-                  .then((sm) => {
-                    setSheetMusicPageCount(sm.page_count);
-                    setSheetMusicInitialPage(sm.last_page_viewed);
-                  })
-                  .catch(() => {
-                    setSheetMusicId(null);
-                    setSheetMusicTitle(null);
-                  });
-              }
-            }
-          }
           return;
         }
 
         // Priority: instrument param from Launch Pad > recent session > stored setup
         if (instrumentParam && INSTRUMENTS.includes(instrumentParam)) {
-          const project = isNewSession ? null : getProject(instrumentParam);
+          const project = getProject(instrumentParam);
           if (project) {
             setInstrument(project.instrument);
             setSongTitle(project.songTitle || "");
@@ -277,22 +241,6 @@ function PracticeTimerContent() {
             setBpm(project.bpm || 120);
             setMediaSource(project.mediaSource || "youtube");
             setAudioFileName(project.audioFileName);
-            if (project.sheetMusicId) {
-              setSheetMusicId(project.sheetMusicId);
-              setSheetMusicTitle(project.sheetMusicTitle);
-              getSheetMusic(project.sheetMusicId)
-                .then((sm) => {
-                  setSheetMusicPageCount(sm.page_count);
-                  setSheetMusicInitialPage(sm.last_page_viewed);
-                })
-                .catch(() => {
-                  setSheetMusicId(null);
-                  setSheetMusicTitle(null);
-                });
-            } else {
-              setSheetMusicId(null);
-              setSheetMusicTitle(null);
-            }
           } else {
             setInstrument(instrumentParam);
           }
@@ -424,8 +372,6 @@ function PracticeTimerContent() {
           notes,
           mediaSource,
           audioFileName,
-          sheetMusicId: sheetMusicId,
-          sheetMusicTitle: sheetMusicTitle,
           lastPracticedAt: new Date().toISOString(),
         });
       }
@@ -446,8 +392,6 @@ function PracticeTimerContent() {
     instrument,
     mediaSource,
     notes,
-    sheetMusicId,
-    sheetMusicTitle,
     songTitle,
     youtubeUrl,
   ]);
@@ -495,8 +439,6 @@ function PracticeTimerContent() {
     const currentBpm = bpm;
     const currentMediaSource = mediaSource;
     const currentAudioFileName = audioFileName;
-    const currentSheetMusicId = sheetMusicId;
-    const currentSheetMusicTitle = sheetMusicTitle;
 
     setIsLoading(true);
     const token = localStorage.getItem("token");
@@ -518,8 +460,6 @@ function PracticeTimerContent() {
           notes: currentNotes,
           mediaSource: currentMediaSource,
           audioFileName: currentAudioFileName,
-          sheetMusicId: currentSheetMusicId,
-          sheetMusicTitle: currentSheetMusicTitle,
           lastPracticedAt: new Date().toISOString(),
         });
       }
@@ -920,13 +860,6 @@ function PracticeTimerContent() {
                 onYoutubeUrlChange={setYoutubeUrl}
                 onMediaSourceChange={setMediaSource}
                 onAudioFileSelect={handleAudioFileSelect}
-                sheetMusicId={sheetMusicId}
-                sheetMusicTitle={sheetMusicTitle}
-                onSheetMusicDetach={() => {
-                  setSheetMusicId(null);
-                  setSheetMusicTitle(null);
-                }}
-                onOpenSheetMusicPicker={() => setShowSheetMusicPicker(true)}
                 onStart={handleStart}
               />
             </div>
@@ -1022,17 +955,6 @@ function PracticeTimerContent() {
               />
             </div>
 
-            {/* Sheet music viewer */}
-            {sheetMusicId && sheetMusicTitle && (
-              <SheetMusicWidget
-                sheetMusicId={sheetMusicId}
-                title={sheetMusicTitle}
-                pageCount={sheetMusicPageCount}
-                initialPage={sheetMusicInitialPage}
-                initialExpanded={shouldAutoResume}
-              />
-            )}
-
             {/* Tools row: recorder + tuner + performance */}
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               <div className="rounded-xl bg-card p-5">
@@ -1055,17 +977,6 @@ function PracticeTimerContent() {
           </div>
         )}
       </div>
-
-      <SheetMusicPicker
-        open={showSheetMusicPicker}
-        onClose={() => setShowSheetMusicPicker(false)}
-        onSelect={(sheet) => {
-          setSheetMusicId(sheet.id);
-          setSheetMusicTitle(sheet.title);
-          setSheetMusicPageCount(sheet.page_count);
-          setSheetMusicInitialPage(sheet.last_page_viewed);
-        }}
-      />
     </div>
   );
 }

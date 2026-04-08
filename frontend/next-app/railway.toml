@@ -1,9 +1,0 @@
-[build]
-builder = "nixpacks"
-
-[build.nixpacks]
-aptPkgs = []
-
-[deploy]
-healthcheckPath = "/"
-restartPolicyType = "ON_FAILURE"

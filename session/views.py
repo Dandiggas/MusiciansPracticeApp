@@ -6,11 +6,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import Throttled
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from rest_framework.parsers import MultiPartParser, FormParser
-from django.http import FileResponse
-from .models import Session, Tag, SheetMusic
+from .models import Session, Tag
 from .permissions import IsAdminOrOwner
-from .serializers import SessionSerializer, TagSerializer, SheetMusicSerializer, SheetMusicUpdateSerializer
+from .serializers import SessionSerializer, TagSerializer
 from django.db.models import Max, Sum, Count, Q
 from django.utils import timezone
 from datetime import timedelta, datetime
@@ -19,7 +17,7 @@ import os
 import json
 import hashlib
 import logging
-from .throttles import RecommendationRateThrottle, SheetMusicUploadThrottle
+from .throttles import RecommendationRateThrottle
 
 
 logger = logging.getLogger(__name__)
@@ -310,51 +308,6 @@ class PracticeByInstrumentView(APIView):
         ]
 
         return Response(formatted_data)
-
-
-class SheetMusicList(generics.ListCreateAPIView):
-    permission_classes = (IsAdminOrOwner,)
-    serializer_class = SheetMusicSerializer
-    parser_classes = (MultiPartParser, FormParser)
-
-    def get_throttles(self):
-        if self.request.method == "POST":
-            return [SheetMusicUploadThrottle()]
-        return []
-
-    def get_queryset(self):
-        return SheetMusic.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class SheetMusicDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAdminOrOwner,)
-
-    def get_serializer_class(self):
-        if self.request.method in ("PATCH", "PUT"):
-            return SheetMusicUpdateSerializer
-        return SheetMusicSerializer
-
-    def get_queryset(self):
-        return SheetMusic.objects.filter(user=self.request.user)
-
-    def perform_destroy(self, instance):
-        instance.file.delete(save=False)
-        instance.delete()
-
-
-@api_view(["GET"])
-@permission_classes([IsAdminOrOwner])
-def serve_sheet_music_file(request, pk):
-    """Serve a sheet music PDF file (auth-protected)."""
-    try:
-        sheet = SheetMusic.objects.get(pk=pk, user=request.user)
-    except SheetMusic.DoesNotExist:
-        return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    return FileResponse(sheet.file.open("rb"), content_type="application/pdf")
 
 
 # Timer Control Views

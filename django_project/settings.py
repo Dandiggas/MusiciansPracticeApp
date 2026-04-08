@@ -91,31 +91,9 @@ TEMPLATES = [
     },
 ]
 
-# Email Configuration
-# In development (DEBUG=True), emails print to console.
-# In production, uses SendGrid SMTP.
-if DEBUG:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = "smtp.sendgrid.net"
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = "apikey"  # SendGrid requires this literal string
-    EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY", "")
-    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@theshed.app")
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 SITE_ID = 1
-
-# django-allauth configuration
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
-ACCOUNT_EMAIL_SUBJECT_PREFIX = "[The Shed] "
-ACCOUNT_ADAPTER = "accounts.adapter.CustomAccountAdapter"
-LOGIN_URL = "/login"
 
 
 WSGI_APPLICATION = "django_project.wsgi.application"
@@ -184,10 +162,6 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# Media files (user-uploaded content like sheet music PDFs)
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.getenv("MEDIA_ROOT", str(BASE_DIR / "media"))
 
 # WhiteNoise configuration for serving static files in production
 STORAGES = {
