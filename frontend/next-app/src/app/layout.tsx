@@ -16,11 +16,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
@@ -31,7 +31,7 @@ export default function RootLayout({
           {/* Grain texture overlay — fixed, pointer-events-none, GPU-safe */}
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed inset-0 z-50 opacity-[0.025]"
+            className="pointer-events-none fixed inset-0 z-30 opacity-[0.025]"
             style={{
               backgroundImage: 'url("/noise.svg")',
               backgroundRepeat: 'repeat',
