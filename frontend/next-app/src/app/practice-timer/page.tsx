@@ -898,7 +898,7 @@ function PracticeTimerContent() {
                     <Button
                       onClick={handleResume}
                       disabled={isLoading}
-                      className="rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground"
+                      className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       <Play size={20} weight="fill" className="mr-1.5" />
                       {isLoading ? "Resuming..." : "Resume"}

@@ -176,7 +176,7 @@ const LoginPage = () => {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="h-12 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-base text-primary-foreground hover:opacity-90"
+                  className="h-12 w-full rounded-lg bg-primary text-base text-primary-foreground hover:bg-primary/90"
                 >
                   {isLoading ? "Logging in..." : "Open The Shed"}
                   {!isLoading && <ArrowRight size={20} weight="regular" className="ml-2" />}

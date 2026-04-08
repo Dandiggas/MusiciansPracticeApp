@@ -216,7 +216,7 @@ export default function RecommendationsPage() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="h-12 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                    className="h-12 w-full rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     {isLoading ? (
                       <>
@@ -251,7 +251,7 @@ export default function RecommendationsPage() {
                   </div>
                   <Button
                     onClick={() => router.push("/practice-timer")}
-                    className="h-11 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                    className="h-11 w-full rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     Take This Into Practice Session
                   </Button>

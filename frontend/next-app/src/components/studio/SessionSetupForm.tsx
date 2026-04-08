@@ -174,7 +174,7 @@ export default function SessionSetupForm({
       <Button
         onClick={onStart}
         disabled={isLoading}
-        className="w-full h-12 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground font-semibold text-base"
+        className="w-full h-12 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90"
       >
         {isLoading ? "Starting..." : "Start Session"}
       </Button>

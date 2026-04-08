@@ -178,7 +178,7 @@ export default function DashboardPage() {
                 </div>
                 <Button
                   onClick={() => router.push("/practice-timer")}
-                  className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                  className="h-11 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   Return to Session
                   <ArrowRight size={20} weight="regular" className="ml-2" />
@@ -220,7 +220,7 @@ export default function DashboardPage() {
                               : `/practice-timer?instrument=${mostRecentInstrument}`
                           )
                         }
-                        className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                        className="h-11 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                       >
                         {activeSession ? "Resume Session" : "Resume Previous Session"}
                         <ArrowRight size={20} weight="regular" className="ml-2" />
