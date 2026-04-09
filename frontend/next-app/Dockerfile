@@ -12,9 +12,15 @@ COPY . .
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NODE_OPTIONS="--max-old-space-size=2048"
-RUN echo "=== DEBUG: listing src/components/media/ ===" && ls -la src/components/media/ || echo "!!! media/ directory does NOT exist !!!"
-RUN echo "=== DEBUG: full src/components/ tree ===" && find src/components/ -type f | head -50
-RUN npm run build
+RUN echo "=== DEBUG START ===" && \
+    echo "--- src/components/media/ ---" && \
+    (ls -la src/components/media/ 2>&1 || echo "!!! media/ directory MISSING !!!") && \
+    echo "--- full components tree ---" && \
+    find src/components/ -type f 2>&1 | head -60 && \
+    echo "--- tsconfig paths ---" && \
+    cat tsconfig.json && \
+    echo "=== DEBUG END ===" && \
+    npm run build
 
 FROM base AS runner
 WORKDIR /app
