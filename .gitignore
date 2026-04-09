@@ -16,4 +16,4 @@ graphify-out/
 stitch_recommendations_improved/
 
 # User uploads (served by Django, not git)
-media/
+/media/
