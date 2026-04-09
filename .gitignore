@@ -12,5 +12,8 @@ RAILWAY_DEPLOYMENT.md
 .claude/
 .superpowers/
 .next/
-.next/trace
-.next/trace-build
+graphify-out/
+stitch_recommendations_improved/
+
+# User uploads (served by Django, not git)
+media/
