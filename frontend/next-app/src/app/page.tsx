@@ -13,7 +13,7 @@ export default function Home() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-6">
       <div className="text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
           The Shed

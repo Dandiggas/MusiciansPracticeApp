@@ -15,7 +15,15 @@ interface InstrumentBreakdownProps {
   days?: number;
 }
 
-const COLORS = ["#ba9eff", "#9bffce", "#8455ef", "#58e7ab", "#6e3bd7", "#ff6e84"];
+// Chart palette derived from design-system tokens (rose/stone scale)
+const COLORS = [
+  "var(--chart-1)",
+  "var(--chart-3)",
+  "var(--chart-5)",
+  "var(--chart-2)",
+  "var(--chart-4)",
+  "var(--primary)",
+];
 
 export function InstrumentBreakdown({
   token,

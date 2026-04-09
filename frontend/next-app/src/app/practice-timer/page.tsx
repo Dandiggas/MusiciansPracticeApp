@@ -3,7 +3,7 @@
 import React, { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { Play, Square, Pause } from "lucide-react";
+import { Play, Square, Pause } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type YouTubePlayerHandle } from "@/components/youtube/YouTubePlayer";
 import { type LocalAudioPlayerHandle } from "@/components/media/LocalAudioPlayer";
@@ -17,6 +17,8 @@ import FocusPoints from "@/components/studio/FocusPoints";
 import { MetronomeEngine } from "@/lib/audio/metronome-engine";
 import { detectPitch } from "@/lib/audio/pitch-detector";
 import { frequencyToNote, type NoteInfo } from "@/lib/audio/note-utils";
+import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
+import { AnimatePresence } from "framer-motion";
 import {
   clearStoredPracticeSetup,
   clearStoredSessionSnapshot,
@@ -42,7 +44,7 @@ interface RecentSession {
 
 export default function PracticeTimerPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" /></div>}>
+    <Suspense fallback={<div className="flex min-h-[100dvh] items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" /></div>}>
       <PracticeTimerContent />
     </Suspense>
   );
@@ -739,14 +741,22 @@ function PracticeTimerContent() {
 
   // ─── Render ──────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-10">
+        <AnimatePresence mode="wait">
 
         {/* ── Setup Mode ──────────────────────────────────────────── */}
         {!isRunning && (
-          <div className="mx-auto max-w-3xl space-y-6">
+          <MotionDiv
+            key="setup"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+          >
+          <StaggerReveal className="mx-auto max-w-3xl space-y-6">
             {/* Session header card */}
-            <div className="rounded-xl bg-card p-6 md:p-8">
+            <StaggerItem><div className="rounded-xl bg-card p-6 md:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                 Session Setup
               </p>
@@ -765,8 +775,10 @@ function PracticeTimerContent() {
                     <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                       Session Clock
                     </p>
-                    <div className="mt-2 text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl">
-                      {formatTime(elapsedSeconds)}
+                    <div className="mt-2">
+                      <span className="text-5xl md:text-7xl font-mono font-bold tracking-tighter tabular-nums text-foreground">
+                        {formatTime(elapsedSeconds)}
+                      </span>
                     </div>
                   </div>
                   <div className="rounded-lg bg-card px-4 py-3">
@@ -779,11 +791,11 @@ function PracticeTimerContent() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div></StaggerItem>
 
             {/* Recent session / stored setup banners */}
             {storedSetup?.mediaSource === "audio" && storedSetup.audioFileName && (
-              <div className="rounded-xl bg-card p-5">
+              <StaggerItem><div className="rounded-xl bg-card p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
                   Last Media Source
                 </p>
@@ -793,11 +805,11 @@ function PracticeTimerContent() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   Your last setup used a local MP3. Re-upload this track to keep the same loop and slowdown workflow.
                 </p>
-              </div>
+              </div></StaggerItem>
             )}
 
             {recentSession && (
-              <div className="rounded-xl bg-card p-5">
+              <StaggerItem><div className="rounded-xl bg-card p-5">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
@@ -838,11 +850,11 @@ function PracticeTimerContent() {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div></StaggerItem>
             )}
 
             {/* Setup form */}
-            <div className="rounded-xl bg-card p-5">
+            <StaggerItem><div className="rounded-xl bg-card p-5">
               <SessionSetupForm
                 instrument={instrument}
                 songTitle={songTitle}
@@ -862,45 +874,79 @@ function PracticeTimerContent() {
                 onAudioFileSelect={handleAudioFileSelect}
                 onStart={handleStart}
               />
-            </div>
-          </div>
+            </div></StaggerItem>
+          </StaggerReveal>
+          </MotionDiv>
         )}
 
         {/* ── Active Session Mode ─────────────────────────────────── */}
         {isRunning && (
+          <MotionDiv
+            key="active"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+          >
           <div className="space-y-6">
             {/* Status bar */}
             <div className="rounded-xl bg-card p-4 md:p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-primary">
-                    Session Active
-                  </p>
-                  <span className="text-3xl font-extrabold tracking-tight text-primary sm:text-4xl">
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                    </span>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-primary">
+                      Session Active
+                    </p>
+                  </div>
+                  <span className={`text-3xl md:text-4xl font-mono font-bold tracking-tighter tabular-nums text-primary transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isPaused ? "opacity-50" : "opacity-100"}`}>
                     {formatTime(elapsedSeconds)}
                   </span>
-                  {isPaused && (
-                    <span className="rounded-lg bg-muted px-3 py-1 text-xs font-semibold uppercase text-muted-foreground">
-                      Paused
-                    </span>
-                  )}
+                  <AnimatePresence>
+                    {isPaused && (
+                      <MotionDiv
+                        key="paused-badge"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+                      >
+                        <span className="rounded-full bg-muted px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                          Paused
+                        </span>
+                      </MotionDiv>
+                    )}
+                  </AnimatePresence>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-muted-foreground mr-2">
                     {instrument}{songTitle ? ` \u00B7 ${songTitle}` : ""}
                   </p>
 
-                  {error && (
-                    <p className="text-sm font-medium text-destructive mr-2">{error}</p>
-                  )}
+                  <AnimatePresence>
+                    {error && (
+                      <MotionDiv
+                        key="error-msg"
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -8 }}
+                        transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+                      >
+                        <p className="text-sm font-medium text-destructive mr-2">{error}</p>
+                      </MotionDiv>
+                    )}
+                  </AnimatePresence>
 
                   {isPaused ? (
                     <Button
                       onClick={handleResume}
                       disabled={isLoading}
-                      className="rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground"
+                      className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                     >
-                      <Play className="mr-1.5 h-4 w-4" />
+                      <Play size={20} weight="fill" className="mr-1.5" />
                       {isLoading ? "Resuming..." : "Resume"}
                     </Button>
                   ) : (
@@ -910,7 +956,7 @@ function PracticeTimerContent() {
                       variant="secondary"
                       className="rounded-lg"
                     >
-                      <Pause className="mr-1.5 h-4 w-4" />
+                      <Pause size={20} weight="fill" className="mr-1.5" />
                       {isLoading ? "Pausing..." : "Pause"}
                     </Button>
                   )}
@@ -920,62 +966,70 @@ function PracticeTimerContent() {
                     variant="destructive"
                     className="rounded-lg"
                   >
-                    <Square className="mr-1.5 h-4 w-4" />
+                    <Square size={20} weight="fill" className="mr-1.5" />
                     {isLoading ? "Stopping..." : "Stop & Save"}
                   </Button>
                 </div>
               </div>
             </div>
 
-            {/* Main workspace: media + metronome */}
-            <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-              <PracticeMedia
-                instrument={instrument}
-                songTitle={songTitle}
-                mediaSource={mediaSource}
-                youtubeUrl={youtubeUrl}
-                audioObjectUrl={audioObjectUrl}
-                audioFileName={audioFileName}
-                playbackSpeed={playbackSpeed}
-                youtubePlayerRef={youtubePlayerRef}
-                audioPlayerRef={audioPlayerRef}
-                getLoopController={getLoopController}
-                onMediaSourceChange={setMediaSource}
-                onPlaybackSpeedChange={handleSpeedChange}
-              />
-              <MetronomeWidget
-                bpm={bpm}
-                isActive={metronomeActive}
-                currentBeat={currentBeat}
-                beatsPerMeasure={beatsPerMeasure}
-                onBpmChange={handleBpmChange}
-                onBeatsPerMeasureChange={setBeatsPerMeasure}
-                onToggle={handleMetronomeToggle}
-                onTapTempo={handleTapTempo}
-              />
-            </div>
-
-            {/* Tools row: recorder + tuner + performance */}
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              <div className="rounded-xl bg-card p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-4">
-                  Take Recorder
-                </p>
-                <TakeRecorder />
+            {/* Asymmetric bento workspace */}
+            <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-4">
+              <div className="space-y-4">
+                {/* Media player (larger) */}
+                <PracticeMedia
+                  instrument={instrument}
+                  songTitle={songTitle}
+                  mediaSource={mediaSource}
+                  youtubeUrl={youtubeUrl}
+                  audioObjectUrl={audioObjectUrl}
+                  audioFileName={audioFileName}
+                  playbackSpeed={playbackSpeed}
+                  youtubePlayerRef={youtubePlayerRef}
+                  audioPlayerRef={audioPlayerRef}
+                  getLoopController={getLoopController}
+                  onMediaSourceChange={setMediaSource}
+                  onPlaybackSpeedChange={handleSpeedChange}
+                />
+                {/* Metronome widget */}
+                <MetronomeWidget
+                  bpm={bpm}
+                  isActive={metronomeActive}
+                  currentBeat={currentBeat}
+                  beatsPerMeasure={beatsPerMeasure}
+                  onBpmChange={handleBpmChange}
+                  onBeatsPerMeasureChange={setBeatsPerMeasure}
+                  onToggle={handleMetronomeToggle}
+                  onTapTempo={handleTapTempo}
+                />
               </div>
-              <TunerWidget
-                isActive={tunerActive}
-                note={tunerNote}
-                error={tunerError}
-                onToggle={handleTunerToggle}
-              />
-              <SessionPerformance elapsedSeconds={elapsedSeconds} />
+              <div className="space-y-4">
+                {/* Tuner widget */}
+                <TunerWidget
+                  isActive={tunerActive}
+                  note={tunerNote}
+                  error={tunerError}
+                  onToggle={handleTunerToggle}
+                />
+                {/* Take recorder */}
+                <div className="rounded-xl bg-card p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-4">
+                    Take Recorder
+                  </p>
+                  <TakeRecorder />
+                </div>
+                {/* Session performance */}
+                <SessionPerformance elapsedSeconds={elapsedSeconds} />
+              </div>
             </div>
 
             {/* Focus points */}
             <FocusPoints notes={notes} onNotesChange={setNotes} />
           </div>
+          </MotionDiv>
         )}
+
+        </AnimatePresence>
       </div>
     </div>
   );

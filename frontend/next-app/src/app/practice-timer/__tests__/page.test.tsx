@@ -96,6 +96,21 @@ jest.mock('@/components/studio/FocusPoints', () => ({
   default: jest.fn().mockReturnValue(<div data-testid="focus-points" />),
 }));
 
+// Mock framer-motion so AnimatePresence and motion.div render children in jsdom
+jest.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  motion: {
+    div: React.forwardRef(({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }, ref: React.Ref<HTMLDivElement>) => <div ref={ref} {...props}>{children}</div>),
+  },
+}));
+
+// Mock motion-wrapper to pass through
+jest.mock('@/components/ui/motion-wrapper', () => ({
+  StaggerReveal: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
+  StaggerItem: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
+  MotionDiv: React.forwardRef(({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }, ref: React.Ref<HTMLDivElement>) => <div ref={ref} {...props}>{children}</div>),
+}));
+
 describe('PracticeTimerPage', () => {
   const originalConsoleError = console.error;
 

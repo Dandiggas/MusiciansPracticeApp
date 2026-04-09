@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X, Plus, Tag as TagIcon } from 'lucide-react';
+import { X, Plus, Tag } from '@phosphor-icons/react';
 
 interface Tag {
   id: number;
@@ -100,7 +100,7 @@ export function TagSelector({ selectedTags, onTagsChange, apiBaseUrl, token }: T
     <div className="space-y-4">
       <div>
         <Label className="flex items-center gap-2 mb-3">
-          <TagIcon className="h-4 w-4" />
+          <Tag size={16} weight="regular" />
           Tags
         </Label>
 
@@ -127,7 +127,7 @@ export function TagSelector({ selectedTags, onTagsChange, apiBaseUrl, token }: T
                   onClick={() => handleDeleteTag(tag.id)}
                   className="absolute -top-2 -right-2 hidden group-hover:flex items-center justify-center w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-xs"
                 >
-                  <X className="h-3 w-3" />
+                  <X size={16} weight="regular" />
                 </button>
               </div>
             );
@@ -175,7 +175,7 @@ export function TagSelector({ selectedTags, onTagsChange, apiBaseUrl, token }: T
 
             <div className="flex gap-2">
               <Button onClick={handleCreateTag} size="sm" className="flex-1">
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus size={16} weight="regular" className="mr-1" />
                 Create Tag
               </Button>
               <Button
@@ -198,7 +198,7 @@ export function TagSelector({ selectedTags, onTagsChange, apiBaseUrl, token }: T
             variant="outline"
             className="w-full"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus size={16} weight="regular" className="mr-2" />
             New Tag
           </Button>
         )}

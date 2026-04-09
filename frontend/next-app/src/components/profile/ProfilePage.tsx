@@ -5,12 +5,12 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import PracticeChart from "../practice/PracticeChart";
-import LogoutButton from "../practice/LogoutButton";
 import { PracticeCalendarHeatmap } from "../charts/CalendarHeatmap";
 import { InstrumentBreakdown } from "../charts/InstrumentBreakdown";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, History, PlayCircle, Youtube } from "lucide-react";
+import { ArrowRight, YoutubeLogo } from "@phosphor-icons/react";
+import { MotionDiv } from "@/components/ui/motion-wrapper";
+import { AnimatePresence } from "framer-motion";
 
 interface Session {
   session_id: number;
@@ -70,7 +70,6 @@ const ProfilePage = () => {
 
   const latestSession = useMemo(() => {
     if (!sessions.length) return null;
-
     return [...sessions].sort((a, b) => {
       const dateDiff =
         new Date(b.session_date).getTime() - new Date(a.session_date).getTime();
@@ -117,21 +116,16 @@ const ProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
-          <p className="mt-4 text-muted-foreground">Loading your history...</p>
-        </div>
+      <div className="flex min-h-[100dvh] items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-destructive">Error: {error}</p>
-        </div>
+      <div className="flex min-h-[100dvh] items-center justify-center bg-background">
+        <p className="text-sm text-destructive">{error}</p>
       </div>
     );
   }
@@ -139,339 +133,228 @@ const ProfilePage = () => {
   const token = localStorage.getItem("token") || "";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
-      <div className="container relative mx-auto p-4 md:p-8">
-        <div className="mx-auto max-w-7xl space-y-8">
-          <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-xl bg-card p-8 text-card-foreground shadow-lg">
-              <div className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                Practice History
-              </div>
-              <h1 className="mt-5 text-4xl font-black tracking-tight text-foreground md:text-6xl">
-                Welcome back, {username}.
+    <div className="min-h-[100dvh] bg-background">
+      <div className="mx-auto max-w-5xl px-4 py-10 md:px-8 md:py-16">
+        <MotionDiv
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+        >
+          {/* ── Header ── */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                {username}.
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
-                Review your recent work, spot your momentum, and jump back into
-                the next session without losing context.
+              <p className="mt-1 text-sm text-muted-foreground">
+                {sessions.length} session{sessions.length !== 1 ? "s" : ""} recorded
+                {latestSession ? ` · last: ${latestSession.instrument} on ${latestSession.session_date}` : ""}
               </p>
-
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-xl bg-secondary p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                    Sessions
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-foreground">
-                    {sessions.length}
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">recorded so far</p>
-                </div>
-                <div className="rounded-xl bg-secondary p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                    Latest
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-foreground">
-                    {latestSession?.instrument || "None"}
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">most recent focus</p>
-                </div>
-                <div className="rounded-xl bg-secondary p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                    Workflow
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-foreground">Resume</p>
-                  <p className="mt-1 text-sm text-muted-foreground">from the dashboard</p>
-                </div>
-              </div>
             </div>
-
-            <div className="rounded-xl bg-card p-6 text-card-foreground shadow-lg">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                    Next Move
-                  </p>
-                  <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
-                    Continue from your latest work
-                  </h2>
-                </div>
-                <PlayCircle className="h-8 w-8 text-primary" />
-              </div>
-
-              <div className="mt-6 rounded-xl border border-border bg-secondary p-5">
-                {latestSession ? (
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">
-                        {latestSession.instrument}
-                        {latestSession.description
-                          ? ` · ${latestSession.description}`
-                          : ""}
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Session #{latestSession.display_id ?? latestSession.session_id} on{" "}
-                        {latestSession.session_date}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      {latestSession.youtube_url ? (
-                        <>
-                          <Youtube className="h-4 w-4 text-destructive" />
-                          YouTube source saved in that session
-                        </>
-                      ) : (
-                        <>
-                          <History className="h-4 w-4 text-muted-foreground" />
-                          Session notes and setup available to reuse
-                        </>
-                      )}
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Button
-                        onClick={() => router.push("/dashboard")}
-                        className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
-                      >
-                        Continue From Dashboard
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                      <Button
-                        onClick={() => router.push("/practice-timer")}
-                        variant="secondary"
-                        className="h-11 rounded-lg bg-secondary text-secondary-foreground shadow-none hover:opacity-80"
-                      >
-                        Open Practice Session
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      No history yet. Start a session and this page will become
-                      your review and restart space.
-                    </p>
-                    <Button
-                      onClick={() => router.push("/practice-timer")}
-                      className="h-11 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
-                    >
-                      Start First Practice Session
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-5 flex justify-end">
-                <LogoutButton />
-              </div>
-            </div>
-          </section>
-
-          <section className="grid gap-6">
-            <Card className="rounded-xl border-border bg-card text-card-foreground shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl text-foreground">
-                  Practice Rhythm
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <PracticeCalendarHeatmap token={token} apiBaseUrl={apiBaseUrl} />
-              </CardContent>
-            </Card>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card className="rounded-xl border-border bg-card text-card-foreground shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl text-foreground">
-                    Time Over Sessions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  {sessions.length > 0 ? (
-                    <div className="h-80">
-                      <PracticeChart sessions={sessions} />
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No chart data yet. Log a few sessions and this view will come alive.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card className="rounded-xl border-border bg-card text-card-foreground shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl text-foreground">
-                    Instrument Mix
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <InstrumentBreakdown token={token} apiBaseUrl={apiBaseUrl} days={30} />
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          <section className="rounded-xl bg-card p-6 text-card-foreground shadow-lg">
-            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                  Session Archive
-                </p>
-                <h2 className="mt-2 text-2xl font-black tracking-tight text-foreground">
-                  Your recorded sessions
-                </h2>
-              </div>
+            {latestSession && (
               <Button
                 onClick={() => router.push("/practice-timer")}
-                className="h-11 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                size="sm"
               >
-                Start Another Session
+                Continue practicing
+                <ArrowRight size={14} weight="bold" className="ml-1" />
               </Button>
+            )}
+          </div>
+
+          {/* ── Latest session card (only if exists) ── */}
+          {latestSession && (
+            <div className="mt-8 rounded-xl border border-border/60 bg-card p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {latestSession.instrument}
+                    {latestSession.description ? ` · ${latestSession.description}` : ""}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Session #{latestSession.display_id ?? latestSession.session_id}
+                    {latestSession.youtube_url && (
+                      <span className="ml-2 inline-flex items-center gap-1">
+                        <YoutubeLogo size={12} weight="regular" className="text-destructive" />
+                        YouTube saved
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => router.push("/dashboard")}
+                    size="sm"
+                    variant="outline"
+                  >
+                    Dashboard
+                  </Button>
+                  <Button
+                    onClick={() => router.push("/practice-timer")}
+                    size="sm"
+                  >
+                    Practice
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Heatmap ── */}
+          <div className="mt-10">
+            <h2 className="text-sm font-medium text-foreground">Practice rhythm</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">Activity over the last year</p>
+            <div className="mt-4 rounded-xl border border-border/60 bg-card p-5">
+              <PracticeCalendarHeatmap token={token} apiBaseUrl={apiBaseUrl} />
+            </div>
+          </div>
+
+          {/* ── Charts (side by side) ── */}
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div>
+              <h2 className="text-sm font-medium text-foreground">Time per session</h2>
+              <div className="mt-3 rounded-xl border border-border/60 bg-card p-5">
+                {sessions.length > 0 ? (
+                  <div className="h-64">
+                    <PracticeChart sessions={sessions} />
+                  </div>
+                ) : (
+                  <p className="py-8 text-center text-sm text-muted-foreground">
+                    Chart appears after your first few sessions.
+                  </p>
+                )}
+              </div>
+            </div>
+            <div>
+              <h2 className="text-sm font-medium text-foreground">Instrument mix</h2>
+              <div className="mt-3 rounded-xl border border-border/60 bg-card p-5">
+                <InstrumentBreakdown token={token} apiBaseUrl={apiBaseUrl} days={30} />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Session archive ── */}
+          <div className="mt-10">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-medium text-foreground">All sessions</h2>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Clear filters
+                </button>
+              )}
             </div>
 
             {/* Filters */}
             {sessions.length > 0 && (
-              <div className="mt-6 space-y-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    variant={instrumentFilter === "all" ? "default" : "secondary"}
-                    size="sm"
-                    className="rounded-lg text-xs"
-                    onClick={() => setInstrumentFilter("all")}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {["all", ...uniqueInstruments].map((inst) => (
+                  <button
+                    key={inst}
+                    onClick={() => setInstrumentFilter(inst)}
+                    className={`rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200 ${
+                      instrumentFilter === inst
+                        ? "bg-primary/10 text-primary"
+                        : "bg-muted text-muted-foreground hover:text-foreground"
+                    }`}
                   >
-                    All Instruments
-                  </Button>
-                  {uniqueInstruments.map((inst) => (
-                    <Button
-                      key={inst}
-                      variant={instrumentFilter === inst ? "default" : "secondary"}
-                      size="sm"
-                      className="rounded-lg text-xs"
-                      onClick={() => setInstrumentFilter(inst)}
-                    >
-                      {inst}
-                    </Button>
-                  ))}
-                </div>
+                    {inst === "all" ? "All" : inst}
+                  </button>
+                ))}
 
-                <div className="flex flex-wrap items-end gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                      From
-                    </label>
-                    <Input
-                      type="date"
-                      value={dateFrom}
-                      onChange={(e) => setDateFrom(e.target.value)}
-                      className="h-9 w-40 rounded-lg bg-secondary border border-border text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                      To
-                    </label>
-                    <Input
-                      type="date"
-                      value={dateTo}
-                      onChange={(e) => setDateTo(e.target.value)}
-                      className="h-9 w-40 rounded-lg bg-secondary border border-border text-sm"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-[200px] space-y-1">
-                    <label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                      Search
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Search by instrument, description, or session #"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-9 rounded-lg bg-secondary border border-border text-sm"
-                    />
-                  </div>
-                  {hasActiveFilters && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="rounded-lg text-xs"
-                      onClick={clearFilters}
-                    >
-                      Clear Filters
-                    </Button>
-                  )}
+                <div className="ml-auto flex items-center gap-2">
+                  <Input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="h-8 w-32 rounded-lg border-border/60 bg-background px-2 text-xs"
+                    placeholder="From"
+                  />
+                  <Input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="h-8 w-32 rounded-lg border-border/60 bg-background px-2 text-xs"
+                    placeholder="To"
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-8 w-40 rounded-lg border-border/60 bg-background px-2 text-xs"
+                  />
                 </div>
-
-                {hasActiveFilters && (
-                  <p className="text-sm text-muted-foreground">
-                    Showing {filteredSessions.length} of {sessions.length} sessions
-                  </p>
-                )}
               </div>
             )}
 
-            <div className="mt-6 grid gap-4">
+            {hasActiveFilters && (
+              <p className="mt-2 text-xs text-muted-foreground font-mono tabular-nums">
+                {filteredSessions.length} of {sessions.length}
+              </p>
+            )}
+
+            {/* Session list */}
+            <div className="mt-4 space-y-2">
               {sessions.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border bg-secondary p-8 text-center text-muted-foreground">
-                  No sessions yet. Start your first practice session and your history will show up here.
+                <div className="rounded-xl border border-dashed border-border/60 py-12 text-center">
+                  <p className="text-sm text-muted-foreground">No sessions yet.</p>
+                  <Button
+                    onClick={() => router.push("/practice-timer")}
+                    size="sm"
+                    className="mt-3"
+                  >
+                    Start your first session
+                  </Button>
                 </div>
               ) : filteredSessions.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border bg-secondary p-8 text-center text-muted-foreground">
+                <p className="py-8 text-center text-sm text-muted-foreground">
                   No sessions match your filters.
-                </div>
+                </p>
               ) : (
-                filteredSessions.map((session) => (
-                    <div
+                <AnimatePresence mode="popLayout">
+                  {filteredSessions.map((session) => (
+                    <MotionDiv
                       key={session.session_id}
-                      className="grid gap-4 rounded-xl border border-border bg-secondary p-5 transition hover:bg-secondary/80 md:grid-cols-[110px_1fr_120px_140px]"
+                      layout
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
                     >
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                          Session
-                        </p>
-                        <p className="mt-2 text-2xl font-black text-foreground">
+                      <div className="flex items-center gap-4 rounded-lg border border-border/40 px-4 py-3 transition-colors duration-200 hover:bg-muted/40">
+                        <span className="w-10 text-right font-mono text-xs tabular-nums text-muted-foreground">
                           #{session.display_id ?? session.session_id}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">
-                          {session.instrument}
-                        </p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {session.description || "No description recorded"}
-                        </p>
-                        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                          {session.session_date}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                          Duration
-                        </p>
-                        <p className="mt-2 font-mono text-sm font-semibold text-foreground">
-                          {session.duration}
-                        </p>
-                      </div>
-                      <div className="flex items-center md:justify-end">
-                        {session.youtube_url ? (
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {session.instrument}
+                            {session.description ? ` · ${session.description}` : ""}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {session.session_date} · {session.duration}
+                          </p>
+                        </div>
+                        {session.youtube_url && (
                           <a
                             href={session.youtube_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary/80"
+                            className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors"
                           >
-                            <Youtube className="mr-2 h-4 w-4 text-destructive" />
-                            View Source
+                            <YoutubeLogo size={16} weight="regular" />
                           </a>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">No video saved</span>
                         )}
                       </div>
-                    </div>
-                  ))
+                    </MotionDiv>
+                  ))}
+                </AnimatePresence>
               )}
             </div>
-          </section>
-        </div>
+          </div>
+        </MotionDiv>
       </div>
     </div>
   );

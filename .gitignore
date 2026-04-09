@@ -6,3 +6,14 @@ db.sqlite3
 DJANGO_CHEATSHEET.md
 PRODUCTION_SECURITY_SUMMARY.md
 RAILWAY_DEPLOYMENT.md
+
+# AI tooling / local-only
+.gstack/
+.claude/
+.superpowers/
+.next/
+graphify-out/
+stitch_recommendations_improved/
+
+# User uploads (served by Django, not git)
+media/

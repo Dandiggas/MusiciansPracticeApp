@@ -86,22 +86,22 @@ export function PracticeCalendarHeatmap({
           shape-rendering: geometricPrecision;
         }
         .react-calendar-heatmap .color-empty {
-          fill: #1f2b49;
+          fill: var(--muted);
         }
         .react-calendar-heatmap .color-scale-1 {
-          fill: #3b2a6e;
+          fill: var(--chart-4);
         }
         .react-calendar-heatmap .color-scale-2 {
-          fill: #6e3bd7;
+          fill: var(--chart-2);
         }
         .react-calendar-heatmap .color-scale-3 {
-          fill: #8455ef;
+          fill: var(--chart-5);
         }
         .react-calendar-heatmap .color-scale-4 {
-          fill: #ba9eff;
+          fill: var(--chart-1);
         }
         .react-calendar-heatmap rect:hover {
-          stroke: #ba9eff;
+          stroke: var(--primary);
           stroke-width: 1.5px;
         }
       `}</style>
@@ -157,11 +157,11 @@ export function PracticeCalendarHeatmap({
         <div className="mt-5 flex items-center gap-3 text-xs font-medium text-muted-foreground">
           <span>Light</span>
           <div className="flex gap-1">
-            <div className="h-3 w-3 rounded-[3px] bg-[#1f2b49]" />
-            <div className="h-3 w-3 rounded-[3px] bg-[#3b2a6e]" />
-            <div className="h-3 w-3 rounded-[3px] bg-[#6e3bd7]" />
-            <div className="h-3 w-3 rounded-[3px] bg-[#8455ef]" />
-            <div className="h-3 w-3 rounded-[3px] bg-[#ba9eff]" />
+            <div className="h-3 w-3 rounded-[3px] bg-muted" />
+            <div className="h-3 w-3 rounded-[3px] bg-chart-4" />
+            <div className="h-3 w-3 rounded-[3px] bg-chart-2" />
+            <div className="h-3 w-3 rounded-[3px] bg-chart-5" />
+            <div className="h-3 w-3 rounded-[3px] bg-chart-1" />
           </div>
           <span>Deep</span>
         </div>
