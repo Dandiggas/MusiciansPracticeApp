@@ -6,4 +6,11 @@ db.sqlite3
 DJANGO_CHEATSHEET.md
 PRODUCTION_SECURITY_SUMMARY.md
 RAILWAY_DEPLOYMENT.md
+
+# AI tooling / local-only
 .gstack/
+.claude/
+.superpowers/
+.next/
+.next/trace
+.next/trace-build
