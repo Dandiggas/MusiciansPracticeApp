@@ -1,7 +1,7 @@
-name: Test and Deploy
+name: Test
 
 on:
-  push:
+  pull_request:
     branches: [main]
 
 jobs:
@@ -67,35 +67,3 @@ jobs:
       - name: Run test coverage
         working-directory: frontend/next-app
         run: npm run test:coverage
-
-  deploy-backend:
-    name: Deploy Backend to Railway
-    needs: [test-backend, test-frontend]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy to Railway
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service MusiciansPracticeApp
-
-  deploy-frontend:
-    name: Deploy Frontend to Railway
-    needs: [test-backend, test-frontend]
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy to Railway
-        working-directory: frontend/next-app
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service frontend
