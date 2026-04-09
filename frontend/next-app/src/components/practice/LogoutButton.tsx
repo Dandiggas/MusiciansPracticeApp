@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { SignOut } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +54,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({
 
   return (
     <Button onClick={handleLogout} variant={variant} className={cn(className)}>
-      {showIcon ? <LogOut className="mr-2 h-4 w-4" /> : null}
+      {showIcon ? <SignOut size={20} weight="regular" className="mr-2" /> : null}
       {label}
     </Button>
   );

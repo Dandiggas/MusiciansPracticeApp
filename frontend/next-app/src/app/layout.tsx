@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Header } from "@/components/navigation/Header";
-
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
 
 export const metadata: Metadata = {
   title: "The Shed",
@@ -21,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${plusJakarta.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -30,9 +25,19 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          <main className="min-h-screen">
+          <main className="min-h-[100dvh]">
             {children}
           </main>
+          {/* Grain texture overlay — fixed, pointer-events-none, GPU-safe */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed inset-0 z-30 opacity-[0.025]"
+            style={{
+              backgroundImage: 'url("/noise.svg")',
+              backgroundRepeat: 'repeat',
+              backgroundSize: '256px 256px',
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

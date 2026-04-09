@@ -3,18 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Sparkles, ArrowRight } from "lucide-react";
+import { SpinnerGap, Sparkle, ArrowRight } from "@phosphor-icons/react";
 import { saveStoredRecommendation } from "@/lib/practice-session-store";
+import { MotionDiv } from "@/components/ui/motion-wrapper";
+import { AnimatePresence } from "framer-motion";
 
 const GOAL_PRESETS = [
   "Tighten rhythm and timing",
@@ -97,169 +92,185 @@ export default function RecommendationsPage() {
     }
   };
 
-  const selectClassName =
-    "flex h-12 w-full rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/40";
+  const selectClass =
+    "flex h-10 w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors duration-200 focus:border-primary/50 focus:bg-card";
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container relative mx-auto max-w-6xl p-4 md:p-8">
-        <div className="grid gap-6 lg:grid-cols-[0.96fr_1.04fr]">
-          <div className="rounded-xl border border-border bg-card p-8 text-card-foreground">
-            <div className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-              Session Planning
-            </div>
-            <h1 className="mt-5 text-4xl font-black tracking-tight text-foreground md:text-5xl">
-              Decide what matters before you press play.
-            </h1>
-            <p className="mt-4 text-base leading-7 text-muted-foreground">
-              Recommendations belong before the session starts. Use this page to
-              turn vague intention into a focused plan, then step straight into
-              the practice workspace with a clear target.
-            </p>
+    <div className="min-h-[100dvh] bg-background">
+      <div className="mx-auto max-w-2xl px-4 py-10 md:px-8 md:py-16">
 
-            <div className="mt-8 space-y-3">
-              {GOAL_PRESETS.map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => setGoals(preset)}
-                  className="flex w-full items-center justify-between rounded-lg border border-border bg-secondary px-4 py-3 text-left text-sm text-foreground transition hover:bg-secondary/80"
-                >
-                  <span>{preset}</span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                </button>
-              ))}
-            </div>
+        <MotionDiv
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+        >
+          {/* Page header — compact, tool-like */}
+          <div className="flex items-center gap-2">
+            <Sparkle size={18} weight="regular" className="text-primary" />
+            <h1 className="text-lg font-semibold text-foreground">Session Planner</h1>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Shape your next session before you press play.
+          </p>
+
+          {/* Quick presets */}
+          <div className="mt-6 flex flex-wrap gap-2">
+            {GOAL_PRESETS.map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setGoals(preset)}
+                className={`rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200 ${
+                  goals === preset
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                }`}
+              >
+                {preset}
+              </button>
+            ))}
           </div>
 
-          <div className="space-y-6">
-            <Card className="rounded-xl border-border bg-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-2xl text-card-foreground">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Build Your Recommendation
-                </CardTitle>
-                <CardDescription className="text-base text-muted-foreground">
-                  Give the assistant just enough context to shape the next session.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="instrument" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                      Instrument
-                    </Label>
-                    <select
-                      id="instrument"
-                      value={instrument}
-                      onChange={(e) => setInstrument(e.target.value)}
-                      className={selectClassName}
-                      required
-                      disabled={isLoading}
-                    >
-                      <option value="">Select an instrument</option>
-                      <option value="guitar">Guitar</option>
-                      <option value="piano">Piano</option>
-                      <option value="drums">Drums</option>
-                      <option value="bass">Bass</option>
-                    </select>
-                  </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="instrument" className="text-xs font-medium text-muted-foreground">
+                  Instrument
+                </Label>
+                <select
+                  id="instrument"
+                  value={instrument}
+                  onChange={(e) => setInstrument(e.target.value)}
+                  className={selectClass}
+                  required
+                  disabled={isLoading}
+                >
+                  <option value="">Select</option>
+                  <option value="guitar">Guitar</option>
+                  <option value="piano">Piano</option>
+                  <option value="drums">Drums</option>
+                  <option value="bass">Bass</option>
+                </select>
+              </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="skillLevel" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                      Skill Level
-                    </Label>
-                    <select
-                      id="skillLevel"
-                      value={skillLevel}
-                      onChange={(e) => setSkillLevel(e.target.value)}
-                      className={selectClassName}
-                      required
-                      disabled={isLoading}
-                    >
-                      <option value="">Select your level</option>
-                      <option value="beginner">Beginner</option>
-                      <option value="intermediate">Intermediate</option>
-                      <option value="advanced">Advanced</option>
-                    </select>
-                  </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="skillLevel" className="text-xs font-medium text-muted-foreground">
+                  Level
+                </Label>
+                <select
+                  id="skillLevel"
+                  value={skillLevel}
+                  onChange={(e) => setSkillLevel(e.target.value)}
+                  className={selectClass}
+                  required
+                  disabled={isLoading}
+                >
+                  <option value="">Select</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+            </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="goals" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                      What do you want from this session?
-                    </Label>
-                    <Input
-                      id="goals"
-                      placeholder="e.g., get the bridge cleaner at 70 bpm, improve voicing changes..."
-                      value={goals}
-                      onChange={(e) => setGoals(e.target.value)}
-                      required
-                      disabled={isLoading}
-                      className="h-12 rounded-lg border-border bg-secondary px-4"
-                    />
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        Short and specific gets better recommendations.
-                      </span>
-                      <span className={goals.length > GOALS_MAX_CHARS ? "font-semibold text-destructive" : "text-muted-foreground"}>
-                        {goals.length}/{GOALS_MAX_CHARS}
-                      </span>
-                    </div>
-                  </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="goals" className="text-xs font-medium text-muted-foreground">
+                What do you want from this session?
+              </Label>
+              <Input
+                id="goals"
+                placeholder="e.g., get the bridge cleaner at 70 bpm"
+                value={goals}
+                onChange={(e) => setGoals(e.target.value)}
+                required
+                disabled={isLoading}
+                className="h-10 rounded-lg border-border/60 bg-background px-3 shadow-none transition-colors duration-200 focus:border-primary/50 focus:bg-card"
+              />
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Short and specific works best.</span>
+                <span className={goals.length > GOALS_MAX_CHARS ? "font-medium text-destructive" : ""}>
+                  {goals.length}/{GOALS_MAX_CHARS}
+                </span>
+              </div>
+            </div>
 
-                  {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && (
+              <p className="rounded-lg bg-destructive/[0.06] px-3 py-2 text-sm font-medium text-destructive">
+                {error}
+              </p>
+            )}
 
-                  <p className="text-xs text-muted-foreground">
-                    Identical requests are cached, and recommendation generation is rate-limited to control API spend.
-                  </p>
-
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="h-12 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+            <Button type="submit" disabled={isLoading} className="w-full">
+              <AnimatePresence mode="wait" initial={false}>
+                {isLoading ? (
+                  <MotionDiv
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center"
                   >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      "Get Recommendation"
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                    <SpinnerGap size={16} weight="regular" className="mr-2 animate-spin" />
+                    Generating...
+                  </MotionDiv>
+                ) : (
+                  <MotionDiv
+                    key="idle"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center"
+                  >
+                    Get Recommendation
+                    <ArrowRight size={14} weight="bold" className="ml-1.5" />
+                  </MotionDiv>
+                )}
+              </AnimatePresence>
+            </Button>
 
+            <p className="text-center text-xs text-muted-foreground">
+              Identical requests are cached. Generation is rate-limited.
+            </p>
+          </form>
+
+          {/* Result */}
+          <AnimatePresence mode="wait">
             {recommendation && (
-              <Card className="rounded-xl border-border bg-card">
-                <CardHeader>
-                  <CardTitle className="text-xl text-card-foreground">
-                    Your Practice Recommendation
-                  </CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    {isCachedResult
-                      ? "This matched a recent request, so we reused the saved recommendation."
-                      : "Use this as the plan for your next focused session."}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="rounded-xl border border-border bg-secondary p-5">
-                    <p className="whitespace-pre-wrap text-sm leading-7 text-foreground">
-                      {recommendation}
-                    </p>
+              <MotionDiv
+                key="result"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+                className="mt-8"
+              >
+                <div className="rounded-xl border border-border/60 bg-card p-6">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-foreground">Your plan</p>
+                    {isCachedResult && (
+                      <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                        cached
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-3 whitespace-pre-wrap text-[14px] leading-7 text-foreground/90">
+                    {recommendation}
                   </div>
                   <Button
                     onClick={() => router.push("/practice-timer")}
-                    className="h-11 w-full rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground hover:opacity-90"
+                    className="mt-5 w-full"
                   >
-                    Take This Into Practice Session
+                    Take This Into Practice
+                    <ArrowRight size={14} weight="bold" className="ml-1.5" />
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </MotionDiv>
             )}
-          </div>
-        </div>
+          </AnimatePresence>
+        </MotionDiv>
       </div>
     </div>
   );

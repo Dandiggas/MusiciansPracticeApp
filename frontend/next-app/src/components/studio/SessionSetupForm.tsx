@@ -4,7 +4,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Youtube, Upload } from "lucide-react";
+import { YoutubeLogo, UploadSimple } from "@phosphor-icons/react";
 import { INSTRUMENTS } from "@/lib/practice-session-store";
 
 type MediaSource = "youtube" | "audio";
@@ -129,7 +129,7 @@ export default function SessionSetupForm({
             onClick={() => onMediaSourceChange("youtube")}
             className="rounded-lg"
           >
-            <Youtube className="mr-1.5 h-4 w-4" />
+            <YoutubeLogo size={20} weight="regular" className="mr-1.5" />
             YouTube
           </Button>
           <Button
@@ -139,7 +139,7 @@ export default function SessionSetupForm({
             onClick={() => onMediaSourceChange("audio")}
             className="rounded-lg"
           >
-            <Upload className="mr-1.5 h-4 w-4" />
+            <UploadSimple size={20} weight="regular" className="mr-1.5" />
             MP3 Upload
           </Button>
         </div>
@@ -174,7 +174,7 @@ export default function SessionSetupForm({
       <Button
         onClick={onStart}
         disabled={isLoading}
-        className="w-full h-12 rounded-lg bg-gradient-to-r from-primary to-[#8455ef] text-primary-foreground font-semibold text-base"
+        className="w-full h-12 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90"
       >
         {isLoading ? "Starting..." : "Start Session"}
       </Button>
