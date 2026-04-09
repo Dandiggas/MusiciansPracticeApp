@@ -97,19 +97,25 @@ jest.mock('@/components/studio/FocusPoints', () => ({
 }));
 
 // Mock framer-motion so AnimatePresence and motion.div render children in jsdom
-jest.mock('framer-motion', () => ({
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  motion: {
-    div: React.forwardRef(({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }, ref: React.Ref<HTMLDivElement>) => <div ref={ref} {...props}>{children}</div>),
-  },
-}));
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  return {
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+    motion: {
+      div: React.forwardRef(function MotionDiv(props: any, ref: any) { const { children, initial, animate, exit, transition, variants, whileHover, whileTap, layout, layoutId, ...rest } = props; return React.createElement('div', { ...rest, ref }, children); }),
+    },
+  };
+});
 
 // Mock motion-wrapper to pass through
-jest.mock('@/components/ui/motion-wrapper', () => ({
-  StaggerReveal: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
-  StaggerItem: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
-  MotionDiv: React.forwardRef(({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }, ref: React.Ref<HTMLDivElement>) => <div ref={ref} {...props}>{children}</div>),
-}));
+jest.mock('@/components/ui/motion-wrapper', () => {
+  const React = require('react');
+  return {
+    StaggerReveal: function StaggerReveal({ children, className }: any) { return React.createElement('div', { className }, children); },
+    StaggerItem: function StaggerItem({ children, className }: any) { return React.createElement('div', { className }, children); },
+    MotionDiv: React.forwardRef(function MotionDiv(props: any, ref: any) { const { children, initial, animate, exit, transition, variants, whileHover, whileTap, layout, layoutId, ...rest } = props; return React.createElement('div', { ...rest, ref }, children); }),
+  };
+});
 
 describe('PracticeTimerPage', () => {
   const originalConsoleError = console.error;
