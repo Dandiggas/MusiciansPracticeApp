@@ -8,6 +8,7 @@ import { MetronomeEngine } from "./metronome-engine";
 
 const makeParam = () => ({
   value: 0,
+  setValueAtTime: jest.fn(),
   exponentialRampToValueAtTime: jest.fn(),
   linearRampToValueAtTime: jest.fn(),
 });
@@ -167,28 +168,39 @@ describe("MetronomeEngine — setVolume", () => {
     expect(createdGains[0].gain.value).toBe(0);
   });
 
-  it("ramps masterGain with linearRampToValueAtTime(~15 ms) when running", () => {
+  it("anchors the ramp with setValueAtTime(currentValue, now) before linearRampToValueAtTime(~15 ms) when running", () => {
     const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
     engine.start();
     const masterGain = createdGains[0];
+    const startValue = masterGain.gain.value; // should be the default 0.8² = 0.64
     mockContext.currentTime = 1.0;
 
     engine.setVolume(0.6);
 
+    // Anchor comes first: setValueAtTime with the current gain value at `now`.
+    expect(masterGain.gain.setValueAtTime).toHaveBeenCalledTimes(1);
+    const [anchorValue, anchorTime] = (
+      masterGain.gain.setValueAtTime as jest.Mock
+    ).mock.calls[0];
+    expect(anchorValue).toBeCloseTo(startValue, 10);
+    expect(anchorTime).toBeCloseTo(1.0, 4);
+
+    // Then the ramp to v² at now + 15 ms.
     expect(masterGain.gain.linearRampToValueAtTime).toHaveBeenCalledTimes(1);
     const [target, atTime] = (
       masterGain.gain.linearRampToValueAtTime as jest.Mock
     ).mock.calls[0];
     expect(target).toBeCloseTo(0.36, 10); // 0.6²
-    expect(atTime).toBeCloseTo(1.015, 4); // currentTime + 0.015
+    expect(atTime).toBeCloseTo(1.015, 4); // currentTime + MASTER_RAMP_TIME (0.015)
   });
 
-  it("does NOT ramp when not running; only caches the value for next start()", () => {
+  it("does NOT ramp or anchor when not running; only caches the value for next start()", () => {
     const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
     engine.setVolume(0.3);
     // No start() yet — no masterGain exists
     engine.start();
     const masterGain = createdGains[0];
+    expect(masterGain.gain.setValueAtTime).not.toHaveBeenCalled();
     expect(masterGain.gain.linearRampToValueAtTime).not.toHaveBeenCalled();
     expect(masterGain.gain.value).toBeCloseTo(0.09, 10); // 0.3²
   });
