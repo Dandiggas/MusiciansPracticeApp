@@ -206,21 +206,42 @@ describe("MetronomeEngine — setVolume", () => {
   });
 });
 
-describe("MetronomeEngine — per-click base gains (accent / unaccented ratio)", () => {
+describe("MetronomeEngine — per-click attack envelope (accent / unaccented ratio)", () => {
   beforeEach(() => {
     installAudioContextMock();
   });
 
-  it("accented click uses base gain 1.0", () => {
+  it("accented click ramps 0 → 1.0 over CLICK_ATTACK_TIME (3 ms) before oscillator.start", () => {
     const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
     engine.start();
     // createdGains[0] = masterGain, [1] = first per-click envelope.
     // currentBeat starts at 0 → isAccent true on first click.
     const firstClickEnvelope = createdGains[1];
-    expect(firstClickEnvelope.gain.value).toBeCloseTo(1.0, 10);
+
+    // Attack starts at 0 at the click time, then ramps linearly to peak 1.0
+    // at time + 0.003 s.
+    expect(firstClickEnvelope.gain.setValueAtTime).toHaveBeenCalledWith(0, expect.any(Number));
+    const [, rampValue, rampTime] = [
+      null,
+      ...(firstClickEnvelope.gain.linearRampToValueAtTime as jest.Mock).mock.calls[0],
+    ];
+    expect(rampValue).toBeCloseTo(1.0, 10);
+
+    const setValueArgs = (firstClickEnvelope.gain.setValueAtTime as jest.Mock).mock.calls[0];
+    const startTime = setValueArgs[1];
+    expect(rampTime).toBeCloseTo(startTime + 0.003, 6);
+
+    // And the attack ramp is scheduled BEFORE the oscillator starts — this is
+    // the anti-pop invariant. Jest tracks invocation order across all mocks.
+    const firstOsc = createdOscillators[0];
+    const setValueOrder = (firstClickEnvelope.gain.setValueAtTime as jest.Mock).mock.invocationCallOrder[0];
+    const linearOrder = (firstClickEnvelope.gain.linearRampToValueAtTime as jest.Mock).mock.invocationCallOrder[0];
+    const oscStartOrder = (firstOsc.start as jest.Mock).mock.invocationCallOrder[0];
+    expect(setValueOrder).toBeLessThan(oscStartOrder);
+    expect(linearOrder).toBeLessThan(oscStartOrder);
   });
 
-  it("unaccented click uses base gain 0.75 (retuned from 0.5)", () => {
+  it("unaccented click ramps 0 → 0.75 (retuned from 0.5) over CLICK_ATTACK_TIME", () => {
     // At BPM 1200 the click interval is 0.05 s. The engine's SCHEDULE_AHEAD_TIME
     // is 0.1 s, so the while-loop inside schedule() queues two clicks on the
     // first call: beat 0 (accented) and beat 1 (unaccented).
@@ -231,6 +252,8 @@ describe("MetronomeEngine — per-click base gains (accent / unaccented ratio)",
     // only one click will schedule and createdGains[2] would be undefined.
     // Fail loudly in that case rather than silently passing / crashing.
     expect(createdGains.length).toBeGreaterThanOrEqual(3);
-    expect(createdGains[2].gain.value).toBeCloseTo(0.75, 10);
+    const unaccentEnvelope = createdGains[2];
+    const rampCall = (unaccentEnvelope.gain.linearRampToValueAtTime as jest.Mock).mock.calls[0];
+    expect(rampCall[0]).toBeCloseTo(0.75, 10);
   });
 });
