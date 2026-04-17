@@ -121,3 +121,75 @@ describe("MetronomeEngine — master gain routing", () => {
     expect(secondMasterGain).not.toBe(firstMasterGain);
   });
 });
+
+describe("MetronomeEngine — setVolume", () => {
+  beforeEach(() => {
+    installAudioContextMock();
+  });
+
+  it("applies a square-law curve on start(): masterGain initial value = volume²", () => {
+    const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine.setVolume(0.5);
+    engine.start();
+    const masterGain = createdGains[0];
+    expect(masterGain.gain.value).toBeCloseTo(0.25, 10);
+  });
+
+  it("clamps setVolume input to [0, 1]", () => {
+    const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine.setVolume(2);
+    engine.start();
+    expect(createdGains[0].gain.value).toBeCloseTo(1, 10);
+
+    installAudioContextMock();
+    const engine2 = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine2.setVolume(-1);
+    engine2.start();
+    expect(createdGains[0].gain.value).toBeCloseTo(0, 10);
+  });
+
+  it("coerces non-finite values (NaN, Infinity, -Infinity) to 0", () => {
+    const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine.setVolume(NaN);
+    engine.start();
+    expect(createdGains[0].gain.value).toBe(0);
+
+    installAudioContextMock();
+    const engine2 = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine2.setVolume(Infinity);
+    engine2.start();
+    expect(createdGains[0].gain.value).toBe(0);
+
+    installAudioContextMock();
+    const engine3 = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine3.setVolume(-Infinity);
+    engine3.start();
+    expect(createdGains[0].gain.value).toBe(0);
+  });
+
+  it("ramps masterGain with linearRampToValueAtTime(~15 ms) when running", () => {
+    const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine.start();
+    const masterGain = createdGains[0];
+    mockContext.currentTime = 1.0;
+
+    engine.setVolume(0.6);
+
+    expect(masterGain.gain.linearRampToValueAtTime).toHaveBeenCalledTimes(1);
+    const [target, atTime] = (
+      masterGain.gain.linearRampToValueAtTime as jest.Mock
+    ).mock.calls[0];
+    expect(target).toBeCloseTo(0.36, 10); // 0.6²
+    expect(atTime).toBeCloseTo(1.015, 4); // currentTime + 0.015
+  });
+
+  it("does NOT ramp when not running; only caches the value for next start()", () => {
+    const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine.setVolume(0.3);
+    // No start() yet — no masterGain exists
+    engine.start();
+    const masterGain = createdGains[0];
+    expect(masterGain.gain.linearRampToValueAtTime).not.toHaveBeenCalled();
+    expect(masterGain.gain.value).toBeCloseTo(0.09, 10); // 0.3²
+  });
+});

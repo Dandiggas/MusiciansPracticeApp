@@ -67,6 +67,21 @@ export class MetronomeEngine {
     this.onBeat = callback;
   }
 
+  setVolume(v: number): void {
+    // Defend against NaN/Infinity from hand-edited localStorage or caller bugs —
+    // AudioParam.gain.value = NaN throws / produces undefined behavior depending on browser.
+    const safe = Number.isFinite(v) ? v : 0;
+    const clamped = Math.min(1, Math.max(0, safe));
+    this.masterVolume = clamped;
+    if (this.audioContext && this.masterGain) {
+      const target = clamped * clamped;
+      this.masterGain.gain.linearRampToValueAtTime(
+        target,
+        this.audioContext.currentTime + 0.015,
+      );
+    }
+  }
+
   private schedule(): void {
     if (!this.isPlaying || !this.audioContext) return;
 
