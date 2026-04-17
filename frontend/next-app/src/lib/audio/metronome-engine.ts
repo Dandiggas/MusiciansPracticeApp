@@ -113,6 +113,9 @@ export class MetronomeEngine {
     gain.connect(this.masterGain ?? this.audioContext.destination);
 
     osc.frequency.value = isAccent ? 1000 : 800;
+    // Base per-click gain. Accent 1.0, unaccent 0.75 — a ~-2.5 dB gap so the
+    // downbeat still reads as the accent but non-downbeats aren't "too quiet
+    // to hear" (see issue #42). Master volume scales both via masterGain.
     gain.gain.value = isAccent ? 1.0 : 0.75;
 
     osc.start(time);
