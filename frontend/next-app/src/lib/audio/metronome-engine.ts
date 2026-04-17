@@ -20,6 +20,7 @@ export class MetronomeEngine {
   private readonly SCHEDULE_AHEAD_TIME = 0.1;
   private readonly LOOKAHEAD = 25;
   private readonly MASTER_RAMP_TIME = 0.015; // 15 ms — fast enough to feel instant while dragging the volume slider, slow enough to prevent audible zipper noise from direct gain.value writes.
+  private readonly CLICK_ATTACK_TIME = 0.003; // 3 ms — per-click attack ramp. Imperceptibly short as a volume change, but long enough to kill the DC-offset pop that hard-stepping from 0 to peak produces at osc.start(time).
 
   constructor(options: MetronomeOptions) {
     this.bpm = options.bpm;
@@ -116,10 +117,17 @@ export class MetronomeEngine {
     // Base per-click gain. Accent 1.0, unaccent 0.75 — a ~-2.5 dB gap so the
     // downbeat still reads as the accent but non-downbeats aren't "too quiet
     // to hear" (see issue #42). Master volume scales both via masterGain.
-    gain.gain.value = isAccent ? 1.0 : 0.75;
+    const peak = isAccent ? 1.0 : 0.75;
+
+    // Attack: ramp 0 → peak over CLICK_ATTACK_TIME (3 ms). Scheduled BEFORE
+    // osc.start so the oscillator's first sample lands inside a smooth envelope
+    // instead of a hard step — eliminates the DC-offset click/pop artifact.
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(peak, time + this.CLICK_ATTACK_TIME);
+    // Decay: exponential down to ~silence over 50 ms total click length.
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
 
     osc.start(time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
     osc.stop(time + 0.05);
   }
 }
