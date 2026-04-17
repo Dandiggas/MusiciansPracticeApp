@@ -22,7 +22,9 @@ import { AnimatePresence } from "framer-motion";
 import {
   clearStoredPracticeSetup,
   clearStoredSessionSnapshot,
+  getMetronomeVolume,
   getStoredPracticeSetup,
+  saveMetronomeVolume,
   saveStoredPracticeSetup,
   saveStoredSessionSnapshot,
   getProject,
@@ -77,6 +79,18 @@ function PracticeTimerContent() {
   const [currentBeat, setCurrentBeat] = useState(-1);
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
   const [, setTapTimes] = useState<number[]>([]);
+  const [metronomeVolume, setMetronomeVolumeState] = useState<number>(0.8);
+
+  // Hydrate from localStorage after mount (SSR-safe)
+  useEffect(() => {
+    const saved = getMetronomeVolume();
+    if (saved !== null) setMetronomeVolumeState(saved);
+  }, []);
+
+  const handleMetronomeVolumeChange = useCallback((v: number) => {
+    setMetronomeVolumeState(v);
+    saveMetronomeVolume(v);
+  }, []);
 
   // ─── Tuner state ─────────────────────────────────────────────────────
   const [tunerActive, setTunerActive] = useState(false);
@@ -617,10 +631,11 @@ function PracticeTimerContent() {
       beatsPerMeasure,
       onBeat: handleBeatCallback,
     });
+    engine.setVolume(metronomeVolume);
     metronomeRef.current = engine;
     engine.start();
     setMetronomeActive(true);
-  }, [bpm, beatsPerMeasure, handleBeatCallback]);
+  }, [bpm, beatsPerMeasure, handleBeatCallback, metronomeVolume]);
 
   const handleMetronomeStop = useCallback(() => {
     metronomeRef.current?.stop();
@@ -640,6 +655,10 @@ function PracticeTimerContent() {
   useEffect(() => {
     metronomeRef.current?.setOnBeat(handleBeatCallback);
   }, [handleBeatCallback]);
+
+  useEffect(() => {
+    metronomeRef.current?.setVolume(metronomeVolume);
+  }, [metronomeVolume]);
 
   const handleBpmChange = (value: number) => {
     const clamped = Math.max(20, Math.min(300, value));
@@ -1001,6 +1020,8 @@ function PracticeTimerContent() {
                   onBeatsPerMeasureChange={setBeatsPerMeasure}
                   onToggle={handleMetronomeToggle}
                   onTapTempo={handleTapTempo}
+                  volume={metronomeVolume}
+                  onVolumeChange={handleMetronomeVolumeChange}
                 />
               </div>
               <div className="space-y-4">
