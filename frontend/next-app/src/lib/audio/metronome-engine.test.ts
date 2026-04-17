@@ -66,14 +66,20 @@ describe("MetronomeEngine — master gain routing", () => {
     installAudioContextMock();
   });
 
-  it("creates a masterGain node on start() and connects it to destination", () => {
+  it("creates a masterGain node FIRST on start() (before any per-click envelope) and connects it to destination exactly once", () => {
     const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
     engine.start();
 
-    // First gain created by start() is the master gain
+    // start() schedules at least one click synchronously (BPM 120, SCHEDULE_AHEAD_TIME 0.1s),
+    // so createdGains must contain masterGain + >=1 envelope gain.
+    expect(createdGains.length).toBeGreaterThanOrEqual(2);
+
     const masterGain = createdGains[0];
     expect(masterGain).toBeDefined();
     expect(masterGain.connect).toHaveBeenCalledWith(mockContext.destination);
+    // masterGain routes to destination exactly once — guards against a regression
+    // where the scheduler reverts to direct-to-destination per click.
+    expect(masterGain.connect).toHaveBeenCalledTimes(1);
   });
 
   it("routes per-click envelope gains into masterGain, not directly to destination", () => {
@@ -91,10 +97,27 @@ describe("MetronomeEngine — master gain routing", () => {
     );
   });
 
-  it("closes the audio context on stop()", () => {
+  it("disconnects masterGain and closes the audio context on stop()", () => {
     const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
     engine.start();
+    const masterGain = createdGains[0];
     engine.stop();
+    expect(masterGain.disconnect).toHaveBeenCalled();
     expect(mockContext.close).toHaveBeenCalled();
+  });
+
+  it("creates a fresh masterGain on the next start() after a stop()", () => {
+    const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine.start();
+    const firstMasterGain = createdGains[0];
+    engine.stop();
+
+    // Reinstall the mock so createdGains starts empty for the second start()
+    installAudioContextMock();
+    engine.start();
+    const secondMasterGain = createdGains[0];
+
+    expect(secondMasterGain).toBeDefined();
+    expect(secondMasterGain).not.toBe(firstMasterGain);
   });
 });
