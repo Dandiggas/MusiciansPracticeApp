@@ -113,7 +113,7 @@ export class MetronomeEngine {
     gain.connect(this.masterGain ?? this.audioContext.destination);
 
     osc.frequency.value = isAccent ? 1000 : 800;
-    gain.gain.value = isAccent ? 1.0 : 0.5;
+    gain.gain.value = isAccent ? 1.0 : 0.75;
 
     osc.start(time);
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);

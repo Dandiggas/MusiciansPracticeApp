@@ -205,3 +205,28 @@ describe("MetronomeEngine — setVolume", () => {
     expect(masterGain.gain.value).toBeCloseTo(0.09, 10); // 0.3²
   });
 });
+
+describe("MetronomeEngine — per-click base gains (accent / unaccented ratio)", () => {
+  beforeEach(() => {
+    installAudioContextMock();
+  });
+
+  it("accented click uses base gain 1.0", () => {
+    const engine = new MetronomeEngine({ bpm: 120, beatsPerMeasure: 4 });
+    engine.start();
+    // createdGains[0] = masterGain, [1] = first per-click envelope.
+    // currentBeat starts at 0 → isAccent true on first click.
+    const firstClickEnvelope = createdGains[1];
+    expect(firstClickEnvelope.gain.value).toBeCloseTo(1.0, 10);
+  });
+
+  it("unaccented click uses base gain 0.75 (retuned from 0.5)", () => {
+    // At BPM 1200 the click interval is 0.05 s. The engine's SCHEDULE_AHEAD_TIME
+    // is 0.1 s, so the while-loop inside schedule() queues two clicks on the
+    // first call: beat 0 (accented) and beat 1 (unaccented).
+    // createdGains[0] = masterGain, [1] = accent envelope, [2] = unaccent envelope.
+    const engine = new MetronomeEngine({ bpm: 1200, beatsPerMeasure: 2 });
+    engine.start();
+    expect(createdGains[2].gain.value).toBeCloseTo(0.75, 10);
+  });
+});
