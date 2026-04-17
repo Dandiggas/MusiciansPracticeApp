@@ -87,6 +87,10 @@ export class MetronomeEngine {
     const gain = this.audioContext.createGain();
 
     osc.connect(gain);
+    // masterGain is non-null whenever isPlaying is true (start() assigns it before
+    // setting isPlaying, and stop() clears isPlaying before nulling it). The ??
+    // fallback exists purely to satisfy the type checker, which can't prove the
+    // invariant through the setTimeout → schedule → playClick indirection.
     gain.connect(this.masterGain ?? this.audioContext.destination);
 
     osc.frequency.value = isAccent ? 1000 : 800;
