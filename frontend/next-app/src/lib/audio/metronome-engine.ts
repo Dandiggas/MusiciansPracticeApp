@@ -10,6 +10,8 @@ export class MetronomeEngine {
   private nextNoteTime: number = 0;
   private currentBeat: number = 0;
   private isPlaying: boolean = false;
+  private masterGain: GainNode | null = null;
+  private masterVolume: number = 0.8;
 
   private bpm: number;
   private beatsPerMeasure: number;
@@ -27,6 +29,9 @@ export class MetronomeEngine {
   start(): void {
     if (this.isPlaying) return;
     this.audioContext = new AudioContext();
+    this.masterGain = this.audioContext.createGain();
+    this.masterGain.gain.value = this.masterVolume * this.masterVolume;
+    this.masterGain.connect(this.audioContext.destination);
     this.isPlaying = true;
     this.currentBeat = 0;
     this.nextNoteTime = this.audioContext.currentTime;
@@ -38,6 +43,10 @@ export class MetronomeEngine {
     if (this.timerId !== null) {
       clearTimeout(this.timerId);
       this.timerId = null;
+    }
+    if (this.masterGain) {
+      this.masterGain.disconnect();
+      this.masterGain = null;
     }
     if (this.audioContext) {
       this.audioContext.close();
@@ -78,7 +87,7 @@ export class MetronomeEngine {
     const gain = this.audioContext.createGain();
 
     osc.connect(gain);
-    gain.connect(this.audioContext.destination);
+    gain.connect(this.masterGain ?? this.audioContext.destination);
 
     osc.frequency.value = isAccent ? 1000 : 800;
     gain.gain.value = isAccent ? 1.0 : 0.5;
