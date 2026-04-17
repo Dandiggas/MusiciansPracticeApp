@@ -19,6 +19,7 @@ export class MetronomeEngine {
 
   private readonly SCHEDULE_AHEAD_TIME = 0.1;
   private readonly LOOKAHEAD = 25;
+  private readonly MASTER_RAMP_TIME = 0.015; // 15 ms — fast enough to feel instant while dragging the volume slider, slow enough to prevent audible zipper noise from direct gain.value writes.
 
   constructor(options: MetronomeOptions) {
     this.bpm = options.bpm;
@@ -75,10 +76,13 @@ export class MetronomeEngine {
     this.masterVolume = clamped;
     if (this.audioContext && this.masterGain) {
       const target = clamped * clamped;
-      this.masterGain.gain.linearRampToValueAtTime(
-        target,
-        this.audioContext.currentTime + 0.015,
-      );
+      const now = this.audioContext.currentTime;
+      // Anchor the ramp with an explicit setValueAtTime. linearRampToValueAtTime ramps from
+      // the value of the previous scheduled event — without this anchor, a bare `.gain.value = v`
+      // write (done in start()) isn't an event-list entry, and the ramp start-time is
+      // implementation-defined (historically buggy on older Safari).
+      this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+      this.masterGain.gain.linearRampToValueAtTime(target, now + this.MASTER_RAMP_TIME);
     }
   }
 
