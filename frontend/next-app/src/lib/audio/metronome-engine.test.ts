@@ -227,6 +227,10 @@ describe("MetronomeEngine — per-click base gains (accent / unaccented ratio)",
     // createdGains[0] = masterGain, [1] = accent envelope, [2] = unaccent envelope.
     const engine = new MetronomeEngine({ bpm: 1200, beatsPerMeasure: 2 });
     engine.start();
+    // Preflight: if SCHEDULE_AHEAD_TIME ever drops below the 0.05 s interval,
+    // only one click will schedule and createdGains[2] would be undefined.
+    // Fail loudly in that case rather than silently passing / crashing.
+    expect(createdGains.length).toBeGreaterThanOrEqual(3);
     expect(createdGains[2].gain.value).toBeCloseTo(0.75, 10);
   });
 });
