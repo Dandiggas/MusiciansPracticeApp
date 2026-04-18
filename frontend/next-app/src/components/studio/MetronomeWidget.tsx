@@ -4,6 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "@phosphor-icons/react";
 import { MotionDiv } from "@/components/ui/motion-wrapper";
+import { VolumeIcon } from "./VolumeIcon";
 
 const TIME_SIGNATURES = [
   { label: "2/4", beats: 2 },
@@ -23,6 +24,8 @@ interface MetronomeWidgetProps {
   onBeatsPerMeasureChange: (beats: number) => void;
   onToggle: () => void;
   onTapTempo: () => void;
+  volume: number;
+  onVolumeChange: (volume: number) => void;
 }
 
 export default function MetronomeWidget({
@@ -34,6 +37,8 @@ export default function MetronomeWidget({
   onBeatsPerMeasureChange,
   onToggle,
   onTapTempo,
+  volume,
+  onVolumeChange,
 }: MetronomeWidgetProps) {
   const handleBpmChange = (value: number) => {
     onBpmChange(Math.max(20, Math.min(300, value)));
@@ -77,6 +82,20 @@ export default function MetronomeWidget({
         <Button variant="secondary" size="icon" className="rounded-lg h-9 w-9" onClick={() => handleBpmChange(bpm + 1)}>
           <Plus size={16} weight="regular" />
         </Button>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <VolumeIcon volume={volume} className="text-muted-foreground shrink-0" />
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={volume}
+          onChange={(e) => onVolumeChange(Number(e.target.value))}
+          className="flex-1 h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+          aria-label="Metronome volume"
+        />
       </div>
 
       <div className="flex justify-center gap-2 py-2">

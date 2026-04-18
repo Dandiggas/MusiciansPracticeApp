@@ -10,6 +10,8 @@ export class MetronomeEngine {
   private nextNoteTime: number = 0;
   private currentBeat: number = 0;
   private isPlaying: boolean = false;
+  private masterGain: GainNode | null = null;
+  private masterVolume: number = 0.8;
 
   private bpm: number;
   private beatsPerMeasure: number;
@@ -17,6 +19,8 @@ export class MetronomeEngine {
 
   private readonly SCHEDULE_AHEAD_TIME = 0.1;
   private readonly LOOKAHEAD = 25;
+  private readonly MASTER_RAMP_TIME = 0.015; // 15 ms — fast enough to feel instant while dragging the volume slider, slow enough to prevent audible zipper noise from direct gain.value writes.
+  private readonly CLICK_ATTACK_TIME = 0.003; // 3 ms — per-click attack ramp. Imperceptibly short as a volume change, but long enough to kill the DC-offset pop that hard-stepping from 0 to peak produces at osc.start(time).
 
   constructor(options: MetronomeOptions) {
     this.bpm = options.bpm;
@@ -27,6 +31,9 @@ export class MetronomeEngine {
   start(): void {
     if (this.isPlaying) return;
     this.audioContext = new AudioContext();
+    this.masterGain = this.audioContext.createGain();
+    this.masterGain.gain.value = this.masterVolume * this.masterVolume;
+    this.masterGain.connect(this.audioContext.destination);
     this.isPlaying = true;
     this.currentBeat = 0;
     this.nextNoteTime = this.audioContext.currentTime;
@@ -38,6 +45,10 @@ export class MetronomeEngine {
     if (this.timerId !== null) {
       clearTimeout(this.timerId);
       this.timerId = null;
+    }
+    if (this.masterGain) {
+      this.masterGain.disconnect();
+      this.masterGain = null;
     }
     if (this.audioContext) {
       this.audioContext.close();
@@ -56,6 +67,24 @@ export class MetronomeEngine {
 
   setOnBeat(callback: (beatNumber: number) => void): void {
     this.onBeat = callback;
+  }
+
+  setVolume(v: number): void {
+    // Defend against NaN/Infinity from hand-edited localStorage or caller bugs —
+    // AudioParam.gain.value = NaN throws / produces undefined behavior depending on browser.
+    const safe = Number.isFinite(v) ? v : 0;
+    const clamped = Math.min(1, Math.max(0, safe));
+    this.masterVolume = clamped;
+    if (this.audioContext && this.masterGain) {
+      const target = clamped * clamped;
+      const now = this.audioContext.currentTime;
+      // Anchor the ramp with an explicit setValueAtTime. linearRampToValueAtTime ramps from
+      // the value of the previous scheduled event — without this anchor, a bare `.gain.value = v`
+      // write (done in start()) isn't an event-list entry, and the ramp start-time is
+      // implementation-defined (historically buggy on older Safari).
+      this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+      this.masterGain.gain.linearRampToValueAtTime(target, now + this.MASTER_RAMP_TIME);
+    }
   }
 
   private schedule(): void {
@@ -78,13 +107,27 @@ export class MetronomeEngine {
     const gain = this.audioContext.createGain();
 
     osc.connect(gain);
-    gain.connect(this.audioContext.destination);
+    // masterGain is non-null whenever isPlaying is true (start() assigns it before
+    // setting isPlaying, and stop() clears isPlaying before nulling it). The ??
+    // fallback exists purely to satisfy the type checker, which can't prove the
+    // invariant through the setTimeout → schedule → playClick indirection.
+    gain.connect(this.masterGain ?? this.audioContext.destination);
 
     osc.frequency.value = isAccent ? 1000 : 800;
-    gain.gain.value = isAccent ? 1.0 : 0.5;
+    // Base per-click gain. Accent 1.0, unaccent 0.75 — a ~-2.5 dB gap so the
+    // downbeat still reads as the accent but non-downbeats aren't "too quiet
+    // to hear" (see issue #42). Master volume scales both via masterGain.
+    const peak = isAccent ? 1.0 : 0.75;
+
+    // Attack: ramp 0 → peak over CLICK_ATTACK_TIME (3 ms). Scheduled BEFORE
+    // osc.start so the oscillator's first sample lands inside a smooth envelope
+    // instead of a hard step — eliminates the DC-offset click/pop artifact.
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(peak, time + this.CLICK_ATTACK_TIME);
+    // Decay: exponential down to ~silence over 50 ms total click length.
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
 
     osc.start(time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
     osc.stop(time + 0.05);
   }
 }

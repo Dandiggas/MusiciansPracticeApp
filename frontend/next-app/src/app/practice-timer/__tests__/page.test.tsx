@@ -30,6 +30,7 @@ jest.mock('@/lib/audio/metronome-engine', () => ({
     setBpm: jest.fn(),
     setBeatsPerMeasure: jest.fn(),
     setOnBeat: jest.fn(),
+    setVolume: jest.fn(),
   })),
 }));
 
@@ -53,6 +54,8 @@ jest.mock('@/lib/practice-session-store', () => ({
   clearStoredSessionSnapshot: jest.fn(),
   getProject: (...args: unknown[]) => mockGetProject(...args),
   saveProject: (...args: unknown[]) => mockSaveProject(...args),
+  getMetronomeVolume: jest.fn().mockReturnValue(null),
+  saveMetronomeVolume: jest.fn(),
   INSTRUMENTS: ['Guitar', 'Bass', 'Drums', 'Keys'] as const,
 }));
 
