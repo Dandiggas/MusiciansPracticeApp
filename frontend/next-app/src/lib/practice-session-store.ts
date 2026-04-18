@@ -109,6 +109,30 @@ export const clearStoredRecommendation = () => {
   removeItem(RECOMMENDATION_KEY);
 };
 
+// --- Metronome volume (global, device-scoped) ---
+
+const METRONOME_VOLUME_KEY = "practice:metronome-volume";
+
+export interface MetronomeVolumeRecord {
+  volume: number; // 0..1
+  updatedAt: string;
+}
+
+const clamp01 = (n: number): number => Math.min(1, Math.max(0, n));
+
+export const getMetronomeVolume = (): number | null => {
+  const record = readJson<MetronomeVolumeRecord>(METRONOME_VOLUME_KEY);
+  if (!record || typeof record.volume !== "number") return null;
+  return clamp01(record.volume);
+};
+
+export const saveMetronomeVolume = (volume: number): void => {
+  writeJson(METRONOME_VOLUME_KEY, {
+    volume: clamp01(volume),
+    updatedAt: new Date().toISOString(),
+  } satisfies MetronomeVolumeRecord);
+};
+
 // --- Per-instrument project persistence (Launch Pad) ---
 
 export const INSTRUMENTS = ["Guitar", "Bass", "Drums", "Keys"] as const;
