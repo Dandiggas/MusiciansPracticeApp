@@ -98,6 +98,7 @@ SITE_ID = 1
 # ─── Allauth + email verification (see issue #16) ────────────────────
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[The Shed] "
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False  # our POST /verify-and-login/ handles it

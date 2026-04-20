@@ -94,3 +94,22 @@ class GrandfatherMigrationTest(TestCase):
         self.assertEqual(existing.email, "mixed@example.com")  # unchanged
         self.assertTrue(existing.verified)
         self.assertTrue(existing.primary)
+
+    def test_normalizes_customuser_email_to_lowercase(self):
+        """Legacy user with mixed-case CustomUser.email gets it normalized
+        so dj-rest-auth's case-sensitive login filter matches the lowercased
+        EmailAddress row. Without this fix, legacy mixed-case users hit a
+        permanent lockout after the mandatory-verify gate flips."""
+        user = CustomUser.objects.create_user(
+            username="legacycaps", email="Legacy@Example.COM", password="x"
+        )
+        grandfather_existing_emails(django_apps, None)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, "legacy@example.com")
+
+        # EmailAddress row should also be the lowercased form.
+        email_row = EmailAddress.objects.get(user=user)
+        self.assertEqual(email_row.email, "legacy@example.com")
+        self.assertTrue(email_row.verified)
+        self.assertTrue(email_row.primary)

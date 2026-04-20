@@ -14,9 +14,19 @@ def grandfather_existing_emails(apps, schema_editor):
         # this, a CustomUser.email of "Dan@Example.com" would miss an
         # existing lowercase EmailAddress row and attempt a duplicate INSERT
         # that trips allauth's partial unique-verified-email index.
-        email = (user.email or "").strip().lower()
+        original_email = user.email or ""
+        email = original_email.strip().lower()
         if not email:
             continue
+
+        # Normalize CustomUser.email too, so dj-rest-auth's login serializer
+        # (which does case-sensitive filter(email=user.email, verified=True))
+        # finds the lowercased EmailAddress row we're about to create/update.
+        # Without this, legacy users with mixed-case user.email get a verified
+        # EmailAddress row but cannot log in — permanent lockout.
+        if user.email != email:
+            user.email = email
+            user.save(update_fields=["email"])
 
         # Demote any OTHER primary rows for this user first. Allauth's
         # partial unique constraint on (user, primary=True) rejects a second
