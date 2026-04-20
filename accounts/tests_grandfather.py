@@ -51,3 +51,46 @@ class GrandfatherMigrationTest(TestCase):
         count_after_first = EmailAddress.objects.count()
         grandfather_existing_emails(django_apps, None)
         self.assertEqual(EmailAddress.objects.count(), count_after_first)
+
+    def test_demotes_other_primary_emailaddress_rows(self):
+        """Users with a stale primary=True row on a different email get it
+        demoted, so the migration can set the target row primary without
+        tripping allauth's partial unique-primary constraint."""
+        user = CustomUser.objects.create_user(
+            username="dualprimary", email="target@example.com", password="x"
+        )
+        # Stale primary on an unrelated email — simulates leftover admin edit
+        # or reverted-migration debris.
+        EmailAddress.objects.create(
+            user=user, email="old@example.com", verified=False, primary=True
+        )
+
+        grandfather_existing_emails(django_apps, None)
+
+        new_row = EmailAddress.objects.get(user=user, email="target@example.com")
+        old_row = EmailAddress.objects.get(user=user, email="old@example.com")
+
+        self.assertTrue(new_row.verified)
+        self.assertTrue(new_row.primary)
+        self.assertFalse(old_row.primary)  # demoted
+
+    def test_normalizes_email_case_to_lowercase(self):
+        """CustomUser.email stored mixed-case finds an existing lowercase
+        EmailAddress row instead of attempting a duplicate insert."""
+        user = CustomUser.objects.create_user(
+            username="mixedcase", email="Mixed@Example.COM", password="x"
+        )
+        # Existing lowercase row — allauth's canonical form.
+        existing = EmailAddress.objects.create(
+            user=user, email="mixed@example.com", verified=False, primary=False
+        )
+
+        grandfather_existing_emails(django_apps, None)
+
+        # Exactly one EmailAddress row for this user — the existing one got
+        # updated, not a duplicate created.
+        self.assertEqual(EmailAddress.objects.filter(user=user).count(), 1)
+        existing.refresh_from_db()
+        self.assertEqual(existing.email, "mixed@example.com")  # unchanged
+        self.assertTrue(existing.verified)
+        self.assertTrue(existing.primary)
