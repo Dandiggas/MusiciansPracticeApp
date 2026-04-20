@@ -88,3 +88,25 @@ class VerifyAndLoginTests(TestCase):
         # No credentials on client — endpoint must be AllowAny.
         resp = self.client.post(VERIFY_URL, {"key": key}, format="json")
         self.assertEqual(resp.status_code, 200)
+
+    def test_expired_hmac_key_returns_410(self):
+        """Production path — allauth 65.x defaults to HMAC keys, so this is
+        the expiry code path real users will hit. Simulates an expired
+        HMAC by patching the clock signing.loads() reads."""
+        from unittest.mock import patch
+        import time
+
+        user, email, key = _make_unverified_user_with_hmac()
+
+        # Jump 8 days forward (past ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=1)
+        # so signing.loads raises SignatureExpired.
+        future = time.time() + 8 * 86400
+
+        with patch("django.core.signing.time.time", return_value=future):
+            resp = self.client.post(VERIFY_URL, {"key": key}, format="json")
+
+        self.assertEqual(resp.status_code, 410)
+        self.assertEqual(resp.json()["detail"], "expired_key")
+        # Sanity: email is still unverified — expired keys don't confirm.
+        email.refresh_from_db()
+        self.assertFalse(email.verified)
