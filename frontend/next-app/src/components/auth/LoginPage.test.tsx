@@ -25,7 +25,7 @@ describe("LoginPage — unverified-account path", () => {
 
   const submitLogin = async () => {
     fireEvent.change(screen.getByLabelText(/username/i), {
-      target: { value: "unverified" },
+      target: { value: "unverified@example.com" },
     });
     fireEvent.change(screen.getAllByLabelText(/password/i)[0], {
       target: { value: "anything" },
@@ -70,6 +70,7 @@ describe("LoginPage — unverified-account path", () => {
         String(c[0]).includes("resend-email")
       );
       expect(resendCalls).toHaveLength(1);
+      expect(resendCalls[0][1]).toEqual({ email: "unverified@example.com" });
     });
 
     // Second submission with the same unverified response must NOT re-fire

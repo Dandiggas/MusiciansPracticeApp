@@ -91,13 +91,9 @@ const LoginPage = () => {
           m.toLowerCase().includes("not verified")
         )
       ) {
-        // Use the typed username as the resend target. If the user logged in
-        // with a plain username (not an email), the resend call may be
-        // rejected server-side — that's caught silently. Users who typed an
-        // email-as-username get the happy auto-resend path; users with a
-        // separate username/email can still use the manual resend button or
-        // visit /auth/check-email directly.
-        setUnverifiedEmail(formData.username);
+        setUnverifiedEmail(
+          formData.username.includes("@") ? formData.username : null
+        );
         setError("");
         return;
       }
