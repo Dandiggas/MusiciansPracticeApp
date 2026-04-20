@@ -1,0 +1,9 @@
+Hey {{ user.username }},
+
+Click the link below to verify your email and sign in. The link expires in 24 hours.
+
+{{ activate_url }}
+
+Didn't sign up for this? Ignore this email.
+
+— The Shed

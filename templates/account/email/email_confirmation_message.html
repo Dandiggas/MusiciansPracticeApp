@@ -1,0 +1,28 @@
+{% load i18n %}<!DOCTYPE html>
+<html>
+<body style="margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #fbfbfa; padding: 32px 16px; color: #37352f;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px;">
+    <tr>
+      <td style="padding: 32px;">
+        <h1 style="font-size: 20px; margin: 0 0 16px; color: #37352f;">Verify your email</h1>
+        <p style="font-size: 15px; line-height: 1.5; margin: 0 0 24px;">
+          Hey <strong>{{ user.username }}</strong>, click the button below to sign in and start practicing.
+        </p>
+        <p style="text-align: center; margin: 32px 0;">
+          <a href="{{ activate_url }}"
+             style="display: inline-block; padding: 12px 28px; background: #0D9488; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">
+            Sign me in
+          </a>
+        </p>
+        <p style="font-size: 13px; color: #78716c; line-height: 1.5; margin: 0 0 8px;">
+          Or paste this link into your browser:
+        </p>
+        <p style="font-size: 13px; color: #78716c; word-break: break-all; margin: 0 0 24px;">
+          <a href="{{ activate_url }}" style="color: #78716c;">{{ activate_url }}</a>
+        </p>
+        <p style="font-size: 13px; color: #78716c; margin: 0;">Expires in 24 hours.</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
