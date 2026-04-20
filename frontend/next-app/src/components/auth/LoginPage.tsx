@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,11 @@ const LoginPage = () => {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [manualResendState, setManualResendState] = useState<
+    "idle" | "sending" | "sent" | "error"
+  >("idle");
+  const autoResendFiredRef = useRef(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,6 +30,38 @@ const LoginPage = () => {
       router.replace("/dashboard");
     }
   }, [router]);
+
+  useEffect(() => {
+    if (!unverifiedEmail || autoResendFiredRef.current) return;
+    autoResendFiredRef.current = true;
+    const apiBaseUrl =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+    void (async () => {
+      try {
+        await axios.post(`${apiBaseUrl}/dj-rest-auth/registration/resend-email/`, {
+          email: unverifiedEmail,
+        });
+      } catch {
+        // Silent failure on auto-fire — manual resend button remains.
+      }
+    })();
+  }, [unverifiedEmail]);
+
+  const handleManualResend = async () => {
+    if (!unverifiedEmail) return;
+    setManualResendState("sending");
+    const apiBaseUrl =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+    try {
+      await axios.post(
+        `${apiBaseUrl}/dj-rest-auth/registration/resend-email/`,
+        { email: unverifiedEmail }
+      );
+      setManualResendState("sent");
+    } catch {
+      setManualResendState("error");
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -46,6 +83,24 @@ const LoginPage = () => {
       router.push("/dashboard");
     } catch (err) {
       console.error("Login error", err);
+      if (
+        axios.isAxiosError(err) &&
+        err.response?.status === 400 &&
+        Array.isArray(err.response?.data?.non_field_errors) &&
+        err.response.data.non_field_errors.some((m: string) =>
+          m.toLowerCase().includes("not verified")
+        )
+      ) {
+        // Use the typed username as the resend target. If the user logged in
+        // with a plain username (not an email), the resend call may be
+        // rejected server-side — that's caught silently. Users who typed an
+        // email-as-username get the happy auto-resend path; users with a
+        // separate username/email can still use the manual resend button or
+        // visit /auth/check-email directly.
+        setUnverifiedEmail(formData.username);
+        setError("");
+        return;
+      }
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<{ detail?: string }>;
         setError(
@@ -145,6 +200,34 @@ const LoginPage = () => {
               </p>
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                {unverifiedEmail && (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="rounded-lg border border-warm/40 bg-warm/10 p-3 text-sm"
+                  >
+                    <p className="font-medium text-foreground">
+                      Your email isn&apos;t verified yet
+                    </p>
+                    <p className="mt-1 text-muted-foreground">
+                      We sent you a fresh link to{" "}
+                      <strong className="text-foreground">{unverifiedEmail}</strong>.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleManualResend}
+                      disabled={manualResendState === "sending"}
+                      className="mt-2 h-9 rounded-lg"
+                    >
+                      {manualResendState === "sending"
+                        ? "Sending..."
+                        : manualResendState === "sent"
+                          ? "Sent!"
+                          : "Resend"}
+                    </Button>
+                  </div>
+                )}
                 {error && (
                   <div className="rounded-lg bg-destructive/[0.06] px-3.5 py-2.5 text-sm font-medium text-destructive">
                     {error}
