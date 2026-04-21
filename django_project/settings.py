@@ -77,7 +77,7 @@ ROOT_URLCONF = "django_project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -94,6 +94,32 @@ TEMPLATES = [
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 SITE_ID = 1
+
+# ─── Allauth + email verification (see issue #16) ────────────────────
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[The Shed] "
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False  # our POST /verify-and-login/ handles it
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+ACCOUNT_ADAPTER = "accounts.adapter.CustomAccountAdapter"
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "hello@theshed.app")
+
+# SendGrid in prod; console backend (already set above) stays default in dev.
+if os.getenv("SENDGRID_API_KEY"):
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp.sendgrid.net"
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = "apikey"
+    EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY")
+    EMAIL_USE_TLS = True
+
+# Fail fast if FRONTEND_URL is missing in a non-debug env. Must come after
+# DEBUG is set above.
+from django_project.startup_checks import check_frontend_url  # noqa: E402
+check_frontend_url()
 
 
 WSGI_APPLICATION = "django_project.wsgi.application"
