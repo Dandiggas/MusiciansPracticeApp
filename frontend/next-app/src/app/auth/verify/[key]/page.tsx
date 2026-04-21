@@ -23,12 +23,16 @@ type VerifyState =
 export default function VerifyPage() {
   const params = useParams();
   const router = useRouter();
-  const key =
+  const rawKey =
     typeof params?.key === "string"
       ? params.key
       : Array.isArray(params?.key)
         ? params.key[0]
         : "";
+  // Trim whitespace defensively — terminal copy-paste of the activate_url
+  // sometimes includes a trailing newline or space which the URL bar silently
+  // preserves, and the backend treats whitespace-suffixed keys as invalid (404).
+  const key = rawKey.trim();
   const hasRun = useRef(false);
   const [state, setState] = useState<VerifyState>({ status: "loading" });
   const [resendEmail, setResendEmail] = useState("");
