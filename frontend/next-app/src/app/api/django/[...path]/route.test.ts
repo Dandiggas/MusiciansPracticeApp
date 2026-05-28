@@ -74,4 +74,39 @@ describe("django write proxy", () => {
     expect(proxiedInit.headers.get("host")).toBeNull();
     expect(proxiedInit.headers.get("content-length")).toBeNull();
   });
+
+  it("materializes JSON writes before forwarding them to Django", async () => {
+    const { POST } = await import("./route");
+    const body = JSON.stringify({ name: "Kevin Bond" });
+
+    const request = new NextRequest("http://app.test/api/django/sessions", {
+      method: "POST",
+      headers: {
+        cookie: "practice_auth_token=test-token",
+        "content-type": "application/json",
+        host: "app.test",
+      },
+      body,
+    });
+
+    const response = await POST(request, {
+      params: Promise.resolve({ path: ["sessions"] }),
+    });
+
+    expect(response.status).toBe(201);
+
+    const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+    const [url, init] = mockFetch.mock.calls[0];
+    const proxiedInit = init as RequestInit & {
+      duplex?: string;
+      headers: Headers;
+    };
+
+    expect(String(url)).toBe("http://django.test/api/v1/sessions/");
+    expect(proxiedInit.method).toBe("POST");
+    expect(proxiedInit.body).toBe(body);
+    expect(proxiedInit.duplex).toBeUndefined();
+    expect(proxiedInit.headers.get("content-type")).toBe("application/json");
+    expect(proxiedInit.headers.get("content-length")).toBe(String(body.length));
+  });
 });
