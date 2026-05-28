@@ -1,34 +1,12 @@
-"use client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import Link from "next/link";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { getAuthCookieName } from "@/lib/django-api";
 
-export default function Home() {
-  const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    router.replace(token ? "/dashboard" : "/login");
-  }, [router]);
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(getAuthCookieName())?.value;
 
-  return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-6">
-      <div className="text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-          The Shed
-        </p>
-        <h1 className="mt-3 text-3xl font-black tracking-tight text-foreground">
-          Opening your workspace...
-        </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          If nothing happens, head to{" "}
-          <Link href="/login" className="font-semibold text-primary underline underline-offset-4">
-            login
-          </Link>
-          .
-        </p>
-      </div>
-    </div>
-  );
+  redirect(token ? "/sessions" : "/login");
 }

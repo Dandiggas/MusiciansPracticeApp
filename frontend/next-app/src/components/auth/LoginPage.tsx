@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,10 +19,11 @@ const LoginPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      router.replace("/dashboard");
-    }
+    void fetch("/api/django/sessions", { method: "GET" }).then((response) => {
+      if (response.ok) {
+        router.replace("/sessions");
+      }
+    });
   }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,26 +35,29 @@ const LoginPage = () => {
     setIsLoading(true);
     setError("");
 
-    const apiBaseUrl =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-    const apiUrl = `${apiBaseUrl}/dj-rest-auth/login/`;
-
     try {
-      const response = await axios.post(apiUrl, formData);
-      localStorage.setItem("token", response.data.key);
-      localStorage.setItem("userId", response.data.user);
-      router.push("/dashboard");
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const detail =
+          typeof data?.detail === "string"
+            ? data.detail
+            : "Invalid username or password. Please try again.";
+        throw new Error(detail);
+      }
+
+      router.push("/sessions");
     } catch (err) {
       console.error("Login error", err);
-      if (axios.isAxiosError(err)) {
-        const axiosError = err as AxiosError<{ detail?: string }>;
-        setError(
-          axiosError.response?.data?.detail ||
-            "Invalid username or password. Please try again."
-        );
-      } else {
-        setError("An unexpected error occurred. Please try again.");
-      }
+      setError(err instanceof Error ? err.message : "An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }

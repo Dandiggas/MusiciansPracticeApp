@@ -36,6 +36,8 @@ pycparser==2.22
 pydantic==2.10.6
 pydantic_core==2.27.2
 PyJWT==2.10.1
+pytest>=8.3.0
+pytest-django>=4.8.0
 python3-openid==3.2.0
 pytz==2024.1
 PyYAML==6.0.2

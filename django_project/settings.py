@@ -162,6 +162,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # WhiteNoise configuration for serving static files in production
 STORAGES = {
@@ -184,11 +186,20 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",],
         "DEFAULT_AUTHENTICATION_CLASSES":[
             "rest_framework.authentication.SessionAuthentication",
-            "rest_framework.authentication.TokenAuthentication",
+            "accounts.authentication.CookieTokenAuthentication",
         
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+AUTH_TOKEN_COOKIE_NAME = os.getenv("AUTH_TOKEN_COOKIE_NAME", "practice_auth_token")
+AUTH_TOKEN_COOKIE_HTTPONLY = True
+AUTH_TOKEN_COOKIE_SAMESITE = "Lax"
+AUTH_TOKEN_COOKIE_SECURE = os.getenv("AUTH_TOKEN_COOKIE_SECURE", "False") == "True"
+AUTH_TOKEN_COOKIE_MAX_AGE = int(
+    os.getenv("AUTH_TOKEN_COOKIE_MAX_AGE", str(60 * 60 * 24 * 30))
+)
+AUTH_TOKEN_COOKIE_PATH = "/"
 
 # CORS Configuration - Allow frontend to make requests to backend
 # Get allowed origins from environment variable for production
@@ -248,4 +259,3 @@ LOGGING = {
         },
     },
 }
-

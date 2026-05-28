@@ -19,8 +19,10 @@ interface MetronomeWidgetProps {
   isActive: boolean;
   currentBeat: number;
   beatsPerMeasure: number;
+  volume: number;
   onBpmChange: (bpm: number) => void;
   onBeatsPerMeasureChange: (beats: number) => void;
+  onVolumeChange: (volume: number) => void;
   onToggle: () => void;
   onTapTempo: () => void;
 }
@@ -30,8 +32,10 @@ export default function MetronomeWidget({
   isActive,
   currentBeat,
   beatsPerMeasure,
+  volume,
   onBpmChange,
   onBeatsPerMeasureChange,
+  onVolumeChange,
   onToggle,
   onTapTempo,
 }: MetronomeWidgetProps) {
@@ -113,6 +117,21 @@ export default function MetronomeWidget({
             {ts.label}
           </Button>
         ))}
+      </div>
+
+      <div>
+        <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+          <span>Volume</span>
+          <span>{Math.round(volume * 100)}%</span>
+        </div>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={Math.round(volume * 100)}
+          onChange={(e) => onVolumeChange(Number(e.target.value) / 100)}
+          className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary"
+        />
       </div>
 
       <div className="flex gap-2">
