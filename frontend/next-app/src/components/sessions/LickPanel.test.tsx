@@ -105,6 +105,8 @@ function Harness() {
       mutateTrack={(updater) => setTrack((current) => updater(current))}
       replaceTrack={setTrack}
       setActiveLickId={setActiveLickId}
+      setDraftEnd={setDraftEnd}
+      setDraftStart={setDraftStart}
       toggleLick={(lickId) =>
         setActiveLickId((current) => (current === lickId ? null : lickId))
       }
@@ -125,13 +127,21 @@ describe("LickPanel", () => {
         position: 1,
       })
     );
+    mockUpdateLick.mockResolvedValue(
+      buildLick({
+        id: 11,
+        name: "Intro",
+        start_seconds: 70,
+        end_seconds: 95,
+      })
+    );
   });
 
   it("creates a new lick after capturing a new timestamp while another lick is loaded", async () => {
     const user = userEvent.setup();
     render(<Harness />);
 
-    expect(screen.getByRole("button", { name: "Update Lick" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save Lick" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Set In" }));
     await waitFor(() =>
@@ -154,6 +164,36 @@ describe("LickPanel", () => {
     expect(await screen.findByText("Outro")).toBeInTheDocument();
   });
 
+  it("updates a saved lick after explicitly choosing to edit it", async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+
+    await user.click(screen.getByRole("button", { name: "Edit Intro" }));
+
+    expect(screen.getByText("Editing")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Update Lick" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Set In" }));
+    await user.click(screen.getByRole("button", { name: "Set Out" }));
+    await user.click(screen.getByRole("button", { name: "Update Lick" }));
+
+    await waitFor(() => expect(mockUpdateLick).toHaveBeenCalledTimes(1));
+    expect(mockUpdateLick).toHaveBeenCalledWith(11, {
+      name: "Intro",
+      start_seconds: 70,
+      end_seconds: 95,
+    });
+    expect(mockCreateLick).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(
+        screen.getAllByText((_, element) =>
+          element?.tagName.toLowerCase() === "p" &&
+          element.textContent === "1:10 - 1:35"
+        )
+      ).toHaveLength(1)
+    );
+  });
+
   it("deletes the active lick and clears the loaded loop", async () => {
     const user = userEvent.setup();
     window.confirm = jest.fn(() => true);
@@ -173,7 +213,7 @@ describe("LickPanel", () => {
     render(<Harness />);
 
     expect(screen.getByText("Active")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Update Lick" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save Lick" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Stop Loop" }));
 
@@ -186,6 +226,6 @@ describe("LickPanel", () => {
 
     expect(screen.getByText("Active")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Stop Loop" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Update Lick" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save Lick" })).toBeInTheDocument();
   });
 });

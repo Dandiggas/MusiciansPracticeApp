@@ -16,7 +16,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { DotsSixVertical, Trash } from "@phosphor-icons/react";
+import { DotsSixVertical, PencilSimple, Trash } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,13 +40,17 @@ function sortLicks(licks: Lick[]) {
 
 function SortableLickRow({
   active,
+  editing,
   lick,
   onDelete,
+  onEdit,
   onSelect,
 }: {
   active: boolean;
+  editing: boolean;
   lick: Lick;
   onDelete: () => void;
+  onEdit: () => void;
   onSelect: () => void;
 }) {
   const {
@@ -65,7 +69,9 @@ function SortableLickRow({
         transition,
       }}
       className={`flex items-center gap-3 rounded-2xl border px-3 py-3 ${
-        active
+        editing
+          ? "border-primary/60 bg-primary/[0.12]"
+          : active
           ? "border-primary/40 bg-primary/[0.08]"
           : "border-border/60 bg-card/60"
       }`}
@@ -83,8 +89,17 @@ function SortableLickRow({
           </p>
         </div>
         <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          {active ? "Active" : "Load"}
+          {editing ? "Editing" : active ? "Active" : "Load"}
         </span>
+      </button>
+
+      <button
+        type="button"
+        aria-label={`Edit ${lick.name}`}
+        className="rounded-xl p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        onClick={onEdit}
+      >
+        <PencilSimple size={16} weight="bold" />
       </button>
 
       <button
@@ -119,6 +134,8 @@ interface LickPanelProps {
   mutateTrack: (updater: (track: Track) => Track) => void;
   replaceTrack: (track: Track) => void;
   setActiveLickId: (lickId: number | null) => void;
+  setDraftEnd: (seconds: number | null) => void;
+  setDraftStart: (seconds: number | null) => void;
   toggleLick: (lickId: number) => void;
   track: Track;
 }
@@ -133,17 +150,35 @@ export function LickPanel({
   mutateTrack,
   replaceTrack,
   setActiveLickId,
+  setDraftEnd,
+  setDraftStart,
   toggleLick,
   track,
 }: LickPanelProps) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+  const [editingLickId, setEditingLickId] = useState<number | null>(null);
   const [draftName, setDraftName] = useState("");
   const [error, setError] = useState("");
   const [isWorking, setIsWorking] = useState(false);
 
+  const editingLick = track.licks.find((lick) => lick.id === editingLickId) ?? null;
+
   useEffect(() => {
-    setDraftName(activeLick?.name ?? "");
-  }, [activeLick?.id, activeLick?.name]);
+    if (!editingLick) {
+      return;
+    }
+
+    setDraftName(editingLick.name);
+    setDraftStart(editingLick.start_seconds);
+    setDraftEnd(editingLick.end_seconds);
+  }, [
+    editingLick?.id,
+    editingLick?.name,
+    editingLick?.start_seconds,
+    editingLick?.end_seconds,
+    setDraftEnd,
+    setDraftStart,
+  ]);
 
   function startNewCapture(capture: () => void) {
     if (activeLick) {
@@ -152,14 +187,42 @@ export function LickPanel({
       setDraftName("");
     }
 
+    setEditingLickId(null);
     setError("");
     capture();
   }
 
-  function stopLoop() {
-    setActiveLickId(null);
+  function captureTimestamp(capture: () => void) {
+    if (editingLick) {
+      setError("");
+      capture();
+      return;
+    }
+
+    startNewCapture(capture);
+  }
+
+  function startEditing(lick: Lick) {
+    setEditingLickId(lick.id);
+    setDraftName(lick.name);
+    setDraftStart(lick.start_seconds);
+    setDraftEnd(lick.end_seconds);
+    setError("");
+  }
+
+  function clearEditor() {
+    setEditingLickId(null);
     clearDraft();
     setDraftName("");
+    setError("");
+  }
+
+  function stopLoop() {
+    setActiveLickId(null);
+    if (!editingLick) {
+      clearDraft();
+      setDraftName("");
+    }
     setError("");
   }
 
@@ -177,8 +240,8 @@ export function LickPanel({
     setError("");
 
     try {
-      if (activeLick) {
-        const updated = await updateLick(activeLick.id, {
+      if (editingLick) {
+        const updated = await updateLick(editingLick.id, {
           name: draftName.trim(),
           start_seconds: draftStart,
           end_seconds: draftEnd,
@@ -190,6 +253,7 @@ export function LickPanel({
             current.licks.map((lick) => (lick.id === updated.id ? updated : lick))
           ),
         }));
+        setEditingLickId(null);
       } else {
         const created = await createLick({
           track: track.id,
@@ -227,6 +291,9 @@ export function LickPanel({
         ...current,
         licks: current.licks.filter((lick) => lick.id !== lickId),
       }));
+      if (editingLickId === lickId) {
+        setEditingLickId(null);
+      }
       if (activeLick?.id === lickId) {
         setActiveLickId(null);
         clearDraft();
@@ -290,13 +357,13 @@ export function LickPanel({
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <div className="rounded-2xl border border-border/60 bg-card/60 p-4">
           <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="secondary" onClick={() => startNewCapture(captureIn)}>
+            <Button type="button" variant="secondary" onClick={() => captureTimestamp(captureIn)}>
               Set In
             </Button>
-            <Button type="button" variant="secondary" onClick={() => startNewCapture(captureOut)}>
+            <Button type="button" variant="secondary" onClick={() => captureTimestamp(captureOut)}>
               Set Out
             </Button>
-            <Button type="button" variant="ghost" onClick={clearDraft}>
+            <Button type="button" variant="ghost" onClick={clearEditor}>
               Clear
             </Button>
           </div>
@@ -321,19 +388,19 @@ export function LickPanel({
               htmlFor="lick-name"
               className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
             >
-              {activeLick ? "Edit active lick" : "New lick name"}
+              {editingLick ? "Edit saved lick" : "New lick name"}
             </label>
             <Input
               id="lick-name"
               value={draftName}
               onChange={(event) => setDraftName(event.target.value)}
-              placeholder={activeLick ? "Rename active lick" : "Intro run"}
+              placeholder={editingLick ? "Rename saved lick" : "Intro run"}
             />
           </div>
 
           <div className="mt-4 flex gap-2">
             <Button type="button" onClick={() => void handleSave()} disabled={isWorking}>
-              {isWorking ? "Saving..." : activeLick ? "Update Lick" : "Save Lick"}
+              {isWorking ? "Saving..." : editingLick ? "Update Lick" : "Save Lick"}
             </Button>
           </div>
 
@@ -354,7 +421,9 @@ export function LickPanel({
                       key={lick.id}
                       lick={lick}
                       active={activeLick?.id === lick.id}
+                      editing={editingLickId === lick.id}
                       onSelect={() => toggleLick(lick.id)}
+                      onEdit={() => startEditing(lick)}
                       onDelete={() => void handleDelete(lick.id)}
                     />
                   ))}
