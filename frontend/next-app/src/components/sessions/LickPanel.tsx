@@ -20,7 +20,7 @@ import { DotsSixVertical, Trash } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createLick, deleteLick, reorderLicks, updateLick, updateTrack } from "@/lib/api";
+import { createLick, deleteLick, reorderLicks, updateLick } from "@/lib/api";
 import { Lick, Track } from "@/types/session";
 
 
@@ -144,6 +144,17 @@ export function LickPanel({
   useEffect(() => {
     setDraftName(activeLick?.name ?? "");
   }, [activeLick?.id, activeLick?.name]);
+
+  function startNewCapture(capture: () => void) {
+    if (activeLick) {
+      setActiveLickId(null);
+      clearDraft();
+      setDraftName("");
+    }
+
+    setError("");
+    capture();
+  }
 
   async function handleSave() {
     if (!draftName.trim()) {
@@ -272,10 +283,10 @@ export function LickPanel({
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <div className="rounded-2xl border border-border/60 bg-card/60 p-4">
           <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="secondary" onClick={captureIn}>
+            <Button type="button" variant="secondary" onClick={() => startNewCapture(captureIn)}>
               Set In
             </Button>
-            <Button type="button" variant="secondary" onClick={captureOut}>
+            <Button type="button" variant="secondary" onClick={() => startNewCapture(captureOut)}>
               Set Out
             </Button>
             <Button type="button" variant="ghost" onClick={clearDraft}>
