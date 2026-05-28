@@ -255,6 +255,17 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isRecording || mode === "audio" || !livePreviewRef.current || !streamRef.current) {
+      return;
+    }
+
+    const preview = livePreviewRef.current;
+    preview.srcObject = streamRef.current;
+    preview.muted = true;
+    void preview.play().catch(() => {});
+  }, [isRecording, mode]);
+
   async function loadDevices() {
     if (!navigator.mediaDevices?.enumerateDevices) {
       return;

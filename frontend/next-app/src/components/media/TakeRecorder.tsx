@@ -97,6 +97,17 @@ export default function TakeRecorder() {
     };
   }, [recordingUrl]);
 
+  useEffect(() => {
+    if (!isRecording || !isVideoMode || !livePreviewRef.current || !streamRef.current) {
+      return;
+    }
+
+    const preview = livePreviewRef.current;
+    preview.srcObject = streamRef.current;
+    preview.muted = true;
+    void preview.play().catch(() => {});
+  }, [isRecording, isVideoMode]);
+
   const resetRecording = () => {
     if (recordingUrl) {
       URL.revokeObjectURL(recordingUrl);
