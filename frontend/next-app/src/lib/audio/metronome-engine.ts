@@ -1,6 +1,7 @@
 export interface MetronomeOptions {
   bpm: number;
   beatsPerMeasure: number;
+  volume?: number;
   onBeat?: (beatNumber: number) => void;
 }
 
@@ -13,6 +14,7 @@ export class MetronomeEngine {
 
   private bpm: number;
   private beatsPerMeasure: number;
+  private volume: number;
   private onBeat?: (beatNumber: number) => void;
 
   private readonly SCHEDULE_AHEAD_TIME = 0.1;
@@ -21,6 +23,7 @@ export class MetronomeEngine {
   constructor(options: MetronomeOptions) {
     this.bpm = options.bpm;
     this.beatsPerMeasure = options.beatsPerMeasure;
+    this.volume = options.volume ?? 0.9;
     this.onBeat = options.onBeat;
   }
 
@@ -54,6 +57,10 @@ export class MetronomeEngine {
     this.currentBeat = 0;
   }
 
+  setVolume(volume: number): void {
+    this.volume = Math.max(0, Math.min(1, volume));
+  }
+
   setOnBeat(callback: (beatNumber: number) => void): void {
     this.onBeat = callback;
   }
@@ -76,15 +83,20 @@ export class MetronomeEngine {
 
     const osc = this.audioContext.createOscillator();
     const gain = this.audioContext.createGain();
+    const clickVolume = isAccent ? this.volume : this.volume * 0.6;
 
     osc.connect(gain);
     gain.connect(this.audioContext.destination);
 
     osc.frequency.value = isAccent ? 1000 : 800;
-    gain.gain.value = isAccent ? 1.0 : 0.5;
+    gain.gain.setValueAtTime(clickVolume, time);
 
     osc.start(time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+    if (clickVolume > 0) {
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+    } else {
+      gain.gain.linearRampToValueAtTime(0, time + 0.05);
+    }
     osc.stop(time + 0.05);
   }
 }

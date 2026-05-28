@@ -12,10 +12,9 @@ export function Header() {
   const pathname = usePathname();
 
   const navigation = [
-    { name: "The Shed", href: "/dashboard" },
-    { name: "Studio", href: "/practice-timer" },
-    { name: "AI Tutor", href: "/recommendations" },
-    { name: "Analytics", href: "/profilepage" },
+    { name: "The Shed", href: "/sessions" },
+    { name: "Metronome", href: "/metronome" },
+    { name: "Tuner", href: "/tuner" },
   ];
 
   if (pathname === "/login" || pathname === "/register") {
@@ -26,7 +25,7 @@ export function Header() {
     <header className="sticky top-0 z-40 h-14 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <div className="mr-4 hidden md:flex">
-          <Link href="/dashboard" className="mr-8 flex items-center space-x-2">
+          <Link href="/sessions" className="mr-8 flex items-center space-x-2">
             <span className="text-lg font-extrabold tracking-tight">
               The Shed
             </span>
@@ -50,7 +49,7 @@ export function Header() {
         </div>
 
         <div className="flex md:hidden flex-1">
-          <Link href="/dashboard" className="flex items-center space-x-2">
+          <Link href="/sessions" className="flex items-center space-x-2">
             <span className="text-lg font-extrabold tracking-tight">
               The Shed
             </span>

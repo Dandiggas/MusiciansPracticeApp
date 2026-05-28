@@ -1,0 +1,77 @@
+/**
+ * @jest-environment node
+ */
+
+import { NextRequest } from "next/server";
+
+
+describe("django write proxy", () => {
+  const originalFetch = global.fetch;
+
+  beforeEach(() => {
+    jest.resetModules();
+    process.env.DJANGO_API_URL = "http://django.test/api/v1";
+    global.fetch = jest.fn().mockResolvedValue(
+      new Response(JSON.stringify({ id: 17 }), {
+        status: 201,
+        headers: {
+          "content-type": "application/json",
+        },
+      })
+    ) as typeof fetch;
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    delete process.env.DJANGO_API_URL;
+  });
+
+  it("streams multipart track uploads through to Django", async () => {
+    const { POST } = await import("./route");
+    const body = [
+      "--demo",
+      'Content-Disposition: form-data; name="name"',
+      "",
+      "Praise on Demand",
+      "--demo--",
+    ].join("\r\n");
+
+    const request = new NextRequest("http://app.test/api/django/tracks", {
+      method: "POST",
+      headers: {
+        cookie: "practice_auth_token=test-token",
+        "content-type": "multipart/form-data; boundary=demo",
+        "content-length": String(body.length),
+        host: "app.test",
+        "x-trace-id": "trace-123",
+      },
+      body,
+    });
+
+    const response = await POST(request, {
+      params: Promise.resolve({ path: ["tracks"] }),
+    });
+
+    expect(response.status).toBe(201);
+    expect(response.headers.get("content-type")).toBe("application/json");
+
+    const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    const [url, init] = mockFetch.mock.calls[0];
+    const proxiedInit = init as RequestInit & {
+      duplex?: string;
+      headers: Headers;
+    };
+
+    expect(String(url)).toBe("http://django.test/api/v1/tracks/");
+    expect(proxiedInit.method).toBe("POST");
+    expect(proxiedInit.body).toBe(request.body);
+    expect(proxiedInit.duplex).toBe("half");
+    expect(proxiedInit.headers.get("Authorization")).toBe("Token test-token");
+    expect(proxiedInit.headers.get("content-type")).toBe("multipart/form-data; boundary=demo");
+    expect(proxiedInit.headers.get("x-trace-id")).toBe("trace-123");
+    expect(proxiedInit.headers.get("host")).toBeNull();
+    expect(proxiedInit.headers.get("content-length")).toBeNull();
+  });
+});

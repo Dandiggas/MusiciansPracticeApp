@@ -20,7 +20,11 @@ const config: Config = {
   ],
   testPathIgnorePatterns: [
     '/node_modules/',
+    '/.next/',
     '/e2e/',  // Ignore E2E tests - they run with Playwright
+  ],
+  modulePathIgnorePatterns: [
+    '<rootDir>/.next/standalone/',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

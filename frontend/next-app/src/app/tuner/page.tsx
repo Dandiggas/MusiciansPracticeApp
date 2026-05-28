@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
+import { StandaloneTunerClient } from "@/components/studio/StandaloneTunerClient";
+
 
 export default function TunerPage() {
-  redirect("/practice-timer");
+  return <StandaloneTunerClient />;
 }

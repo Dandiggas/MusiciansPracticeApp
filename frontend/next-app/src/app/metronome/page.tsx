@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
+import { StandaloneMetronomeClient } from "@/components/studio/StandaloneMetronomeClient";
+
 
 export default function MetronomePage() {
-  redirect("/practice-timer");
+  return <StandaloneMetronomeClient />;
 }

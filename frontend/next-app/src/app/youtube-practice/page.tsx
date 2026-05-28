@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
-export default function YouTubePracticePage() {
-  redirect("/practice-timer");
+
+export default function YoutubePracticeRedirectPage() {
+  redirect("/sessions");
+  return null;
 }

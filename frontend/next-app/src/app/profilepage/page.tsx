@@ -1,5 +1,7 @@
-import ProfilePage from '@/components/profile/ProfilePage';
+import { redirect } from "next/navigation";
 
-export default function ProfilePageRoute() {
-  return <ProfilePage />;
+
+export default function ProfileRedirectPage() {
+  redirect("/sessions");
+  return null;
 }
