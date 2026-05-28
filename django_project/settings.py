@@ -27,8 +27,17 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key-for-dev-only"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# ALLOWED_HOSTS - restrict to specific domains in production
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+def split_env_list(name, default=""):
+    return [value.strip() for value in os.getenv(name, default).split(",") if value.strip()]
+
+
+# ALLOWED_HOSTS - restrict to specific domains in production.
+# Railway injects the public and private service hostnames at runtime; include
+# them so frontend-to-backend proxy requests are not rejected before DRF runs.
+ALLOWED_HOSTS = split_env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS += split_env_list("RAILWAY_PUBLIC_DOMAIN")
+ALLOWED_HOSTS += split_env_list("RAILWAY_PRIVATE_DOMAIN")
+ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
 
 
 # Application definition

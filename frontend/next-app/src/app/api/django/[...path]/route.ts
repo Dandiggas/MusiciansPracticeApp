@@ -8,6 +8,31 @@ function buildDjangoUrl(path: string[], search: string) {
   return new URL(`${getDjangoApiBaseUrl()}/${normalizedPath}${search}`);
 }
 
+function requestCanHaveBody(method: string) {
+  return method !== "GET" && method !== "HEAD";
+}
+
+function isMultipartRequest(request: NextRequest) {
+  return (request.headers.get("content-type") || "").includes("multipart/form-data");
+}
+
+async function buildBodyInit(request: NextRequest, headers: Headers) {
+  if (!requestCanHaveBody(request.method)) {
+    return {};
+  }
+
+  if (isMultipartRequest(request)) {
+    return {
+      body: request.body,
+      duplex: "half",
+    };
+  }
+
+  const body = await request.text();
+  headers.set("content-length", String(new TextEncoder().encode(body).byteLength));
+  return { body };
+}
+
 
 async function proxy(request: NextRequest, path: string[]) {
   const token = request.cookies.get(getAuthCookieName())?.value;
@@ -22,12 +47,11 @@ async function proxy(request: NextRequest, path: string[]) {
   }
   headers.set("Accept", "application/json");
 
+  const bodyInit = await buildBodyInit(request, headers);
   const response = await fetch(url, {
     method: request.method,
     headers,
-    body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
-    // @ts-expect-error Node fetch requires duplex when proxying request streams.
-    duplex: "half",
+    ...bodyInit,
   });
 
   return new NextResponse(response.body, {
