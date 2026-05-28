@@ -194,6 +194,39 @@ describe("LickPanel", () => {
     );
   });
 
+  it("updates a saved lick from typed timestamp values", async () => {
+    const user = userEvent.setup();
+    mockUpdateLick.mockResolvedValue(
+      buildLick({
+        id: 11,
+        name: "Intro",
+        start_seconds: 72,
+        end_seconds: 90,
+      })
+    );
+
+    render(<Harness />);
+
+    await user.click(screen.getByRole("button", { name: "Edit Intro" }));
+
+    const inInput = screen.getByLabelText("In point");
+    const outInput = screen.getByLabelText("Out point");
+
+    await user.clear(inInput);
+    await user.type(inInput, "1:12");
+    await user.clear(outInput);
+    await user.type(outInput, "90");
+    await user.click(screen.getByRole("button", { name: "Update Lick" }));
+
+    await waitFor(() => expect(mockUpdateLick).toHaveBeenCalledTimes(1));
+    expect(mockUpdateLick).toHaveBeenCalledWith(11, {
+      name: "Intro",
+      start_seconds: 72,
+      end_seconds: 90,
+    });
+    expect(mockCreateLick).not.toHaveBeenCalled();
+  });
+
   it("deletes the active lick and clears the loaded loop", async () => {
     const user = userEvent.setup();
     window.confirm = jest.fn(() => true);

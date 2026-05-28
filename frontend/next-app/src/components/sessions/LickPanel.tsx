@@ -34,6 +34,51 @@ function formatTime(seconds: number | null) {
   return `${minutes}:${String(remainder).padStart(2, "0")}`;
 }
 
+function formatTimestampInput(seconds: number | null) {
+  if (seconds === null || !Number.isFinite(seconds)) {
+    return "";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds - minutes * 60;
+  const secondsText = Number.isInteger(remainder)
+    ? String(remainder).padStart(2, "0")
+    : remainder.toFixed(2).padStart(5, "0").replace(/0+$/, "").replace(/\.$/, "");
+
+  return `${minutes}:${secondsText}`;
+}
+
+function parseTimestampInput(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (trimmed.includes(":")) {
+    const parts = trimmed.split(":");
+    if (parts.length !== 2) {
+      return Number.NaN;
+    }
+
+    const minutes = Number(parts[0]);
+    const seconds = Number(parts[1]);
+    if (
+      !Number.isFinite(minutes) ||
+      !Number.isFinite(seconds) ||
+      minutes < 0 ||
+      seconds < 0 ||
+      seconds >= 60
+    ) {
+      return Number.NaN;
+    }
+
+    return minutes * 60 + seconds;
+  }
+
+  const seconds = Number(trimmed);
+  return Number.isFinite(seconds) && seconds >= 0 ? seconds : Number.NaN;
+}
+
 function sortLicks(licks: Lick[]) {
   return [...licks].sort((left, right) => left.position - right.position);
 }
@@ -158,10 +203,20 @@ export function LickPanel({
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const [editingLickId, setEditingLickId] = useState<number | null>(null);
   const [draftName, setDraftName] = useState("");
+  const [draftEndText, setDraftEndText] = useState("");
+  const [draftStartText, setDraftStartText] = useState("");
   const [error, setError] = useState("");
   const [isWorking, setIsWorking] = useState(false);
 
   const editingLick = track.licks.find((lick) => lick.id === editingLickId) ?? null;
+
+  useEffect(() => {
+    setDraftStartText(formatTimestampInput(draftStart));
+  }, [draftStart]);
+
+  useEffect(() => {
+    setDraftEndText(formatTimestampInput(draftEnd));
+  }, [draftEnd]);
 
   useEffect(() => {
     if (!editingLick) {
@@ -210,6 +265,14 @@ export function LickPanel({
     setError("");
   }
 
+  function updateDraftStart(value: string) {
+    setDraftStartText(value);
+  }
+
+  function updateDraftEnd(value: string) {
+    setDraftEndText(value);
+  }
+
   function clearEditor() {
     setEditingLickId(null);
     clearDraft();
@@ -231,7 +294,16 @@ export function LickPanel({
       setError("Give the lick a name.");
       return;
     }
-    if (draftStart === null || draftEnd === null || draftEnd <= draftStart) {
+
+    const parsedStart = parseTimestampInput(draftStartText);
+    const parsedEnd = parseTimestampInput(draftEndText);
+    if (
+      parsedStart === null ||
+      parsedEnd === null ||
+      !Number.isFinite(parsedStart) ||
+      !Number.isFinite(parsedEnd) ||
+      parsedEnd <= parsedStart
+    ) {
       setError("Set a valid in and out point first.");
       return;
     }
@@ -243,8 +315,8 @@ export function LickPanel({
       if (editingLick) {
         const updated = await updateLick(editingLick.id, {
           name: draftName.trim(),
-          start_seconds: draftStart,
-          end_seconds: draftEnd,
+          start_seconds: parsedStart,
+          end_seconds: parsedEnd,
         });
 
         mutateTrack((current) => ({
@@ -258,8 +330,8 @@ export function LickPanel({
         const created = await createLick({
           track: track.id,
           name: draftName.trim(),
-          start_seconds: draftStart,
-          end_seconds: draftEnd,
+          start_seconds: parsedStart,
+          end_seconds: parsedEnd,
           position: track.licks.length,
         });
 
@@ -370,16 +442,34 @@ export function LickPanel({
 
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             <div className="rounded-xl border border-border/60 bg-muted/40 p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              <label
+                htmlFor="lick-in-timestamp"
+                className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+              >
                 In point
-              </p>
-              <p className="mt-1 text-lg font-bold text-foreground">{formatTime(draftStart)}</p>
+              </label>
+              <Input
+                id="lick-in-timestamp"
+                value={draftStartText}
+                onChange={(event) => updateDraftStart(event.target.value)}
+                placeholder="0:10 or 10"
+                className="mt-2 h-10 font-semibold"
+              />
             </div>
             <div className="rounded-xl border border-border/60 bg-muted/40 p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              <label
+                htmlFor="lick-out-timestamp"
+                className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+              >
                 Out point
-              </p>
-              <p className="mt-1 text-lg font-bold text-foreground">{formatTime(draftEnd)}</p>
+              </label>
+              <Input
+                id="lick-out-timestamp"
+                value={draftEndText}
+                onChange={(event) => updateDraftEnd(event.target.value)}
+                placeholder="0:42 or 42"
+                className="mt-2 h-10 font-semibold"
+              />
             </div>
           </div>
 
