@@ -7,6 +7,11 @@ import { NextRequest } from "next/server";
 
 describe("django write proxy", () => {
   const originalFetch = global.fetch;
+  const textEncoder = new TextEncoder();
+
+  async function readProxiedBody(body: BodyInit | null | undefined) {
+    return new Response(body ?? null).text();
+  }
 
   beforeEach(() => {
     jest.resetModules();
@@ -26,7 +31,7 @@ describe("django write proxy", () => {
     delete process.env.DJANGO_API_URL;
   });
 
-  it("streams multipart track uploads through to Django", async () => {
+  it("materializes multipart track uploads before forwarding them to Django", async () => {
     const { POST } = await import("./route");
     const body = [
       "--demo",
@@ -66,13 +71,13 @@ describe("django write proxy", () => {
 
     expect(String(url)).toBe("http://django.test/api/v1/tracks/");
     expect(proxiedInit.method).toBe("POST");
-    expect(proxiedInit.body).toBe(request.body);
-    expect(proxiedInit.duplex).toBe("half");
+    await expect(readProxiedBody(proxiedInit.body)).resolves.toBe(body);
+    expect(proxiedInit.duplex).toBeUndefined();
     expect(proxiedInit.headers.get("Authorization")).toBe("Token test-token");
     expect(proxiedInit.headers.get("content-type")).toBe("multipart/form-data; boundary=demo");
     expect(proxiedInit.headers.get("x-trace-id")).toBe("trace-123");
     expect(proxiedInit.headers.get("host")).toBeNull();
-    expect(proxiedInit.headers.get("content-length")).toBeNull();
+    expect(proxiedInit.headers.get("content-length")).toBe(String(textEncoder.encode(body).byteLength));
   });
 
   it("materializes JSON writes before forwarding them to Django", async () => {
@@ -104,9 +109,9 @@ describe("django write proxy", () => {
 
     expect(String(url)).toBe("http://django.test/api/v1/sessions/");
     expect(proxiedInit.method).toBe("POST");
-    expect(proxiedInit.body).toBe(body);
+    await expect(readProxiedBody(proxiedInit.body)).resolves.toBe(body);
     expect(proxiedInit.duplex).toBeUndefined();
     expect(proxiedInit.headers.get("content-type")).toBe("application/json");
-    expect(proxiedInit.headers.get("content-length")).toBe(String(body.length));
+    expect(proxiedInit.headers.get("content-length")).toBe(String(textEncoder.encode(body).byteLength));
   });
 });

@@ -108,4 +108,45 @@ describe("AddTrackForm", () => {
     await waitFor(() => expect(onTrackCreated).toHaveBeenCalledWith(buildTrack()));
     expect(screen.getByRole("button", { name: /add track/i })).toBeInTheDocument();
   });
+
+  it("submits the expected payload for a valid file track", async () => {
+    const user = userEvent.setup();
+    const onTrackCreated = jest.fn();
+    const track = buildTrack({
+      source_type: "mp3",
+      youtube_url: "",
+      file: "https://media.test/praise.mp3",
+      bpm: null,
+    });
+    const file = new File(["audio-data"], "praise.mp3", { type: "audio/mpeg" });
+    mockCreateTrack.mockResolvedValue(track);
+
+    render(
+      <AddTrackForm
+        sessionId={7}
+        insertPosition={2}
+        onTrackCreated={onTrackCreated}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: /add track/i }));
+    await user.type(screen.getByLabelText(/track name/i), "Praise on Demand");
+    await user.selectOptions(screen.getByLabelText(/source type/i), "mp3");
+    await user.upload(screen.getByLabelText(/file/i), file);
+    await user.click(screen.getByRole("button", { name: /save track/i }));
+
+    await waitFor(() => expect(mockCreateTrack).toHaveBeenCalledTimes(1));
+
+    const formData = mockCreateTrack.mock.calls[0][0];
+    expect(formData.get("session")).toBe("7");
+    expect(formData.get("name")).toBe("Praise on Demand");
+    expect(formData.get("source_type")).toBe("mp3");
+    expect(formData.get("position")).toBe("2");
+    expect(formData.get("file")).toBe(file);
+    expect(formData.has("youtube_url")).toBe(false);
+    expect(formData.has("bpm")).toBe(false);
+
+    await waitFor(() => expect(onTrackCreated).toHaveBeenCalledWith(track));
+    expect(screen.getByRole("button", { name: /add track/i })).toBeInTheDocument();
+  });
 });
