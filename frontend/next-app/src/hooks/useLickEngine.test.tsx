@@ -5,7 +5,7 @@ import { Transport } from "@/hooks/transport";
 
 
 describe("useLickEngine", () => {
-  it("seeks to the lick start, applies speed, and loops back after the end", () => {
+  it("lets the full saved segment play before looping back to the lick start", () => {
     const seek = jest.fn();
     const setSpeed = jest.fn();
 
@@ -26,7 +26,7 @@ describe("useLickEngine", () => {
         track: 1,
         name: "Intro",
         start_seconds: 10,
-        end_seconds: 12,
+        end_seconds: 42,
         last_speed: 0.75,
         position: 0,
         created_at: "",
@@ -55,6 +55,7 @@ describe("useLickEngine", () => {
 
     expect(seek).toHaveBeenCalledWith(10);
     expect(setSpeed).toHaveBeenCalledWith(0.75);
+    seek.mockClear();
 
     rerender({
       transport: {
@@ -63,6 +64,16 @@ describe("useLickEngine", () => {
       },
     });
 
-    expect(seek).toHaveBeenLastCalledWith(10);
+    expect(seek).not.toHaveBeenCalled();
+
+    rerender({
+      transport: {
+        ...baseTransport,
+        currentTime: 42.2,
+      },
+    });
+
+    expect(seek).toHaveBeenCalledTimes(1);
+    expect(seek).toHaveBeenCalledWith(10);
   });
 });
