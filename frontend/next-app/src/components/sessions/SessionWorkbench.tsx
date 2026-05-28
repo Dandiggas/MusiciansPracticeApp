@@ -194,18 +194,19 @@ export function SessionWorkbench({ session }: { session: SessionDetail }) {
                 No tracks yet. Add the first song, chart, or clip below.
               </div>
             )}
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <AddTrackForm
+                sessionId={sessionState.id}
+                insertPosition={0}
+                onTrackCreated={handleTrackCreated}
+              />
+            </div>
             {sidebarError ? <p className="mt-3 text-sm text-destructive">{sidebarError}</p> : null}
           </div>
 
           <SessionPracticeTools
             trackName={selectedTrack?.name ?? null}
             trackBpm={selectedTrack?.bpm ?? null}
-          />
-
-          <AddTrackForm
-            sessionId={sessionState.id}
-            insertPosition={0}
-            onTrackCreated={handleTrackCreated}
           />
         </aside>
 
