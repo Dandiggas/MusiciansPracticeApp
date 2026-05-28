@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Transport } from "@/hooks/transport";
 import { Lick } from "@/types/session";
@@ -23,6 +23,10 @@ export function useLickEngine({
   onPersistTrackSpeed,
   onPersistLickSpeed,
 }: UseLickEngineArgs) {
+  const transportRef = useRef(transport);
+  transportRef.current = transport;
+  const normalizeSpeedRef = useRef(normalizeSpeed);
+  normalizeSpeedRef.current = normalizeSpeed;
   const [activeLickId, setActiveLickId] = useState<number | null>(null);
   const [speed, setSpeed] = useState(normalizeSpeed(trackLastSpeed ?? 1));
   const [draftStart, setDraftStart] = useState<number | null>(null);
@@ -40,38 +44,40 @@ export function useLickEngine({
   }, [activeLickId, licks]);
 
   useEffect(() => {
-    const nextSpeed = normalizeSpeed(
+    const nextSpeed = normalizeSpeedRef.current(
       activeLick?.last_speed ?? trackLastSpeed ?? 1
     );
     setSpeed(nextSpeed);
-    transport.setSpeed(nextSpeed);
+    transportRef.current.setSpeed(nextSpeed);
 
     if (activeLick) {
-      transport.seek(activeLick.start_seconds);
+      transportRef.current.seek(activeLick.start_seconds);
       setDraftStart(activeLick.start_seconds);
       setDraftEnd(activeLick.end_seconds);
     }
-  }, [activeLick, trackLastSpeed, transport, normalizeSpeed]);
+  }, [activeLick, trackLastSpeed]);
 
   useEffect(() => {
-    transport.setSpeed(normalizeSpeed(speed));
-  }, [speed, transport, normalizeSpeed]);
+    transportRef.current.setSpeed(normalizeSpeedRef.current(speed));
+  }, [speed]);
 
   useEffect(() => {
-    if (!activeLick || !transport.isPlaying) {
+    const currentTransport = transportRef.current;
+
+    if (!activeLick || !currentTransport.isPlaying) {
       return;
     }
 
-    if (transport.currentTime >= activeLick.end_seconds) {
-      transport.seek(activeLick.start_seconds);
+    if (currentTransport.currentTime >= activeLick.end_seconds) {
+      currentTransport.seek(activeLick.start_seconds);
     }
-  }, [activeLick, transport]);
+  }, [activeLick, transport.currentTime, transport.isPlaying]);
 
   useEffect(() => {
-    const persistedSpeed = normalizeSpeed(
+    const persistedSpeed = normalizeSpeedRef.current(
       activeLick?.last_speed ?? trackLastSpeed ?? 1
     );
-    const nextSpeed = normalizeSpeed(speed);
+    const nextSpeed = normalizeSpeedRef.current(speed);
 
     if (Math.abs(persistedSpeed - nextSpeed) < 0.001) {
       return;
@@ -90,7 +96,6 @@ export function useLickEngine({
     activeLick,
     onPersistLickSpeed,
     onPersistTrackSpeed,
-    normalizeSpeed,
     speed,
     trackLastSpeed,
   ]);
@@ -105,8 +110,8 @@ export function useLickEngine({
     setDraftStart,
     setSpeed,
     speed,
-    captureIn: () => setDraftStart(transport.currentTime),
-    captureOut: () => setDraftEnd(transport.currentTime),
+    captureIn: () => setDraftStart(transportRef.current.currentTime),
+    captureOut: () => setDraftEnd(transportRef.current.currentTime),
     clearDraft: () => {
       setDraftStart(null);
       setDraftEnd(null);
