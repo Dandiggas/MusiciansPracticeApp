@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { TrackTakesPanel } from "@/components/sessions/TrackTakesPanel";
-import { Track } from "@/types/session";
+import { Take, Track } from "@/types/session";
 
 
 jest.mock("@/lib/api", () => ({
@@ -45,6 +45,19 @@ function buildTrack(overrides: Partial<Track> = {}): Track {
     takes: [],
     created_at: "2026-05-28T10:00:00.000Z",
     updated_at: "2026-05-28T10:00:00.000Z",
+    ...overrides,
+  };
+}
+
+function buildTake(overrides: Partial<Take> = {}): Take {
+  return {
+    id: 14,
+    track: 8,
+    name: "Pocket Study take 1",
+    capture_mode: "video_audio",
+    file: "/media/takes/pocket-study.webm",
+    created_at: "2026-05-28T10:10:00.000Z",
+    updated_at: "2026-05-28T10:10:00.000Z",
     ...overrides,
   };
 }
@@ -127,5 +140,23 @@ describe("TrackTakesPanel", () => {
       await (navigator.mediaDevices.getUserMedia as jest.Mock).mock.results[0].value
     );
     expect(HTMLMediaElement.prototype.play).toHaveBeenCalled();
+  });
+
+  it("plays saved video takes through the authenticated take file endpoint", async () => {
+    const { container } = render(
+      <TrackTakesPanel
+        track={buildTrack({ takes: [buildTake()] })}
+        mutateTrack={jest.fn()}
+      />
+    );
+
+    await waitFor(() => expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalled());
+
+    const player = container.querySelector("video");
+    expect(player).not.toBeNull();
+    expect(player?.getAttribute("src")).toBe("/api/django/takes/14/file/");
+
+    const download = screen.getByRole("link", { name: /download/i });
+    expect(download).toHaveAttribute("href", "/api/django/takes/14/file/");
   });
 });

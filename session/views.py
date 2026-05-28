@@ -1,3 +1,6 @@
+import mimetypes
+
+from django.http import FileResponse
 from django.db import transaction
 from django.db.models import F
 from rest_framework import status, viewsets
@@ -147,3 +150,16 @@ class TakeViewSet(viewsets.ModelViewSet):
         if track.session.user_id != self.request.user.id:
             raise NotFound()
         serializer.save()
+
+    @action(detail=True, methods=["get"], url_path="file")
+    def file(self, request, pk=None):
+        take = self.get_object()
+        if not take.file:
+            raise NotFound()
+
+        content_type = mimetypes.guess_type(take.file.name)[0] or "application/octet-stream"
+        return FileResponse(
+            take.file.open("rb"),
+            content_type=content_type,
+            filename=take.file.name.rsplit("/", 1)[-1],
+        )
