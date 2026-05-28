@@ -98,6 +98,8 @@ export function YoutubePlayer({
         track={track}
         activeLick={lickEngine.activeLick}
         setActiveLickId={lickEngine.setActiveLickId}
+        setDraftEnd={lickEngine.setDraftEnd}
+        setDraftStart={lickEngine.setDraftStart}
         toggleLick={lickEngine.toggleLick}
         draftStart={lickEngine.draftStart}
         draftEnd={lickEngine.draftEnd}
