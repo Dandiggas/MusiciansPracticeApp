@@ -103,6 +103,10 @@ function captureIcon(mode: TakeCaptureMode) {
   return <VideoCamera size={16} weight="bold" />;
 }
 
+function takeFileUrl(take: Take) {
+  return `/api/django/takes/${take.id}/file/`;
+}
+
 function TakeRow({
   active,
   onDelete,
@@ -492,13 +496,13 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
                       </p>
                     </div>
                   </div>
-                  <audio controls src={selectedTake.file} className="w-full" />
+                  <audio controls src={takeFileUrl(selectedTake)} className="w-full" />
                 </div>
               ) : (
                 <video
                   controls
                   playsInline
-                  src={selectedTake.file}
+                  src={takeFileUrl(selectedTake)}
                   className="aspect-video w-full bg-black object-cover"
                 />
               )
@@ -679,7 +683,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
               </div>
               <div className="mt-4">
                 <Button asChild type="button" size="sm" variant="secondary">
-                  <a href={selectedTake.file} download>
+                  <a href={takeFileUrl(selectedTake)} download>
                     <DownloadSimple size={16} weight="bold" />
                     Download
                   </a>

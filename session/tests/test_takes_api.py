@@ -156,3 +156,48 @@ def test_delete_take(alice, practice_session, client_for):
 
     assert response.status_code == 204
     assert Take.objects.count() == 0
+
+
+def test_take_file_endpoint_streams_owned_recording(alice, practice_session, client_for, settings, tmp_path):
+    settings.MEDIA_ROOT = tmp_path
+    track = Track.objects.create(
+        session=practice_session,
+        name="Manifest",
+        source_type="youtube",
+        youtube_url="https://youtu.be/example",
+        position=0,
+    )
+    take = Take.objects.create(
+        track=track,
+        name="Video take",
+        capture_mode="video_audio",
+        file=SimpleUploadedFile("video-take.webm", b"recorded-video", content_type="video/webm"),
+    )
+
+    response = client_for(alice).get(reverse("take-file", args=[take.id]))
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == "video/webm"
+    assert b"".join(response.streaming_content) == b"recorded-video"
+
+
+def test_take_file_endpoint_hides_other_users_recording(alice, bob, client_for, settings, tmp_path):
+    settings.MEDIA_ROOT = tmp_path
+    other_session = Session.objects.create(user=bob, name="Other")
+    track = Track.objects.create(
+        session=other_session,
+        name="Manifest",
+        source_type="youtube",
+        youtube_url="https://youtu.be/example",
+        position=0,
+    )
+    take = Take.objects.create(
+        track=track,
+        name="Video take",
+        capture_mode="video_audio",
+        file=SimpleUploadedFile("video-take.webm", b"recorded-video", content_type="video/webm"),
+    )
+
+    response = client_for(alice).get(reverse("take-file", args=[take.id]))
+
+    assert response.status_code == 404
