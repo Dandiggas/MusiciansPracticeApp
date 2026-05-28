@@ -165,6 +165,27 @@ describe("LickPanel", () => {
 
     await waitFor(() => expect(mockDeleteLick).toHaveBeenCalledWith(11));
     expect(screen.queryByRole("button", { name: /Intro/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Practice Whole Track" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Stop Loop" })).not.toBeInTheDocument();
+  });
+
+  it("stops the loaded loop and lets the same lick be loaded again", async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+
+    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Update Lick" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Stop Loop" }));
+
+    expect(screen.queryByText("Active")).not.toBeInTheDocument();
+    expect(screen.getByText("Load")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Stop Loop" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save Lick" })).toBeInTheDocument();
+
+    await user.click(screen.getAllByRole("button", { name: /Intro/ })[0]);
+
+    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Stop Loop" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Update Lick" })).toBeInTheDocument();
   });
 });

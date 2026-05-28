@@ -156,6 +156,13 @@ export function LickPanel({
     capture();
   }
 
+  function stopLoop() {
+    setActiveLickId(null);
+    clearDraft();
+    setDraftName("");
+    setError("");
+  }
+
   async function handleSave() {
     if (!draftName.trim()) {
       setError("Give the lick a name.");
@@ -274,8 +281,8 @@ export function LickPanel({
           </p>
         </div>
         {activeLick ? (
-          <Button type="button" variant="ghost" onClick={() => setActiveLickId(null)}>
-            Practice Whole Track
+          <Button type="button" variant="ghost" onClick={stopLoop}>
+            Stop Loop
           </Button>
         ) : null}
       </div>
