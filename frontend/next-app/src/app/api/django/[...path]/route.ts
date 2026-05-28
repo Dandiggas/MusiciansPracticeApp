@@ -12,24 +12,13 @@ function requestCanHaveBody(method: string) {
   return method !== "GET" && method !== "HEAD";
 }
 
-function isMultipartRequest(request: NextRequest) {
-  return (request.headers.get("content-type") || "").includes("multipart/form-data");
-}
-
 async function buildBodyInit(request: NextRequest, headers: Headers) {
   if (!requestCanHaveBody(request.method)) {
     return {};
   }
 
-  if (isMultipartRequest(request)) {
-    return {
-      body: request.body,
-      duplex: "half",
-    };
-  }
-
-  const body = await request.text();
-  headers.set("content-length", String(new TextEncoder().encode(body).byteLength));
+  const body = await request.arrayBuffer();
+  headers.set("content-length", String(body.byteLength));
   return { body };
 }
 
