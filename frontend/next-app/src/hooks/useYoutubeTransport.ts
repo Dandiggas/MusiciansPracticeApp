@@ -130,6 +130,26 @@ export function useYoutubeTransport(url: string | null): {
   const [error, setError] = useState<string | null>(null);
   const videoId = extractVideoId(url || "");
 
+  function stopPolling() {
+    if (pollRef.current) {
+      window.clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  }
+
+  function startPolling(player: YT.Player) {
+    stopPolling();
+
+    pollRef.current = window.setInterval(() => {
+      try {
+        setCurrentTime(player.getCurrentTime() || 0);
+        setDuration(player.getDuration() || 0);
+      } catch {
+        // no-op while player is initializing
+      }
+    }, 250);
+  }
+
   useEffect(() => {
     setCurrentTime(0);
     setDuration(0);
@@ -168,7 +188,9 @@ export function useYoutubeTransport(url: string | null): {
         events: {
           onReady: (event) => {
             setDuration(event.target.getDuration() || 0);
+            setCurrentTime(event.target.getCurrentTime() || 0);
             setError(null);
+            startPolling(event.target);
           },
           onStateChange: (event) => {
             setIsPlaying(event.data === window.YT?.PlayerState.PLAYING);
@@ -185,41 +207,9 @@ export function useYoutubeTransport(url: string | null): {
 
     return () => {
       cancelled = true;
-      if (pollRef.current) {
-        window.clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
+      stopPolling();
       playerRef.current?.destroy();
       playerRef.current = null;
-    };
-  }, [videoId]);
-
-  useEffect(() => {
-    if (!playerRef.current) {
-      return;
-    }
-
-    if (pollRef.current) {
-      window.clearInterval(pollRef.current);
-    }
-
-    pollRef.current = window.setInterval(() => {
-      if (!playerRef.current) {
-        return;
-      }
-      try {
-        setCurrentTime(playerRef.current.getCurrentTime() || 0);
-        setDuration(playerRef.current.getDuration() || 0);
-      } catch {
-        // no-op while player is initializing
-      }
-    }, 250);
-
-    return () => {
-      if (pollRef.current) {
-        window.clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
     };
   }, [videoId]);
 
@@ -227,7 +217,11 @@ export function useYoutubeTransport(url: string | null): {
     () => ({
       play: () => safePlayerCall(playerRef.current, "playVideo"),
       pause: () => safePlayerCall(playerRef.current, "pauseVideo"),
-      seek: (seconds) => safePlayerCall(playerRef.current, "seekTo", Math.max(0, seconds), true),
+      seek: (seconds) => {
+        const nextTime = Math.max(0, seconds);
+        setCurrentTime(nextTime);
+        safePlayerCall(playerRef.current, "seekTo", nextTime, true);
+      },
       setSpeed: (rate) => applyYoutubePlaybackRate(playerRef.current, rate),
       currentTime,
       duration,
