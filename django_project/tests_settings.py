@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
 
@@ -33,10 +32,6 @@ class AuthSettingsTest(TestCase):
     def test_default_from_email_set(self):
         self.assertTrue(settings.DEFAULT_FROM_EMAIL)
 
-    def test_frontend_url_guard_module_exists(self):
-        # The guard is imported from django_project.startup_checks.
-        # If FRONTEND_URL is unset AND DEBUG is False, import raises
-        # ImproperlyConfigured. Verify the module is importable and the
-        # function is callable.
-        from django_project.startup_checks import check_frontend_url
-        self.assertTrue(callable(check_frontend_url))
+    def test_startup_diagnostics_module_exists(self):
+        from django_project.startup_checks import has_frontend_url
+        self.assertTrue(callable(has_frontend_url))
