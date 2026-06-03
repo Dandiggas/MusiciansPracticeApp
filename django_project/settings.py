@@ -125,12 +125,6 @@ if os.getenv("SENDGRID_API_KEY"):
     EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY")
     EMAIL_USE_TLS = True
 
-# Fail fast if FRONTEND_URL is missing in a non-debug env. Must come after
-# DEBUG is set above.
-from django_project.startup_checks import check_frontend_url  # noqa: E402
-check_frontend_url()
-
-
 WSGI_APPLICATION = "django_project.wsgi.application"
 
 
