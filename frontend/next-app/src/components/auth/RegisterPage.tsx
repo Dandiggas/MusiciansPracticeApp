@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +14,15 @@ interface FormErrors {
   email?: string;
   password1?: string;
   password2?: string;
+  non_field_errors?: string;
+  detail?: string;
+}
+
+function normalizeErrorValue(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.join(" ");
+  }
+  return typeof value === "string" ? value : undefined;
 }
 
 const RegisterPage = () => {
@@ -25,6 +33,7 @@ const RegisterPage = () => {
     password2: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const validate = () => {
@@ -55,21 +64,41 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      const apiBaseUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-      const apiUrl = `${apiBaseUrl}/dj-rest-auth/registration/`;
-
+      setIsSubmitting(true);
+      setErrors({});
       try {
-        await axios.post(apiUrl, formData);
+        const response = await fetch("/api/django/dj-rest-auth/registration/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          setErrors({
+            username: normalizeErrorValue(data?.username),
+            email: normalizeErrorValue(data?.email),
+            password1: normalizeErrorValue(data?.password1),
+            password2: normalizeErrorValue(data?.password2),
+            non_field_errors: normalizeErrorValue(data?.non_field_errors),
+            detail:
+              normalizeErrorValue(data?.detail) ||
+              "We couldn't create your account. Please check the form and try again.",
+          });
+          return;
+        }
+
         router.push(`/auth/check-email?email=${encodeURIComponent(formData.email)}`);
       } catch (error) {
         console.error("Registration error", error);
-        if (axios.isAxiosError(error)) {
-          const axiosError = error as AxiosError<Record<string, string>>;
-          if (axiosError.response?.data) {
-            setErrors(axiosError.response.data);
-          }
-        }
+        setErrors({
+          detail: "We couldn't reach the server. Please try again in a moment.",
+        });
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
@@ -179,6 +208,12 @@ const RegisterPage = () => {
                 </p>
 
                 <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+                  {(errors.detail || errors.non_field_errors) && (
+                    <div className="rounded-lg bg-destructive/[0.06] px-3.5 py-2.5 text-sm font-medium text-destructive">
+                      {errors.non_field_errors || errors.detail}
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <Label
                       htmlFor="username"
@@ -195,6 +230,7 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       placeholder="your_username"
                       required
+                      disabled={isSubmitting}
                     />
                     {errors.username && (
                       <p className="text-sm font-medium text-destructive">
@@ -219,6 +255,7 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       placeholder="your@email.com"
                       required
+                      disabled={isSubmitting}
                     />
                     {errors.email && (
                       <p className="text-sm font-medium text-destructive">
@@ -243,6 +280,7 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       placeholder="••••••••"
                       required
+                      disabled={isSubmitting}
                     />
                     {errors.password1 && (
                       <p className="text-sm font-medium text-destructive">
@@ -267,6 +305,7 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       placeholder="••••••••"
                       required
+                      disabled={isSubmitting}
                     />
                     {errors.password2 && (
                       <p className="text-sm font-medium text-destructive">
@@ -275,8 +314,13 @@ const RegisterPage = () => {
                     )}
                   </div>
 
-                  <Button type="submit" size="lg" className="group w-full">
-                    <span>Create Account</span>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="group w-full"
+                    disabled={isSubmitting}
+                  >
+                    <span>{isSubmitting ? "Creating..." : "Create Account"}</span>
                     <span className="ml-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-[1px] group-hover:scale-105">
                       <ArrowRight size={14} weight="bold" />
                     </span>
