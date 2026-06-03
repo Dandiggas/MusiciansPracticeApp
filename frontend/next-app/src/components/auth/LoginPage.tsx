@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { ArrowRight, Clock, MusicNote, Sparkle } from "@phosphor-icons/react";
 import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
 
+const resendEmailPath = "/api/django/dj-rest-auth/registration/resend-email/";
+
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -16,6 +18,11 @@ const LoginPage = () => {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [manualResendState, setManualResendState] = useState<
+    "idle" | "sending" | "sent" | "error"
+  >("idle");
+  const autoResendFiredRef = useRef(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,6 +32,46 @@ const LoginPage = () => {
       }
     });
   }, [router]);
+
+  useEffect(() => {
+    if (!unverifiedEmail || autoResendFiredRef.current) return;
+    autoResendFiredRef.current = true;
+    void (async () => {
+      try {
+        await fetch(resendEmailPath, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ email: unverifiedEmail }),
+        });
+      } catch {
+        // Silent failure on auto-fire; manual resend button remains.
+      }
+    })();
+  }, [unverifiedEmail]);
+
+  const handleManualResend = async () => {
+    if (!unverifiedEmail) return;
+    setManualResendState("sending");
+    try {
+      const response = await fetch(resendEmailPath, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ email: unverifiedEmail }),
+      });
+      if (!response.ok) {
+        throw new Error("Unable to resend verification email.");
+      }
+      setManualResendState("sent");
+    } catch {
+      setManualResendState("error");
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,6 +94,22 @@ const LoginPage = () => {
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
+        if (
+          response.status === 400 &&
+          Array.isArray(data?.non_field_errors) &&
+          data.non_field_errors.some(
+            (message: unknown) =>
+              typeof message === "string" &&
+              message.toLowerCase().includes("not verified")
+          )
+        ) {
+          const email = formData.username.trim();
+          setUnverifiedEmail(email.includes("@") ? email : null);
+          setManualResendState("idle");
+          setError("");
+          return;
+        }
+
         const detail =
           typeof data?.detail === "string"
             ? data.detail
@@ -57,7 +120,11 @@ const LoginPage = () => {
       router.push("/sessions");
     } catch (err) {
       console.error("Login error", err);
-      setError(err instanceof Error ? err.message : "An unexpected error occurred. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -148,6 +215,34 @@ const LoginPage = () => {
               </p>
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                {unverifiedEmail && (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="rounded-lg border border-warm/40 bg-warm/10 p-3 text-sm"
+                  >
+                    <p className="font-medium text-foreground">
+                      Your email isn&apos;t verified yet
+                    </p>
+                    <p className="mt-1 text-muted-foreground">
+                      We sent you a fresh link to{" "}
+                      <strong className="text-foreground">{unverifiedEmail}</strong>.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleManualResend}
+                      disabled={manualResendState === "sending"}
+                      className="mt-2 h-9 rounded-lg"
+                    >
+                      {manualResendState === "sending"
+                        ? "Sending..."
+                        : manualResendState === "sent"
+                          ? "Sent!"
+                          : "Resend"}
+                    </Button>
+                  </div>
+                )}
                 {error && (
                   <div className="rounded-lg bg-destructive/[0.06] px-3.5 py-2.5 text-sm font-medium text-destructive">
                     {error}
