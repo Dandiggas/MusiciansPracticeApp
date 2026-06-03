@@ -61,7 +61,7 @@ const RegisterPage = () => {
 
       try {
         await axios.post(apiUrl, formData);
-        router.push("/login");
+        router.push(`/auth/check-email?email=${encodeURIComponent(formData.email)}`);
       } catch (error) {
         console.error("Registration error", error);
         if (axios.isAxiosError(error)) {
