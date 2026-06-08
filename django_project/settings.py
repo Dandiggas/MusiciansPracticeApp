@@ -127,12 +127,8 @@ def env_bool(name, default=False):
 
 # SendGrid in prod; console backend (already set above) stays default in dev.
 if os.getenv("SENDGRID_API_KEY"):
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = "smtp.sendgrid.net"
-    EMAIL_PORT = 587
-    EMAIL_HOST_USER = "apikey"
-    EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY")
-    EMAIL_USE_TLS = True
+    EMAIL_BACKEND = "django_project.email_backends.SendGridApiEmailBackend"
+    EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))
 elif EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
     EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.sendgrid.net")
     EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
