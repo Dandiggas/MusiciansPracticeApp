@@ -57,7 +57,7 @@ describe("LoginPage - unverified-account path", () => {
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: "unverified@example.com" },
     });
-    fireEvent.change(screen.getAllByLabelText(/password/i)[0], {
+    fireEvent.change(screen.getByLabelText(/^password$/i), {
       target: { value: "anything" },
     });
     fireEvent.click(
@@ -124,5 +124,18 @@ describe("LoginPage - unverified-account path", () => {
       );
       expect(resendCalls.length).toBeGreaterThanOrEqual(2);
     });
+  });
+
+  it("lets users reveal and hide their password", () => {
+    render(<LoginPage />);
+
+    const password = screen.getByLabelText(/^password$/i);
+    expect(password).toHaveAttribute("type", "password");
+
+    fireEvent.click(screen.getByRole("button", { name: /^show password$/i }));
+    expect(password).toHaveAttribute("type", "text");
+
+    fireEvent.click(screen.getByRole("button", { name: /^hide password$/i }));
+    expect(password).toHaveAttribute("type", "password");
   });
 });

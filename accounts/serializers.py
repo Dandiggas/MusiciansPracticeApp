@@ -1,6 +1,12 @@
+import os
+
+from django.conf import settings
 from rest_framework import serializers
 from allauth.account.models import EmailAddress
+from allauth.account.utils import user_pk_to_url_str
+from dj_rest_auth.serializers import PasswordResetSerializer
 
+from .adapter import _origin_from_request
 from .models import CustomUser
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -34,3 +40,21 @@ class AdminUserSerializer(serializers.ModelSerializer):
             .order_by("email")
             .values_list("email", "verified")
         ]
+
+
+def _frontend_url(request):
+    return (
+        getattr(settings, "FRONTEND_URL", "")
+        or os.getenv("FRONTEND_URL", "")
+        or _origin_from_request(request)
+        or "http://localhost:3000"
+    ).rstrip("/")
+
+
+class FrontendPasswordResetSerializer(PasswordResetSerializer):
+    def get_email_options(self):
+        def url_generator(request, user, temp_key):
+            uid = user_pk_to_url_str(user)
+            return f"{_frontend_url(request)}/password-reset/confirm/{uid}/{temp_key}"
+
+        return {"url_generator": url_generator}
