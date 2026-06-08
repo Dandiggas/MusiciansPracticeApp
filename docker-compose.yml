@@ -12,6 +12,7 @@ services:
       - db
     environment:
       - DEBUG=True
+      - USE_DOCKER_DB=True
       - OPENAI_API_KEY
   db:
     image: postgres:13

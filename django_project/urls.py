@@ -20,11 +20,37 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from accounts.views import CookieLoginView
+from accounts.views_auth import (
+    ThrottledPasswordResetConfirmView,
+    ThrottledPasswordResetView,
+    ThrottledRegisterView,
+    ThrottledResendEmailVerificationView,
+)
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/dj-rest-auth/login/", CookieLoginView.as_view(), name="cookie-login"),
+    path(
+        "api/v1/dj-rest-auth/password/reset/",
+        ThrottledPasswordResetView.as_view(),
+        name="rest_password_reset",
+    ),
+    path(
+        "api/v1/dj-rest-auth/password/reset/confirm/",
+        ThrottledPasswordResetConfirmView.as_view(),
+        name="rest_password_reset_confirm",
+    ),
+    path(
+        "api/v1/dj-rest-auth/registration/",
+        ThrottledRegisterView.as_view(),
+        name="rest_register",
+    ),
+    path(
+        "api/v1/dj-rest-auth/registration/resend-email/",
+        ThrottledResendEmailVerificationView.as_view(),
+        name="rest_resend_email",
+    ),
     path("api/v1/", include("session.urls")),
     path("api-auth/", include("rest_framework.urls")),
     path("api/v1/dj-rest-auth/", include("dj_rest_auth.urls")),

@@ -93,7 +93,7 @@ describe("API write helpers", () => {
 
     await createTrack(formData);
 
-    let request = lastRequest();
+    const request = lastRequest();
     expect(request.input).toBe("/api/django/tracks");
     expect(request.init.method).toBe("POST");
     expect(request.init.headers).toEqual({ Accept: "application/json" });

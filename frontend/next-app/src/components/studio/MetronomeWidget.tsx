@@ -67,7 +67,13 @@ export default function MetronomeWidget({
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="secondary" size="icon" className="rounded-lg h-9 w-9" onClick={() => handleBpmChange(bpm - 1)}>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="h-11 w-11 rounded-lg"
+          aria-label="Decrease BPM"
+          onClick={() => handleBpmChange(bpm - 1)}
+        >
           <Minus size={16} weight="regular" />
         </Button>
         <input
@@ -76,9 +82,16 @@ export default function MetronomeWidget({
           max={300}
           value={bpm}
           onChange={(e) => handleBpmChange(Number(e.target.value))}
-          className="flex-1 h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+          aria-label="BPM"
+          className="h-2 flex-1 cursor-pointer appearance-none rounded-full bg-muted accent-primary"
         />
-        <Button variant="secondary" size="icon" className="rounded-lg h-9 w-9" onClick={() => handleBpmChange(bpm + 1)}>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="h-11 w-11 rounded-lg"
+          aria-label="Increase BPM"
+          onClick={() => handleBpmChange(bpm + 1)}
+        >
           <Plus size={16} weight="regular" />
         </Button>
       </div>
@@ -130,6 +143,7 @@ export default function MetronomeWidget({
           max={100}
           value={Math.round(volume * 100)}
           onChange={(e) => onVolumeChange(Number(e.target.value) / 100)}
+          aria-label="Metronome volume"
           className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary"
         />
       </div>

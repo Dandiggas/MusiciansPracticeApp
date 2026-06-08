@@ -231,6 +231,7 @@ export function LickPanel({
     editingLick?.name,
     editingLick?.start_seconds,
     editingLick?.end_seconds,
+    editingLick,
     setDraftEnd,
     setDraftStart,
   ]);

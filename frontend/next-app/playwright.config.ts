@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const mockDjangoUrl = 'http://127.0.0.1:8010';
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -19,9 +21,16 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: 'node e2e/mock-django-server.mjs',
+      url: mockDjangoUrl,
+      reuseExistingServer: false,
+    },
+    {
+      command: `DJANGO_API_URL=${mockDjangoUrl}/api/v1 npm run dev`,
+      url: 'http://localhost:3000',
+      reuseExistingServer: false,
+    },
+  ],
 });

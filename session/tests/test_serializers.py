@@ -1,4 +1,5 @@
 import pytest
+from django.test import override_settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
@@ -85,6 +86,24 @@ def test_mp3_track_with_audio_file_is_valid(practice_session):
     )
 
     assert serializer.is_valid(), serializer.errors
+
+
+@override_settings(TRACK_FILE_MAX_UPLOAD_SIZE=2)
+def test_track_file_rejects_oversized_upload(practice_session):
+    file_obj = SimpleUploadedFile("clip.mp3", b"abc", content_type="audio/mpeg")
+    serializer = TrackSerializer(
+        data={
+            "session": practice_session.id,
+            "name": "Tune",
+            "source_type": "mp3",
+            "file": file_obj,
+            "position": 0,
+        }
+    )
+
+    assert not serializer.is_valid()
+    assert "file" in serializer.errors
+    assert "smaller" in str(serializer.errors["file"][0])
 
 
 def test_pdf_track_rejects_url(practice_session):
@@ -230,6 +249,30 @@ def test_video_take_rejects_audio_extension(practice_session):
 
     assert not serializer.is_valid()
     assert "file" in serializer.errors
+
+
+@override_settings(TAKE_FILE_MAX_UPLOAD_SIZE=2)
+def test_take_file_rejects_oversized_upload(practice_session):
+    track = Track.objects.create(
+        session=practice_session,
+        name="Manifest",
+        source_type="youtube",
+        youtube_url="https://youtu.be/example",
+        position=0,
+    )
+    file_obj = SimpleUploadedFile("intro-take.webm", b"abc", content_type="audio/webm")
+    serializer = TakeSerializer(
+        data={
+            "track": track.id,
+            "name": "Audio take",
+            "capture_mode": "audio",
+            "file": file_obj,
+        }
+    )
+
+    assert not serializer.is_valid()
+    assert "file" in serializer.errors
+    assert "smaller" in str(serializer.errors["file"][0])
 
 
 def test_take_update_only_allows_name(practice_session):

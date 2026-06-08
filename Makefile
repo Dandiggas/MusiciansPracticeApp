@@ -40,7 +40,7 @@ test: test-backend test-frontend
 
 test-backend:
 	@echo "Running backend tests..."
-	docker-compose exec web python manage.py test
+	python -m pytest -q
 
 test-frontend:
 	@echo "Running frontend unit tests..."
@@ -57,8 +57,13 @@ test-e2e:
 test-all: test-backend test-frontend test-e2e
 	@echo "✅ All tests (unit + E2E) completed!"
 
+check-production:
+	@echo "Running production readiness checks..."
+	python manage.py check --deploy
+	cd frontend/next-app && npm run lint && npm run build
+
 # Combined stop command (stops backend, frontend needs manual stop or separate command)
 stop: stop-backend
 	@echo "Backend services stopped. Frontend (if running) needs to be stopped manually (Ctrl+C)."
 
-.PHONY: all start backend frontend frontend-cra frontend-next stop-backend logs-backend build-backend stop test test-backend test-frontend test-frontend-coverage test-e2e test-all
+	.PHONY: all start backend frontend frontend-cra frontend-next stop-backend logs-backend build-backend stop test test-backend test-frontend test-frontend-coverage test-e2e test-all check-production

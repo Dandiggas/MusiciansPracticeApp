@@ -62,7 +62,7 @@ export function MobileNav() {
               ))}
               <LogoutButton
                 label="Log Out"
-                className="mt-2 h-11 w-full justify-center rounded-xl border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
+                className="mt-2 h-11 w-full justify-center rounded-xl border-border bg-secondary text-secondary-foreground hover:bg-secondary/80"
               />
             </div>
           </nav>
