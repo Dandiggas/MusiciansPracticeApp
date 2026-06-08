@@ -15,6 +15,7 @@ export function Header() {
     { name: "The Shed", href: "/sessions" },
     { name: "Metronome", href: "/metronome" },
     { name: "Tuner", href: "/tuner" },
+    { name: "Admin", href: "/admin" },
   ];
 
   if (pathname === "/login" || pathname === "/register") {

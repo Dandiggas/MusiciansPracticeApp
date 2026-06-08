@@ -3,6 +3,7 @@ from django.test import TestCase
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from allauth.account.models import EmailAddress
 
 
 class CustomUserModelTests(TestCase):
@@ -111,3 +112,76 @@ class LogoutViewTests(APITestCase):
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN
         ])
+
+
+class AdminUserViewTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = get_user_model().objects.create_superuser(
+            username="admin",
+            email="admin@email.com",
+            password="adminpass123",
+        )
+        self.user = get_user_model().objects.create_user(
+            username="regular",
+            email="regular@email.com",
+            password="userpass123",
+        )
+        EmailAddress.objects.create(
+            user=self.user,
+            email="regular@email.com",
+            verified=False,
+            primary=True,
+        )
+
+    def authenticate(self, user):
+        token, _ = Token.objects.get_or_create(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
+
+    def test_admin_can_list_users(self):
+        self.authenticate(self.admin)
+
+        response = self.client.get("/api/v1/admin/users/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        usernames = [user["username"] for user in response.data]
+        self.assertIn("admin", usernames)
+        self.assertIn("regular", usernames)
+        regular = next(user for user in response.data if user["username"] == "regular")
+        self.assertEqual(
+            regular["verified_emails"],
+            [{"email": "regular@email.com", "verified": False}],
+        )
+
+    def test_non_staff_user_cannot_list_users(self):
+        self.authenticate(self.user)
+
+        response = self.client.get("/api/v1/admin/users/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_admin_can_delete_another_user(self):
+        self.authenticate(self.admin)
+        user_id = self.user.pk
+
+        response = self.client.delete(f"/api/v1/admin/users/{user_id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(get_user_model().objects.filter(pk=user_id).exists())
+        self.assertFalse(EmailAddress.objects.filter(user_id=user_id).exists())
+
+    def test_admin_cannot_delete_self(self):
+        self.authenticate(self.admin)
+
+        response = self.client.delete(f"/api/v1/admin/users/{self.admin.pk}/")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(get_user_model().objects.filter(pk=self.admin.pk).exists())
+
+    def test_non_staff_user_cannot_delete_user(self):
+        self.authenticate(self.user)
+
+        response = self.client.delete(f"/api/v1/admin/users/{self.admin.pk}/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(get_user_model().objects.filter(pk=self.admin.pk).exists())
