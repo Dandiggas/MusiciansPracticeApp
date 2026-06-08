@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const passwordResetConfirmPath = "/api/django/dj-rest-auth/password/reset/confirm/";
+const passwordResetConfirmPath = "/api/django/dj-rest-auth/password/reset/confirm";
 
 function extractErrorMessage(body: unknown) {
   if (body && typeof body === "object") {
