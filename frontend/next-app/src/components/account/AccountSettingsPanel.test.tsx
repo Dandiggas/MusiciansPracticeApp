@@ -5,6 +5,15 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { AccountSettingsPanel } from "./AccountSettingsPanel";
 
+const mockReplace = jest.fn();
+const mockRefresh = jest.fn();
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: mockReplace,
+    refresh: mockRefresh,
+  }),
+}));
+
 const currentUser = {
   id: 7,
   username: "player",
@@ -23,6 +32,8 @@ describe("AccountSettingsPanel", () => {
   const originalFetch = global.fetch;
 
   beforeEach(() => {
+    mockReplace.mockReset();
+    mockRefresh.mockReset();
     global.fetch = jest.fn().mockResolvedValue(
       mockResponse({ detail: "New password has been saved." })
     ) as typeof fetch;
@@ -95,5 +106,38 @@ describe("AccountSettingsPanel", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /^hide current password$/i }));
     expect(currentPassword).toHaveAttribute("type", "password");
+  });
+
+  it("requires confirmation before deleting an account", async () => {
+    render(<AccountSettingsPanel currentUser={currentUser} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /^delete account$/i }));
+
+    expect(screen.getByText(/click again to permanently delete/i)).toBeInTheDocument();
+    expect(global.fetch).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: /^delete permanently$/i }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/django/account",
+        expect.objectContaining({ method: "DELETE" })
+      );
+    });
+    expect(mockReplace).toHaveBeenCalledWith("/login");
+    expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  it("shows account delete errors", async () => {
+    global.fetch = jest.fn().mockResolvedValue(
+      mockResponse({ detail: "Could not delete account." }, 500)
+    ) as typeof fetch;
+
+    render(<AccountSettingsPanel currentUser={currentUser} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /^delete account$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^delete permanently$/i }));
+
+    expect(await screen.findByText(/could not delete account/i)).toBeInTheDocument();
   });
 });

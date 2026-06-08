@@ -53,6 +53,21 @@ def logout_view(request):
     return response
 
 
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def account_detail_view(request):
+    user = request.user
+    user.delete()
+
+    response = Response(status=status.HTTP_204_NO_CONTENT)
+    response.delete_cookie(
+        settings.AUTH_TOKEN_COOKIE_NAME,
+        path=settings.AUTH_TOKEN_COOKIE_PATH,
+        samesite=settings.AUTH_TOKEN_COOKIE_SAMESITE,
+    )
+    return response
+
+
 def _is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 

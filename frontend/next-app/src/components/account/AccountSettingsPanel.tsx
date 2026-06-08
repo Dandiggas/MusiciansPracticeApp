@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { CheckCircle, Eye, EyeSlash, Key, UserCircle } from "@phosphor-icons/react";
+import { useRouter } from "next/navigation";
+import { CheckCircle, Eye, EyeSlash, Key, Trash, UserCircle, WarningCircle } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +83,7 @@ function PasswordInput({
 }
 
 export function AccountSettingsPanel({ currentUser }: { currentUser: CurrentUser }) {
+  const router = useRouter();
   const [form, setForm] = useState<PasswordForm>({
     old_password: "",
     new_password1: "",
@@ -94,6 +96,10 @@ export function AccountSettingsPanel({ currentUser }: { currentUser: CurrentUser
   });
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [error, setError] = useState("");
+  const [deleteStatus, setDeleteStatus] = useState<
+    "idle" | "confirming" | "deleting" | "error"
+  >("idle");
+  const [deleteError, setDeleteError] = useState("");
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setForm((current) => ({
@@ -141,23 +147,114 @@ export function AccountSettingsPanel({ currentUser }: { currentUser: CurrentUser
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (deleteStatus !== "confirming") {
+      setDeleteStatus("confirming");
+      setDeleteError("");
+      return;
+    }
+
+    setDeleteStatus("deleting");
+    setDeleteError("");
+
+    try {
+      const response = await fetch("/api/django/account", {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(extractErrorMessage(body));
+      }
+
+      router.replace("/login");
+      router.refresh();
+    } catch (deleteAccountError) {
+      setDeleteStatus("error");
+      setDeleteError(
+        deleteAccountError instanceof Error
+          ? deleteAccountError.message
+          : "Could not delete your account. Try again in a moment."
+      );
+    }
+  };
+
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-      <section className="border-y border-border/70 py-5">
-        <div className="flex items-start gap-3">
-          <div className="rounded-full bg-muted p-2.5 text-muted-foreground">
-            <UserCircle size={22} weight="regular" />
+      <div className="space-y-6">
+        <section className="border-y border-border/70 py-5">
+          <div className="flex items-start gap-3">
+            <div className="rounded-full bg-muted p-2.5 text-muted-foreground">
+              <UserCircle size={22} weight="regular" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                {currentUser.username}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {currentUser.email || "No email on file"}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-base font-semibold text-foreground">
-              {currentUser.username}
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {currentUser.email || "No email on file"}
+        </section>
+
+        <section className="border-y border-destructive/30 py-5">
+          <div className="flex items-start gap-3">
+            <div className="rounded-lg bg-destructive/10 p-2 text-destructive">
+              <WarningCircle size={18} weight="regular" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                Delete account
+              </h2>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                This removes your account, sessions, tracks, takes, and uploaded media.
+              </p>
+            </div>
+          </div>
+
+          {deleteStatus === "error" && (
+            <div className="mt-4 rounded-lg bg-destructive/[0.06] px-3.5 py-2.5 text-sm font-medium text-destructive">
+              {deleteError}
+            </div>
+          )}
+
+          {deleteStatus === "confirming" && (
+            <p className="mt-4 text-sm font-medium text-destructive">
+              Click again to permanently delete your account.
             </p>
+          )}
+
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => void handleDeleteAccount()}
+              disabled={deleteStatus === "deleting"}
+              className="gap-2"
+            >
+              <Trash size={15} weight="regular" />
+              {deleteStatus === "deleting"
+                ? "Deleting..."
+                : deleteStatus === "confirming"
+                  ? "Delete permanently"
+                  : "Delete account"}
+            </Button>
+            {deleteStatus === "confirming" && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setDeleteStatus("idle")}
+              >
+                Cancel
+              </Button>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <section className="rounded-xl border border-border/60 bg-card p-5">
         <div className="flex items-start gap-3">
