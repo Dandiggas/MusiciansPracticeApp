@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Transport } from "@/hooks/transport";
 
@@ -130,14 +130,14 @@ export function useYoutubeTransport(url: string | null): {
   const [error, setError] = useState<string | null>(null);
   const videoId = extractVideoId(url || "");
 
-  function stopPolling() {
+  const stopPolling = useCallback(() => {
     if (pollRef.current) {
       window.clearInterval(pollRef.current);
       pollRef.current = null;
     }
-  }
+  }, []);
 
-  function startPolling(player: YT.Player) {
+  const startPolling = useCallback((player: YT.Player) => {
     stopPolling();
 
     pollRef.current = window.setInterval(() => {
@@ -148,14 +148,14 @@ export function useYoutubeTransport(url: string | null): {
         // no-op while player is initializing
       }
     }, 250);
-  }
+  }, [stopPolling]);
 
   useEffect(() => {
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
     setError(videoId ? null : "Enter a valid YouTube link.");
-  }, [videoId]);
+  }, [startPolling, stopPolling, videoId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -211,7 +211,7 @@ export function useYoutubeTransport(url: string | null): {
       playerRef.current?.destroy();
       playerRef.current = null;
     };
-  }, [videoId]);
+  }, [startPolling, stopPolling, videoId]);
 
   const transport = useMemo<Transport>(
     () => ({

@@ -1,5 +1,6 @@
 import os
 
+from django.conf import settings
 from rest_framework import serializers
 
 from .models import Lick, Session, Take, Track
@@ -14,6 +15,15 @@ TAKE_VIDEO_EXTS = {".webm", ".mp4", ".mov", ".m4v"}
 
 def _ext(file_obj) -> str:
     return os.path.splitext(getattr(file_obj, "name", "") or "")[1].lower()
+
+
+def _file_size_error(file_obj, limit: int, label: str) -> str | None:
+    size = getattr(file_obj, "size", 0) or 0
+    if size <= limit:
+        return None
+
+    max_mb = limit / (1024 * 1024)
+    return f"{label} must be {max_mb:.0f} MB or smaller."
 
 
 class LickSerializer(serializers.ModelSerializer):
@@ -92,7 +102,14 @@ class TakeSerializer(serializers.ModelSerializer):
             errors["file"] = "A recorded file is required."
         else:
             extension = _ext(file_obj)
-            if capture_mode == Take.MODE_AUDIO and extension not in TAKE_AUDIO_EXTS:
+            size_error = _file_size_error(
+                file_obj,
+                settings.TAKE_FILE_MAX_UPLOAD_SIZE,
+                "Recorded files",
+            )
+            if size_error:
+                errors["file"] = size_error
+            elif capture_mode == Take.MODE_AUDIO and extension not in TAKE_AUDIO_EXTS:
                 errors["file"] = "Audio takes must be an audio-compatible file."
             elif capture_mode in (Take.MODE_VIDEO, Take.MODE_VIDEO_AUDIO) and extension not in TAKE_VIDEO_EXTS:
                 errors["file"] = "Video takes must be a video-compatible file."
@@ -155,22 +172,46 @@ class TrackSerializer(serializers.ModelSerializer):
         elif source_type == Track.SOURCE_MP3:
             if not file_obj:
                 errors["file"] = "Required for MP3 tracks."
-            elif _ext(file_obj) not in AUDIO_EXTS:
-                errors["file"] = "Must be an audio file."
+            else:
+                size_error = _file_size_error(
+                    file_obj,
+                    settings.TRACK_FILE_MAX_UPLOAD_SIZE,
+                    "Track files",
+                )
+                if size_error:
+                    errors["file"] = size_error
+                elif _ext(file_obj) not in AUDIO_EXTS:
+                    errors["file"] = "Must be an audio file."
             if youtube_url:
                 errors["youtube_url"] = "MP3 tracks must not have a URL."
         elif source_type == Track.SOURCE_PDF:
             if not file_obj:
                 errors["file"] = "Required for PDF tracks."
-            elif _ext(file_obj) not in PDF_EXTS:
-                errors["file"] = "Must be a PDF file."
+            else:
+                size_error = _file_size_error(
+                    file_obj,
+                    settings.TRACK_FILE_MAX_UPLOAD_SIZE,
+                    "Track files",
+                )
+                if size_error:
+                    errors["file"] = size_error
+                elif _ext(file_obj) not in PDF_EXTS:
+                    errors["file"] = "Must be a PDF file."
             if youtube_url:
                 errors["youtube_url"] = "PDF tracks must not have a URL."
         elif source_type == Track.SOURCE_IMAGE:
             if not file_obj:
                 errors["file"] = "Required for image tracks."
-            elif _ext(file_obj) not in IMAGE_EXTS:
-                errors["file"] = "Must be an image file."
+            else:
+                size_error = _file_size_error(
+                    file_obj,
+                    settings.TRACK_FILE_MAX_UPLOAD_SIZE,
+                    "Track files",
+                )
+                if size_error:
+                    errors["file"] = size_error
+                elif _ext(file_obj) not in IMAGE_EXTS:
+                    errors["file"] = "Must be an image file."
             if youtube_url:
                 errors["youtube_url"] = "Image tracks must not have a URL."
         else:

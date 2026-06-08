@@ -10,22 +10,43 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+import sys
+from pathlib import Path
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def load_local_env():
+    env_path = BASE_DIR / ".env"
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
+
+
+load_local_env()
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key-for-dev-only")
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "local-development-only-secret-key-change-me-before-deploying-2026",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
+IS_TESTING = "pytest" in sys.modules or "PYTEST_CURRENT_TEST" in os.environ
 
 def split_env_list(name, default=""):
     return [value.strip() for value in os.getenv(name, default).split(",") if value.strip()]
@@ -37,6 +58,8 @@ def split_env_list(name, default=""):
 ALLOWED_HOSTS = split_env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
 ALLOWED_HOSTS += split_env_list("RAILWAY_PUBLIC_DOMAIN")
 ALLOWED_HOSTS += split_env_list("RAILWAY_PRIVATE_DOMAIN")
+if IS_TESTING:
+    ALLOWED_HOSTS.append("testserver")
 ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
 
 
@@ -161,7 +184,7 @@ if DATABASE_URL:
             conn_health_checks=True,
         )
     }
-else:
+elif os.getenv("USE_DOCKER_DB", "False") == "True":
     # Development: Use local Docker PostgreSQL
     DATABASES = {
         "default": {
@@ -171,6 +194,14 @@ else:
             "PASSWORD": "postgres",
             "HOST": "db",
             "PORT": 5432,
+        }
+    }
+else:
+    # Local development and test fallback. Production must set DATABASE_URL.
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 # Password validation
@@ -210,7 +241,11 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", BASE_DIR / "media"))
+TRACK_FILE_MAX_UPLOAD_SIZE = int(os.getenv("TRACK_FILE_MAX_UPLOAD_SIZE", str(50 * 1024 * 1024)))
+TAKE_FILE_MAX_UPLOAD_SIZE = int(os.getenv("TAKE_FILE_MAX_UPLOAD_SIZE", str(250 * 1024 * 1024)))
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(20 * 1024 * 1024)))
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(10 * 1024 * 1024)))
 
 # WhiteNoise configuration for serving static files in production
 STORAGES = {
@@ -237,12 +272,19 @@ REST_FRAMEWORK = {
         
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "auth_login": os.getenv("AUTH_LOGIN_RATE_LIMIT", "10/minute"),
+        "auth_register": os.getenv("AUTH_REGISTER_RATE_LIMIT", "5/minute"),
+        "auth_password_reset": os.getenv("AUTH_PASSWORD_RESET_RATE_LIMIT", "5/minute"),
+        "auth_email_verification": os.getenv("AUTH_EMAIL_VERIFICATION_RATE_LIMIT", "10/minute"),
+        "recommendations": os.getenv("OPENAI_RECOMMENDATIONS_RATE_LIMIT", "5/hour"),
+    },
 }
 
 AUTH_TOKEN_COOKIE_NAME = os.getenv("AUTH_TOKEN_COOKIE_NAME", "practice_auth_token")
 AUTH_TOKEN_COOKIE_HTTPONLY = True
 AUTH_TOKEN_COOKIE_SAMESITE = "Lax"
-AUTH_TOKEN_COOKIE_SECURE = os.getenv("AUTH_TOKEN_COOKIE_SECURE", "False") == "True"
+AUTH_TOKEN_COOKIE_SECURE = env_bool("AUTH_TOKEN_COOKIE_SECURE", not DEBUG)
 AUTH_TOKEN_COOKIE_MAX_AGE = int(
     os.getenv("AUTH_TOKEN_COOKIE_MAX_AGE", str(60 * 60 * 24 * 30))
 )
@@ -270,7 +312,7 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 if not DEBUG:
-    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
+    SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", not IS_TESTING)
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True

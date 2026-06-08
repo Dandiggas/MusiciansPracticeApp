@@ -81,15 +81,13 @@
 ```
 MusiciansPracticeApp/
 ├── django_project/          # Django settings, URLs, WSGI/ASGI
-├── accounts/                # CustomUser model, auth views, serializers
-├── session/                 # Core app: Session, Tag, SheetMusic models
-│   ├── models.py           # Session, Tag, SheetMusic
-│   ├── views.py            # All API views (484 lines)
-│   ├── serializers.py      # DRF serializers with PDF validation
-│   ├── urls.py             # 15 URL patterns
-│   ├── permissions.py      # IsAdminOrOwner permission
-│   ├── throttles.py        # Rate limiters for AI + uploads
-│   └── tests.py            # 898 lines of tests
+├── accounts/                # CustomUser, auth views, throttles, serializers
+├── session/                 # Session workbench API: sessions, tracks, licks, takes
+│   ├── models.py           # Session, Track, Lick, Take
+│   ├── views.py            # Owner-scoped DRF viewsets
+│   ├── serializers.py      # Media validation and nested session data
+│   ├── urls.py             # Session workbench API router
+│   └── tests/              # API/model/serializer tests
 ├── frontend/next-app/
 │   ├── src/app/            # Next.js App Router pages
 │   │   ├── dashboard/      # Launch Pad
@@ -353,25 +351,28 @@ The current app uses a dark theme that aligns with the "Midnight Studio" directi
 1. **Custom domain** — Currently on Railway-generated URLs. Need branded domain (e.g., theshed.app or theshedmusic.app).
 2. **Landing page** — No public-facing marketing page. The app goes straight to login. Need a landing page with value proposition, screenshots, CTA.
 3. **SEO / Meta tags** — No evidence of meta descriptions, OG tags, or structured data for social sharing.
-4. **Email verification** — No email verification flow, which means fake signups.
-5. **Password reset** — No forgot password flow.
-6. **User onboarding** — First-time experience could be smoother. The "isFirstTime" check exists but is minimal.
+4. **Live deployment smoke test** — Verify register, email verification, login, password reset, session creation, track upload, take recording, account deletion, and admin deletion on the deployed domain.
+5. **User onboarding** — First-time experience could be smoother. Empty sessions should guide users toward adding a song, chart, or recording.
 
 ### Product Improvements
-7. **Backend sync for projects** — Major gap: instrument project data (song title, YouTube URL, BPM, notes, sheet music reference) is localStorage only. Switching browsers or clearing data loses everything.
-8. **User-configurable instruments** — Only 4 hardcoded instruments. Vocalists, violinists, saxophonists, etc. can't use their instrument name on the Launch Pad.
-9. **Session history search/filter** — No way to search or filter past sessions.
-10. **Social features** — No sharing, no community, no social proof.
-11. **Offline support / PWA** — No service worker, no offline capability.
+6. **User-configurable instruments** — The old Launch Pad assumptions are deprecated, but user-level instrument preferences still need a settled model if analytics/history returns.
+7. **Session history search/filter** — No dedicated search or archive filtering on the current sessions list.
+8. **Social features** — No sharing, no community, no social proof.
+9. **Offline support / PWA** — No service worker, no offline capability.
 
 ### Technical Improvements
-12. **Test coverage gaps** — Dashboard page, recommendations page, profile page, sheet music pages have no frontend tests.
-13. **Error tracking** — No Sentry or equivalent.
-14. **Analytics/telemetry** — No usage analytics (Posthog, Mixpanel, etc.).
-15. **Rate limiting on auth** — No rate limiting on login/register endpoints.
-16. **Media file storage** — Sheet music PDFs stored on Railway volume (not S3/CDN). May not scale well.
-17. **Console.log in production** — accounts/views.py still has print statements.
-18. **API versioning** — Only v1, which is fine, but no deprecation strategy.
+10. **Production env/storage** — Production must set `SECRET_KEY`, `DATABASE_URL`, `FRONTEND_URL`, host/CORS/CSRF values, and a durable `MEDIA_ROOT` or object-storage replacement.
+11. **Test coverage gaps** — Current Playwright coverage verifies the sessions workbench, but account settings, admin, upload, recording, email verification, and password reset need broader e2e coverage.
+12. **Error tracking** — No Sentry or equivalent.
+13. **Analytics/telemetry** — No usage analytics (PostHog, Mixpanel, Plausible, etc.).
+14. **Media file storage** — Local or Railway-volume uploads may be acceptable for small beta testing, but object storage/CDN is the long-term production path.
+15. **API versioning** — Only v1, which is fine, but no deprecation strategy.
+
+### Recently Completed
+16. **Auth rate limiting** — Login, register, password reset, email resend, and verify-and-login are now protected by scoped DRF throttles.
+17. **Email verification** — Mandatory allauth verification flow is implemented.
+18. **Password reset** — Frontend password reset flow is implemented.
+19. **Production checks** — `manage.py check --deploy` now reports missing production env/storage setup and passes with production-like env vars.
 
 ### Marketing & Growth
 19. **No blog / content** — No content marketing infrastructure.

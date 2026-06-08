@@ -238,7 +238,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
   useEffect(() => {
     setTakeName(buildDefaultTakeName(track, track.takes.length + 1));
     setSelectedTakeId(track.takes[0]?.id ?? null);
-  }, [track.id]);
+  }, [track]);
 
   useEffect(() => {
     setSelectedTakeId((current) => {

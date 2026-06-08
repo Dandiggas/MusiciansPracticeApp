@@ -1,13 +1,16 @@
 from urllib.parse import unquote
 
 from django.core import signing
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from allauth.account import app_settings as allauth_settings
 from allauth.account.models import EmailAddress, EmailConfirmation, EmailConfirmationHMAC
+
+from .throttles import EmailVerificationRateThrottle
 
 
 def _resolve_confirmation(key):
@@ -56,8 +59,18 @@ def _resolve_confirmation(key):
     return confirmation, confirmation.email_address, False, False
 
 
+@extend_schema(
+    request={"application/json": {"type": "object", "properties": {"key": {"type": "string"}}}},
+    responses={
+        200: OpenApiResponse(description="Email confirmed and auth token issued."),
+        404: OpenApiResponse(description="Invalid verification key."),
+        409: OpenApiResponse(description="Email address is already verified."),
+        410: OpenApiResponse(description="Verification key expired."),
+    },
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([EmailVerificationRateThrottle])
 def verify_and_login_view(request):
     """Confirm an email-verification key AND issue an auth token in one
     round-trip. Used by the Next.js /auth/verify/<key> page to make

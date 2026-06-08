@@ -14,7 +14,7 @@ export function StandaloneMetronomeClient() {
   const [isActive, setIsActive] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(-1);
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
-  const [tapTimes, setTapTimes] = useState<number[]>([]);
+  const [, setTapTimes] = useState<number[]>([]);
   const metronomeRef = useRef<MetronomeEngine | null>(null);
 
   useEffect(() => {

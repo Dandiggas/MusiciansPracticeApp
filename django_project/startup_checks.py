@@ -1,5 +1,7 @@
-"""Optional startup checks for deployment diagnostics."""
 import os
+
+from django.conf import settings
+from django.core.checks import Tags, Warning, register
 
 
 def has_frontend_url():
@@ -44,3 +46,55 @@ def email_delivery_status(env=None):
         "frontend_url": frontend_url,
         "missing": missing,
     }
+
+
+@register(Tags.security, deploy=True)
+def production_environment_check(app_configs, **kwargs):
+    warnings = []
+
+    if not os.getenv("SECRET_KEY"):
+        warnings.append(
+            Warning(
+                "SECRET_KEY is using the local fallback.",
+                hint="Set a long random SECRET_KEY in the production environment.",
+                id="practice.W001",
+            )
+        )
+
+    if not os.getenv("DATABASE_URL"):
+        warnings.append(
+            Warning(
+                "DATABASE_URL is not set.",
+                hint="Use a durable PostgreSQL database for production deployments.",
+                id="practice.W002",
+            )
+        )
+
+    if not os.getenv("FRONTEND_URL"):
+        warnings.append(
+            Warning(
+                "FRONTEND_URL is not set.",
+                hint="Set FRONTEND_URL so account verification and password reset links point at the deployed frontend.",
+                id="practice.W003",
+            )
+        )
+
+    if not settings.AUTH_TOKEN_COOKIE_SECURE:
+        warnings.append(
+            Warning(
+                "Authentication cookies are not marked secure.",
+                hint="Set AUTH_TOKEN_COOKIE_SECURE=True in production.",
+                id="practice.W004",
+            )
+        )
+
+    if str(settings.MEDIA_ROOT).startswith(str(settings.BASE_DIR)):
+        warnings.append(
+            Warning(
+                "MEDIA_ROOT points inside the application checkout.",
+                hint="Use a persistent mounted volume or object storage for uploaded tracks and takes.",
+                id="practice.W005",
+            )
+        )
+
+    return warnings

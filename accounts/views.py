@@ -1,18 +1,22 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from dj_rest_auth.views import LoginView
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .serializers import AdminUserSerializer, CustomUserSerializer
+from .throttles import LoginRateThrottle
 
 
 User = get_user_model()
 
 
 class CookieLoginView(LoginView):
+    throttle_classes = [LoginRateThrottle]
+
     def get_response(self):
         response = super().get_response()
 
@@ -30,6 +34,7 @@ class CookieLoginView(LoginView):
         return response
 
 
+@extend_schema(responses=CustomUserSerializer)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def current_user_view(request):
@@ -37,6 +42,7 @@ def current_user_view(request):
     return Response(serializer.data)
 
 
+@extend_schema(request=None, responses={200: None})
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
@@ -53,6 +59,7 @@ def logout_view(request):
     return response
 
 
+@extend_schema(request=None, responses={204: None})
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def account_detail_view(request):
@@ -72,6 +79,7 @@ def _is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 
+@extend_schema(responses=AdminUserSerializer(many=True))
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def admin_users_view(request):
@@ -86,6 +94,7 @@ def admin_users_view(request):
     return Response(serializer.data)
 
 
+@extend_schema(request=None, responses={204: None})
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def admin_user_detail_view(request, user_id):

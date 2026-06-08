@@ -1,4 +1,5 @@
 import pytest
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
@@ -8,8 +9,23 @@ pytestmark = pytest.mark.django_db
 User = get_user_model()
 
 
+def create_verified_user(username: str):
+    user = User.objects.create_user(
+        username=username,
+        email=f"{username}@example.com",
+        password="pw123456",
+    )
+    EmailAddress.objects.create(
+        user=user,
+        email=user.email,
+        verified=True,
+        primary=True,
+    )
+    return user
+
+
 def test_login_sets_http_only_cookie():
-    User.objects.create_user(username="alice", password="pw123456")
+    create_verified_user("alice")
     client = APIClient()
 
     response = client.post(
@@ -27,7 +43,7 @@ def test_login_sets_http_only_cookie():
 
 
 def test_cookie_auth_works_on_protected_endpoint():
-    User.objects.create_user(username="alice", password="pw123456")
+    create_verified_user("alice")
     client = APIClient()
 
     login_response = client.post(

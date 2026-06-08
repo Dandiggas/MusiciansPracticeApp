@@ -1,43 +1,61 @@
 # TODOS
 
-Deferred items from Launch Pad implementation (2026-03-30).
+Current production-readiness and product follow-ups as of 2026-06-09.
 
-## Backend sync for per-instrument projects
+## Before broad production launch
 
-**What:** Sync `practice:projects` localStorage data to the Django backend so project state persists across devices and browser clears.
+1. **Production environment variables**
+   - Set a real `SECRET_KEY`, `DATABASE_URL`, `FRONTEND_URL`, `ALLOWED_HOSTS`,
+     `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` in the production host.
+   - Keep `DEBUG=False`, `SECURE_SSL_REDIRECT=True`, and
+     `AUTH_TOKEN_COOKIE_SECURE=True`.
 
-**Why:** Currently all per-instrument project data (song title, YouTube URL, BPM, notes) lives only in localStorage. If the user clears browser data, switches devices, or uses a different browser, all Launch Pad state vanishes.
+2. **Durable media storage**
+   - Move uploaded tracks, PDFs/images, and takes to durable storage before a
+     wider launch.
+   - A persistent Railway volume is acceptable for a small beta. Object storage
+     plus CDN is the better long-term path.
 
-**Context:** Design doc says "start local, sync later." The `InstrumentProject` shape doesn't match the backend session model, so a new API endpoint or model extension is needed. Consider whether to sync the whole project object or just the fields that matter for continuity (songTitle, youtubeUrl, bpm, notes).
+3. **Live smoke test**
+   - On the deployed domain, manually verify register, email verification,
+     login, password reset, session creation, track upload, take recording,
+     account deletion, and admin deletion.
 
-## User-configurable instrument list
+4. **Observability**
+   - Add error tracking such as Sentry.
+   - Add basic product analytics such as PostHog or Plausible once user testing
+     starts.
 
-**What:** Allow users to add/remove instruments beyond the hardcoded Guitar, Bass, Drums, Keys.
+## Product and UX follow-ups
 
-**Why:** Multi-instrumentalists may play instruments not in the default list (violin, saxophone, voice, etc.). The current dropdown limits them to 4 options.
+1. **First-run onboarding**
+   - Create a more guided empty session path so a new musician immediately knows
+     to add a song, chart, or audio file.
 
-**Context:** The `INSTRUMENTS` constant and `InstrumentName` type in `practice-session-store.ts` would need to become dynamic. The Launch Pad grid layout (4-col) would need to adapt to variable counts. Start simple: let users add instruments, cap at 8 to keep the grid clean.
+2. **PWA / mobile install**
+   - Make the app installable from mobile home screens.
+   - Test tuner, recorder, and YouTube playback on iPhone Safari before relying
+     on PWA mode.
 
-## Dashboard (Launch Pad) test suite
+3. **Marketing surface**
+   - Add a simple public landing page, custom domain, social preview metadata,
+     and screenshots before broader outreach.
 
-**What:** Add tests for `frontend/next-app/src/app/dashboard/page.tsx`.
+4. **Expanded e2e coverage**
+   - Current Playwright coverage verifies the session workbench happy path.
+   - Add live-backed or richer mocked flows for account settings, admin, upload,
+     recording, email verification, and password reset.
 
-**Why:** The Launch Pad screen has no test coverage. It renders instrument cards, fetches stats, shows active session banners, and handles navigation, all untested.
+5. **API lifecycle**
+   - Keep `/api/v1/`, but document an API versioning/deprecation policy before
+     external integrations exist.
 
-**Context:** Would need mocks for axios (stats + active session endpoints), localStorage (projects), and next/navigation (router). Follow the pattern in `practice-timer/__tests__/page.test.tsx`.
+## Recently completed
 
-## PWA / mobile optimization
-
-**What:** Make the app installable as a Progressive Web App with home screen shortcut.
-
-**Why:** The target user (busy parent musician) would benefit from tapping a home screen icon instead of opening a browser and navigating to the URL. This is Approach C from the design doc.
-
-**Context:** PWA audio APIs are flaky on iOS (particularly getUserMedia for the tuner). Test thoroughly on iPhone Safari before shipping. The YouTube embed may also behave differently in a PWA context.
-
-## Migration edge case: non-matching instruments
-
-**What:** `migrateFromLegacySetup()` silently deletes legacy data when the stored instrument doesn't match one of the 4 hardcoded names.
-
-**Why:** If a user had "Piano" or "Violin" as their instrument before the Launch Pad update, the migration function can't map it to a Launch Pad card and deletes the legacy setup data without preserving it.
-
-**Context:** This is a one-time migration that runs on first dashboard load. The damage (if any) is already done for existing users. Fix this if/when adding user-configurable instruments, by preserving unmatched legacy data and mapping it to the new instrument once it's added.
+- Auth rate limiting on login, register, password reset, email resend, and
+  verify-and-login.
+- Email verification and password reset flows.
+- Mandatory frontend lint during production builds.
+- Current-session Playwright coverage replacing stale practice timer tests.
+- Upload size limits for tracks and takes.
+- Production deploy diagnostics via `manage.py check --deploy`.

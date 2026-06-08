@@ -33,7 +33,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
             "verified_emails",
         )
 
-    def get_verified_emails(self, user):
+    def get_verified_emails(self, user) -> list[dict[str, str | bool]]:
         return [
             {"email": email, "verified": verified}
             for email, verified in EmailAddress.objects.filter(user=user)

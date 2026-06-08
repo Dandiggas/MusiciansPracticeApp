@@ -24,6 +24,8 @@ class SessionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Session.objects.none()
         return (
             Session.objects.filter(user=self.request.user)
             .prefetch_related("tracks__licks", "tracks__takes")
@@ -70,6 +72,8 @@ class TrackViewSet(viewsets.ModelViewSet):
     serializer_class = TrackSerializer
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Track.objects.none()
         return (
             Track.objects.filter(session__user=self.request.user)
             .select_related("session")
@@ -122,6 +126,8 @@ class LickViewSet(viewsets.ModelViewSet):
     serializer_class = LickSerializer
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Lick.objects.none()
         return Lick.objects.filter(track__session__user=self.request.user).select_related(
             "track",
             "track__session",
@@ -140,6 +146,8 @@ class TakeViewSet(viewsets.ModelViewSet):
     serializer_class = TakeSerializer
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Take.objects.none()
         return Take.objects.filter(track__session__user=self.request.user).select_related(
             "track",
             "track__session",
