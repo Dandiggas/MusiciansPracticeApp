@@ -118,6 +118,7 @@ ACCOUNT_ADAPTER = "accounts.adapter.CustomAccountAdapter"
 
 REST_AUTH = {
     "PASSWORD_RESET_SERIALIZER": "accounts.serializers.FrontendPasswordResetSerializer",
+    "OLD_PASSWORD_FIELD_ENABLED": True,
 }
 
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "hello@theshed.app")
