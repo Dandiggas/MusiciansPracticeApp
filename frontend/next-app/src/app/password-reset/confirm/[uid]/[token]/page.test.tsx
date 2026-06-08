@@ -45,7 +45,7 @@ describe("PasswordResetConfirmPage", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/django/dj-rest-auth/password/reset/confirm/",
+        "/api/django/dj-rest-auth/password/reset/confirm",
         expect.objectContaining({
           method: "POST",
           body: JSON.stringify({

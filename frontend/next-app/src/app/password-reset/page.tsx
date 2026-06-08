@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const passwordResetPath = "/api/django/dj-rest-auth/password/reset/";
+const passwordResetPath = "/api/django/dj-rest-auth/password/reset";
 
 function errorMessage(body: unknown) {
   if (body && typeof body === "object") {
