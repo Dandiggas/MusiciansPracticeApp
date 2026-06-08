@@ -72,6 +72,22 @@ describe("VerifyPage", () => {
     });
   });
 
+  it("decodes URL-escaped verification keys before posting", async () => {
+    mockKey = "OQ%3A1wWYbJ%3Aabc123";
+
+    render(<VerifyPage />);
+
+    await waitFor(() => {
+      const verifyCall = (global.fetch as jest.Mock).mock.calls.find(
+        (call) => call[0] === "/api/auth/verify-and-login"
+      );
+      expect(verifyCall).toBeDefined();
+      expect(JSON.parse(String(verifyCall?.[1].body))).toEqual({
+        key: "OQ:1wWYbJ:abc123",
+      });
+    });
+  });
+
   it("on 410 expired, renders expired state with resend affordance", async () => {
     verifyResponses.push(
       mockResponse({ detail: "expired_key" }, 410)

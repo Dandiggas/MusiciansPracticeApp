@@ -1,3 +1,5 @@
+from urllib.parse import unquote
+
 from django.core import signing
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -71,7 +73,7 @@ def verify_and_login_view(request):
       409 — already verified (re-click of a spent HMAC)
       410 — key expired past ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS
     """
-    key = request.data.get("key", "")
+    key = unquote(str(request.data.get("key", ""))).strip()
     if not key:
         return Response({"detail": "invalid_key"}, status=status.HTTP_404_NOT_FOUND)
 
