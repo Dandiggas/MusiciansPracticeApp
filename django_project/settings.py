@@ -116,6 +116,10 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = False  # our POST /verify-and-login/ handles it
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 ACCOUNT_ADAPTER = "accounts.adapter.CustomAccountAdapter"
 
+REST_AUTH = {
+    "PASSWORD_RESET_SERIALIZER": "accounts.serializers.FrontendPasswordResetSerializer",
+}
+
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "hello@theshed.app")
 
 def env_bool(name, default=False):

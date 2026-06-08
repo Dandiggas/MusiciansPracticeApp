@@ -37,11 +37,10 @@ describe("RegisterPage", () => {
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: "new@example.com" },
     });
-    const passwordInputs = screen.getAllByLabelText(/password/i);
-    fireEvent.change(passwordInputs[0], {
+    fireEvent.change(screen.getByLabelText(/^password$/i), {
       target: { value: "StrongPass123!" },
     });
-    fireEvent.change(passwordInputs[1], {
+    fireEvent.change(screen.getByLabelText(/^confirm password$/i), {
       target: { value: "StrongPass123!" },
     });
   };
@@ -94,5 +93,24 @@ describe("RegisterPage", () => {
     await waitFor(() => {
       expect(screen.getByText(/enter a valid email address/i)).toBeInTheDocument();
     });
+  });
+
+  it("lets users reveal and hide both password fields", () => {
+    render(<RegisterPage />);
+
+    const password = screen.getByLabelText(/^password$/i);
+    const confirmPassword = screen.getByLabelText(/^confirm password$/i);
+    expect(password).toHaveAttribute("type", "password");
+    expect(confirmPassword).toHaveAttribute("type", "password");
+
+    fireEvent.click(screen.getByRole("button", { name: /^show password$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^show confirm password$/i }));
+    expect(password).toHaveAttribute("type", "text");
+    expect(confirmPassword).toHaveAttribute("type", "text");
+
+    fireEvent.click(screen.getByRole("button", { name: /^hide password$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^hide confirm password$/i }));
+    expect(password).toHaveAttribute("type", "password");
+    expect(confirmPassword).toHaveAttribute("type", "password");
   });
 });

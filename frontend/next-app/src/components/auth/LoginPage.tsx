@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Clock, MusicNote, Sparkle } from "@phosphor-icons/react";
+import { ArrowRight, Clock, Eye, EyeSlash, MusicNote, Sparkle } from "@phosphor-icons/react";
 import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
 
 const resendEmailPath = "/api/django/dj-rest-auth/registration/resend-email/";
@@ -19,6 +19,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [manualResendState, setManualResendState] = useState<
     "idle" | "sending" | "sent" | "error"
   >("idle");
@@ -267,20 +268,43 @@ const LoginPage = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">
-                    Password
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    required
-                    disabled={isLoading}
-                    className="h-10 rounded-lg border-border/60 bg-background px-3 shadow-none transition-colors duration-200 focus:border-primary/50 focus:bg-white"
-                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">
+                      Password
+                    </Label>
+                    <Link
+                      href="/password-reset"
+                      className="text-xs font-medium text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="••••••••"
+                      required
+                      disabled={isLoading}
+                      className="h-10 rounded-lg border-border/60 bg-background px-3 pr-11 shadow-none transition-colors duration-200 focus:border-primary/50 focus:bg-white"
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={() => setShowPassword((current) => !current)}
+                      disabled={isLoading}
+                      className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      {showPassword ? (
+                        <EyeSlash size={18} weight="regular" />
+                      ) : (
+                        <Eye size={18} weight="regular" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <Button

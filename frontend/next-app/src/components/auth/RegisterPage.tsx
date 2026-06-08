@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Guitar, Clock, Sparkle } from "@phosphor-icons/react";
+import { ArrowRight, Clock, Eye, EyeSlash, Guitar, Sparkle } from "@phosphor-icons/react";
 import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
 
 interface FormErrors {
@@ -34,6 +34,8 @@ const RegisterPage = () => {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
   const router = useRouter();
 
   const validate = () => {
@@ -271,17 +273,32 @@ const RegisterPage = () => {
                     >
                       Password
                     </Label>
-                    <Input
-                      className={inputClass}
-                      id="password1"
-                      type="password"
-                      name="password1"
-                      value={formData.password1}
-                      onChange={handleChange}
-                      placeholder="••••••••"
-                      required
-                      disabled={isSubmitting}
-                    />
+                    <div className="relative">
+                      <Input
+                        className={`${inputClass} pr-12`}
+                        id="password1"
+                        type={showPassword1 ? "text" : "password"}
+                        name="password1"
+                        value={formData.password1}
+                        onChange={handleChange}
+                        placeholder="••••••••"
+                        required
+                        disabled={isSubmitting}
+                      />
+                      <button
+                        type="button"
+                        aria-label={showPassword1 ? "Hide password" : "Show password"}
+                        onClick={() => setShowPassword1((current) => !current)}
+                        disabled={isSubmitting}
+                        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+                      >
+                        {showPassword1 ? (
+                          <EyeSlash size={18} weight="regular" />
+                        ) : (
+                          <Eye size={18} weight="regular" />
+                        )}
+                      </button>
+                    </div>
                     {errors.password1 && (
                       <p className="text-sm font-medium text-destructive">
                         {errors.password1}
@@ -296,17 +313,32 @@ const RegisterPage = () => {
                     >
                       Confirm Password
                     </Label>
-                    <Input
-                      className={inputClass}
-                      id="password2"
-                      type="password"
-                      name="password2"
-                      value={formData.password2}
-                      onChange={handleChange}
-                      placeholder="••••••••"
-                      required
-                      disabled={isSubmitting}
-                    />
+                    <div className="relative">
+                      <Input
+                        className={`${inputClass} pr-12`}
+                        id="password2"
+                        type={showPassword2 ? "text" : "password"}
+                        name="password2"
+                        value={formData.password2}
+                        onChange={handleChange}
+                        placeholder="••••••••"
+                        required
+                        disabled={isSubmitting}
+                      />
+                      <button
+                        type="button"
+                        aria-label={showPassword2 ? "Hide confirm password" : "Show confirm password"}
+                        onClick={() => setShowPassword2((current) => !current)}
+                        disabled={isSubmitting}
+                        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+                      >
+                        {showPassword2 ? (
+                          <EyeSlash size={18} weight="regular" />
+                        ) : (
+                          <Eye size={18} weight="regular" />
+                        )}
+                      </button>
+                    </div>
                     {errors.password2 && (
                       <p className="text-sm font-medium text-destructive">
                         {errors.password2}
