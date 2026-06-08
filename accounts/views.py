@@ -1,10 +1,15 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from dj_rest_auth.views import LoginView
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .serializers import CustomUserSerializer
+
+from .serializers import AdminUserSerializer, CustomUserSerializer
+
+
+User = get_user_model()
 
 
 class CookieLoginView(LoginView):
@@ -46,3 +51,45 @@ def logout_view(request):
         samesite=settings.AUTH_TOKEN_COOKIE_SAMESITE,
     )
     return response
+
+
+def _is_admin(user):
+    return user.is_authenticated and (user.is_staff or user.is_superuser)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def admin_users_view(request):
+    if not _is_admin(request.user):
+        return Response(
+            {"detail": "Admin access required."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    users = User.objects.order_by("-date_joined")
+    serializer = AdminUserSerializer(users, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def admin_user_detail_view(request, user_id):
+    if not _is_admin(request.user):
+        return Response(
+            {"detail": "Admin access required."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    if request.user.pk == user_id:
+        return Response(
+            {"detail": "You cannot delete your own account from the admin dashboard."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    user.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

@@ -16,6 +16,7 @@ export function MobileNav() {
     { name: "The Shed", href: "/sessions" },
     { name: "Metronome", href: "/metronome" },
     { name: "Tuner", href: "/tuner" },
+    { name: "Admin", href: "/admin" },
   ];
 
   // Don't show on login/register pages
