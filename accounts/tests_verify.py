@@ -1,4 +1,6 @@
 from datetime import timedelta
+from urllib.parse import quote
+
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -44,6 +46,16 @@ class VerifyAndLoginTests(TestCase):
         resp = self.client.post(VERIFY_URL, {"key": "definitely-not-a-key"}, format="json")
         self.assertEqual(resp.status_code, 404)
         self.assertEqual(resp.json()["detail"], "invalid_key")
+
+    def test_url_encoded_hmac_key_confirms_email(self):
+        user, email, key = _make_unverified_user_with_hmac()
+
+        resp = self.client.post(VERIFY_URL, {"key": quote(key)}, format="json")
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()["user"], user.pk)
+        email.refresh_from_db()
+        self.assertTrue(email.verified)
 
     def test_missing_key_returns_404(self):
         resp = self.client.post(VERIFY_URL, {}, format="json")

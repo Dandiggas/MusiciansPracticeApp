@@ -16,8 +16,25 @@ function shouldUseSecureCookie(request: Request) {
   return process.env.NODE_ENV === "production";
 }
 
+function normalizeVerificationBody(body: unknown) {
+  if (!body || typeof body !== "object" || !("key" in body)) {
+    return body;
+  }
+
+  const key = (body as { key?: unknown }).key;
+  if (typeof key !== "string") {
+    return body;
+  }
+
+  try {
+    return { ...body, key: decodeURIComponent(key.trim()).trim() };
+  } catch {
+    return { ...body, key: key.trim() };
+  }
+}
+
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = normalizeVerificationBody(await request.json());
 
   const response = await fetch(
     `${getDjangoApiBaseUrl()}/dj-rest-auth/registration/verify-and-login/`,

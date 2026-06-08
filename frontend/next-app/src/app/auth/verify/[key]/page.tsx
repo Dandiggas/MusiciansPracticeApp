@@ -10,6 +10,15 @@ import { CheckCircle, Warning, Clock } from "@phosphor-icons/react";
 
 const resendEmailPath = "/api/django/dj-rest-auth/registration/resend-email/";
 
+function normalizeVerificationKey(value: string) {
+  const trimmed = value.trim();
+  try {
+    return decodeURIComponent(trimmed).trim();
+  } catch {
+    return trimmed;
+  }
+}
+
 type VerifyState =
   | { status: "loading" }
   | { status: "success" }
@@ -27,10 +36,9 @@ export default function VerifyPage() {
       : Array.isArray(params?.key)
         ? params.key[0]
         : "";
-  // Trim whitespace defensively — terminal copy-paste of the activate_url
-  // sometimes includes a trailing newline or space which the URL bar silently
-  // preserves, and the backend treats whitespace-suffixed keys as invalid (404).
-  const key = rawKey.trim();
+  // Decode URL-escaped route params before POSTing to Django. allauth HMAC
+  // keys contain ":"; Next route params can surface those as "%3A".
+  const key = normalizeVerificationKey(rawKey);
   const hasRun = useRef(false);
   const [state, setState] = useState<VerifyState>({ status: "loading" });
   const [resendEmail, setResendEmail] = useState("");
