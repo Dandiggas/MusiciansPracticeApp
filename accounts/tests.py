@@ -65,6 +65,8 @@ class CurrentUserViewTests(APITestCase):
         self.assertEqual(response.data['username'], 'testuser')
         self.assertEqual(response.data['email'], 'test@email.com')
         self.assertEqual(response.data['name'], 'Test User')
+        self.assertFalse(response.data['is_staff'])
+        self.assertFalse(response.data['is_superuser'])
 
     def test_get_current_user_unauthenticated(self):
         """Test that unauthenticated users cannot access current user endpoint"""
@@ -83,6 +85,8 @@ class CurrentUserViewTests(APITestCase):
         self.assertIn('username', response.data)
         self.assertIn('name', response.data)
         self.assertIn('email', response.data)
+        self.assertIn('is_staff', response.data)
+        self.assertIn('is_superuser', response.data)
 
 
 class LogoutViewTests(APITestCase):

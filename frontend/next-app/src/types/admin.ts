@@ -21,4 +21,6 @@ export interface CurrentUser {
   username: string;
   name: string | null;
   email: string;
+  is_staff: boolean;
+  is_superuser: boolean;
 }
