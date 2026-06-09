@@ -7,19 +7,62 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { MobileNav } from "./MobileNav";
 import { cn } from "@/lib/utils";
 import LogoutButton from "@/components/practice/LogoutButton";
+import type { CurrentUser } from "@/types/admin";
+
+const baseNavigation = [
+  { name: "The Shed", href: "/sessions" },
+  { name: "Metronome", href: "/metronome" },
+  { name: "Tuner", href: "/tuner" },
+  { name: "Account", href: "/account" },
+];
+
+const adminNavigationItem = { name: "Admin", href: "/admin" };
 
 export function Header() {
   const pathname = usePathname();
+  const [showAdmin, setShowAdmin] = React.useState(false);
 
-  const navigation = [
-    { name: "The Shed", href: "/sessions" },
-    { name: "Metronome", href: "/metronome" },
-    { name: "Tuner", href: "/tuner" },
-    { name: "Account", href: "/account" },
-    { name: "Admin", href: "/admin" },
-  ];
+  const isAuthPage =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname.startsWith("/password-reset");
+  const navigation = showAdmin
+    ? [...baseNavigation, adminNavigationItem]
+    : baseNavigation;
 
-  if (pathname === "/login" || pathname === "/register" || pathname.startsWith("/password-reset")) {
+  React.useEffect(() => {
+    if (isAuthPage) {
+      setShowAdmin(false);
+      return;
+    }
+
+    let isCurrent = true;
+
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch("/api/django/current-user");
+        if (!response.ok) {
+          if (isCurrent) setShowAdmin(false);
+          return;
+        }
+
+        const user = (await response.json()) as CurrentUser;
+        if (isCurrent) {
+          setShowAdmin(Boolean(user.is_staff || user.is_superuser));
+        }
+      } catch {
+        if (isCurrent) setShowAdmin(false);
+      }
+    }
+
+    loadCurrentUser();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [isAuthPage]);
+
+  if (isAuthPage) {
     return null;
   }
 
@@ -65,7 +108,7 @@ export function Header() {
               className="hidden h-9 rounded-lg border-border bg-secondary px-4 text-sm text-secondary-foreground hover:bg-secondary/80 md:inline-flex"
             />
             <ThemeToggle />
-            <MobileNav />
+            <MobileNav showAdmin={showAdmin} />
           </nav>
         </div>
       </div>

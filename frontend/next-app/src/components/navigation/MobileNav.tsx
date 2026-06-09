@@ -8,17 +8,26 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import LogoutButton from "@/components/practice/LogoutButton";
 
-export function MobileNav() {
+const baseNavigation = [
+  { name: "The Shed", href: "/sessions" },
+  { name: "Metronome", href: "/metronome" },
+  { name: "Tuner", href: "/tuner" },
+  { name: "Account", href: "/account" },
+];
+
+const adminNavigationItem = { name: "Admin", href: "/admin" };
+
+type MobileNavProps = {
+  showAdmin?: boolean;
+};
+
+export function MobileNav({ showAdmin = false }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  const navigation = [
-    { name: "The Shed", href: "/sessions" },
-    { name: "Metronome", href: "/metronome" },
-    { name: "Tuner", href: "/tuner" },
-    { name: "Account", href: "/account" },
-    { name: "Admin", href: "/admin" },
-  ];
+  const navigation = showAdmin
+    ? [...baseNavigation, adminNavigationItem]
+    : baseNavigation;
 
   // Don't show on login/register pages
   if (pathname === "/login" || pathname === "/register" || pathname.startsWith("/password-reset")) {

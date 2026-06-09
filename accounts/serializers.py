@@ -12,7 +12,7 @@ from .models import CustomUser
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id', 'username', 'name', 'email',)
+        fields = ('id', 'username', 'name', 'email', 'is_staff', 'is_superuser')
 
 
 class AdminUserSerializer(serializers.ModelSerializer):

@@ -19,6 +19,8 @@ const currentUser = {
   username: "player",
   name: "",
   email: "player@example.com",
+  is_staff: false,
+  is_superuser: false,
 };
 
 const mockResponse = (data: unknown, status = 200) =>
