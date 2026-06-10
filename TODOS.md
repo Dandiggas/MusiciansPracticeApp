@@ -50,6 +50,31 @@ Current production-readiness and product follow-ups as of 2026-06-09.
    - Keep `/api/v1/`, but document an API versioning/deprecation policy before
      external integrations exist.
 
+## Design review follow-ups (deferred from /design-review, 2026-06-10)
+
+1. **Spacing tokens** (medium) — layouts use repeated Tailwind magic values
+   (`px-4 py-10 md:px-8`, `gap-6`); define a small spacing scale if drift
+   continues. Flagged by Codex as P1.
+2. **Card overuse in the workbench** (medium) — most regions are wrapped in
+   rounded bordered panels; some are decorative framing rather than the
+   interaction itself. A calmer surface hierarchy would read more premium.
+3. **Legacy components bypass the theme** (medium) — `TakeRecorder`,
+   `StatsCard`, `TagSelector`, `PracticeChart`, `LocalAudioPlayer` hardcode
+   slate/hex colors and break dark mode. They are unreachable from the current
+   nav — consider deleting them and the legacy routes (`/dashboard`,
+   `/profilepage`, `/practice-timer`, `/recommendations`, `/youtube-practice`).
+4. **"Kevin Bond" placeholder** (polish) — the new-session input placeholder
+   reads like a person's name, not a session name. Confirm it's intentional.
+5. **Time-signature button size** (polish) — 32px tall, under the 44px touch
+   minimum. Density tradeoff; revisit if mis-taps happen on mobile.
+6. **Mobile Playwright project** (polish) — Playwright only configures Desktop
+   Chrome; add an iPhone viewport project to guard the responsive layout.
+
+Fixed by /design-review on main, 2026-06-10: light/dark contrast tokens
+(muted-foreground, primary, destructive), destructive buttons now use
+`text-destructive-foreground`, Delete Session demoted to outline, nav link hit
+areas stretched to header height, `transition-all` removed from metronome.
+
 ## Recently completed
 
 - Auth rate limiting on login, register, password reset, email resend, and
