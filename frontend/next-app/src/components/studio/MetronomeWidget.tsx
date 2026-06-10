@@ -124,7 +124,7 @@ export default function MetronomeWidget({
             key={ts.label}
             variant={beatsPerMeasure === ts.beats ? "default" : "secondary"}
             size="sm"
-            className="rounded-lg text-xs h-8 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            className="rounded-lg text-xs h-8 transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             onClick={() => onBeatsPerMeasureChange(ts.beats)}
           >
             {ts.label}
@@ -156,9 +156,9 @@ export default function MetronomeWidget({
         >
           <Button
             onClick={onToggle}
-            className={`w-full h-10 rounded-lg font-semibold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            className={`w-full h-10 rounded-lg font-semibold transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
               isActive
-                ? "bg-destructive text-white hover:bg-destructive/90"
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 : "bg-primary text-primary-foreground hover:bg-primary/90"
             }`}
           >
