@@ -99,7 +99,7 @@ export default function TunerWidget({
         onClick={onToggle}
         className={`w-full h-10 rounded-lg font-semibold ${
           isActive
-            ? "bg-destructive text-white hover:bg-destructive/90"
+            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
             : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
         }`}
       >
