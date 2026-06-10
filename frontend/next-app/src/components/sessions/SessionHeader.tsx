@@ -104,7 +104,8 @@ export function SessionHeader({
           </p>
           <Button
             type="button"
-            variant="destructive"
+            variant="outline"
+            className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
             onClick={() => void handleDelete()}
             disabled={isDeleting}
           >
