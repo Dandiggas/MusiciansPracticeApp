@@ -95,6 +95,36 @@ describe("RegisterPage", () => {
     });
   });
 
+  it("shows duplicate email actions without the generic global banner", async () => {
+    global.fetch = jest.fn().mockResolvedValue(
+      mockResponse(
+        { email: ["User is already registered with this e-mail address."] },
+        400
+      )
+    ) as typeof fetch;
+
+    render(<RegisterPage />);
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole("button", { name: /create.*account/i }));
+
+    expect(
+      await screen.findByText("Looks like this email already has an account.")
+    ).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole("link", { name: /sign in/i })
+        .some((link) => link.getAttribute("href") === "/login")
+    ).toBe(true);
+    expect(screen.getByRole("link", { name: /reset password/i })).toHaveAttribute(
+      "href",
+      "/password-reset"
+    );
+    expect(
+      screen.queryByText(/we couldn't create your account/i)
+    ).not.toBeInTheDocument();
+  });
+
   it("lets users reveal and hide both password fields", () => {
     render(<RegisterPage />);
 

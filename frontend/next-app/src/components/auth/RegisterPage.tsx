@@ -25,6 +25,10 @@ function normalizeErrorValue(value: unknown) {
   return typeof value === "string" ? value : undefined;
 }
 
+function isDuplicateEmailError(message?: string) {
+  return Boolean(message?.match(/already|registered|exists|in use/i));
+}
+
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -80,15 +84,26 @@ const RegisterPage = () => {
 
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          setErrors({
+          const nextErrors: FormErrors = {
             username: normalizeErrorValue(data?.username),
             email: normalizeErrorValue(data?.email),
             password1: normalizeErrorValue(data?.password1),
             password2: normalizeErrorValue(data?.password2),
             non_field_errors: normalizeErrorValue(data?.non_field_errors),
-            detail:
-              normalizeErrorValue(data?.detail) ||
-              "We couldn't create your account. Please check the form and try again.",
+          };
+          const hasFieldErrors = Boolean(
+            nextErrors.username ||
+              nextErrors.email ||
+              nextErrors.password1 ||
+              nextErrors.password2
+          );
+
+          setErrors({
+            ...nextErrors,
+            detail: hasFieldErrors
+              ? undefined
+              : normalizeErrorValue(data?.detail) ||
+                "We couldn't create your account. Please check the form and try again.",
           });
           return;
         }
@@ -260,9 +275,29 @@ const RegisterPage = () => {
                       disabled={isSubmitting}
                     />
                     {errors.email && (
-                      <p className="text-sm font-medium text-destructive">
-                        {errors.email}
-                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-destructive">
+                          {isDuplicateEmailError(errors.email)
+                            ? "Looks like this email already has an account."
+                            : errors.email}
+                        </p>
+                        {isDuplicateEmailError(errors.email) && (
+                          <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                            <Link
+                              href="/login"
+                              className="font-semibold text-foreground hover:underline"
+                            >
+                              Sign in
+                            </Link>
+                            <Link
+                              href="/password-reset"
+                              className="font-semibold text-foreground hover:underline"
+                            >
+                              Reset password
+                            </Link>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
 

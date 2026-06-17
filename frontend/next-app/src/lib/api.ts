@@ -3,6 +3,9 @@ import { Lick, SessionSummary, Take, Track } from "@/types/session";
 
 type JsonBody = Record<string, unknown>;
 
+const DEFAULT_NETWORK_ERROR =
+  "The app server didn't respond. Please try again.";
+
 function isJsonResponse(response: Response) {
   return (response.headers.get("content-type") || "").includes("application/json");
 }
@@ -38,9 +41,16 @@ function extractErrorMessage(body: unknown, fallback: string) {
 async function requestJson<T>(
   input: string,
   init: RequestInit,
-  fallbackMessage: string
+  fallbackMessage: string,
+  networkMessage = DEFAULT_NETWORK_ERROR
 ): Promise<T> {
-  const response = await fetch(input, init);
+  let response: Response;
+  try {
+    response = await fetch(input, init);
+  } catch {
+    throw new Error(networkMessage);
+  }
+
   const body = await readBody(response);
 
   if (!response.ok) {
@@ -103,7 +113,8 @@ export async function createTrack(formData: FormData) {
       },
       body: formData,
     },
-    "Could not create track."
+    "Could not create track.",
+    "We couldn't save this track because the app server didn't respond. Please try again."
   );
 }
 
