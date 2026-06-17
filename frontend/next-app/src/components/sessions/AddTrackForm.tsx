@@ -23,6 +23,63 @@ const SOURCE_LABELS: Record<TrackSourceType, string> = {
   image: "Image",
 };
 
+const YOUTUBE_URL_ERROR =
+  "Paste a normal YouTube link, e.g. https://youtu.be/...";
+const TRACK_NETWORK_ERROR =
+  "We couldn't save this track because the app server didn't respond. Please try again.";
+
+function extractYouTubeVideoId(value: string) {
+  let url: URL;
+  try {
+    url = new URL(value.trim());
+  } catch {
+    return null;
+  }
+
+  const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+  let videoId: string | null = null;
+
+  if (hostname === "youtu.be") {
+    videoId = url.pathname.split("/").filter(Boolean)[0] ?? null;
+  } else if (hostname === "youtube.com") {
+    if (url.pathname === "/watch") {
+      videoId = url.searchParams.get("v");
+    } else {
+      const [kind, id] = url.pathname.split("/").filter(Boolean);
+      if (kind === "shorts") {
+        videoId = id ?? null;
+      }
+    }
+  }
+
+  if (!videoId || !/^[A-Za-z0-9_-]+$/.test(videoId)) {
+    return null;
+  }
+
+  return videoId;
+}
+
+function normalizeYouTubeUrl(value: string) {
+  const videoId = extractYouTubeVideoId(value);
+  return videoId ? `https://www.youtube.com/watch?v=${videoId}` : null;
+}
+
+function isNetworkFailureMessage(message: string) {
+  return /failed to fetch|networkerror|load failed|app server/i.test(message);
+}
+
+function createTrackErrorMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return "Could not create track.";
+  }
+
+  if (isNetworkFailureMessage(error.message)) {
+    return TRACK_NETWORK_ERROR;
+  }
+
+  return error.message || "Could not create track.";
+}
+
 export function AddTrackForm({
   insertPosition,
   onTrackCreated,
@@ -88,6 +145,16 @@ export function AddTrackForm({
       return;
     }
 
+    let normalizedYouTubeUrl = "";
+    if (sourceType === "youtube") {
+      const normalizedUrl = normalizeYouTubeUrl(youtubeUrl);
+      if (!normalizedUrl) {
+        setError(YOUTUBE_URL_ERROR);
+        return;
+      }
+      normalizedYouTubeUrl = normalizedUrl;
+    }
+
     const formData = new FormData();
     formData.append("session", String(sessionId));
     formData.append("name", name.trim());
@@ -97,7 +164,7 @@ export function AddTrackForm({
       formData.append("bpm", bpm.trim());
     }
     if (sourceType === "youtube") {
-      formData.append("youtube_url", youtubeUrl.trim());
+      formData.append("youtube_url", normalizedYouTubeUrl);
     } else if (file) {
       formData.append("file", file);
     }
@@ -109,7 +176,7 @@ export function AddTrackForm({
       onTrackCreated(track);
       resetForm();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not create track.");
+      setError(createTrackErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

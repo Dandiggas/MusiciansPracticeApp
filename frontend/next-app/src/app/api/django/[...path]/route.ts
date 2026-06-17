@@ -36,12 +36,20 @@ async function proxy(request: NextRequest, path: string[]) {
   }
   headers.set("Accept", "application/json");
 
-  const bodyInit = await buildBodyInit(request, headers);
-  const response = await fetch(url, {
-    method: request.method,
-    headers,
-    ...bodyInit,
-  });
+  let response: Response;
+  try {
+    const bodyInit = await buildBodyInit(request, headers);
+    response = await fetch(url, {
+      method: request.method,
+      headers,
+      ...bodyInit,
+    });
+  } catch {
+    return NextResponse.json(
+      { detail: "The app server could not be reached. Please try again." },
+      { status: 502 }
+    );
+  }
 
   return new NextResponse(response.body, {
     status: response.status,

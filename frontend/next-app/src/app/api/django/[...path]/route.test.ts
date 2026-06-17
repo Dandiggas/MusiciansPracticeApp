@@ -114,4 +114,28 @@ describe("django write proxy", () => {
     expect(proxiedInit.headers.get("content-type")).toBe("application/json");
     expect(proxiedInit.headers.get("content-length")).toBe(String(textEncoder.encode(body).byteLength));
   });
+
+  it("returns a JSON 502 when Django cannot be reached", async () => {
+    global.fetch = jest.fn().mockRejectedValue(new TypeError("fetch failed")) as typeof fetch;
+    const { POST } = await import("./route");
+    const body = JSON.stringify({ name: "Praise on Demand" });
+
+    const request = new NextRequest("http://app.test/api/django/tracks", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body,
+    });
+
+    const response = await POST(request, {
+      params: Promise.resolve({ path: ["tracks"] }),
+    });
+
+    await expect(response.json()).resolves.toEqual({
+      detail: "The app server could not be reached. Please try again.",
+    });
+    expect(response.status).toBe(502);
+    expect(response.headers.get("content-type")).toContain("application/json");
+  });
 });

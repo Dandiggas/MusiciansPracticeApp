@@ -76,7 +76,21 @@ describe("AddTrackForm", () => {
     expect(mockCreateTrack).not.toHaveBeenCalled();
   });
 
-  it("submits the expected payload for a valid YouTube track", async () => {
+  it.each([
+    ["https://youtu.be/fQOXsG8YxvM", "https://www.youtube.com/watch?v=fQOXsG8YxvM"],
+    [
+      "https://youtu.be/fQOXsG8YxvM?si=share-token",
+      "https://www.youtube.com/watch?v=fQOXsG8YxvM",
+    ],
+    [
+      "https://www.youtube.com/watch?v=fQOXsG8YxvM",
+      "https://www.youtube.com/watch?v=fQOXsG8YxvM",
+    ],
+    [
+      "https://youtube.com/shorts/fQOXsG8YxvM",
+      "https://www.youtube.com/watch?v=fQOXsG8YxvM",
+    ],
+  ])("normalizes a valid YouTube URL before submit: %s", async (url, expectedUrl) => {
     const user = userEvent.setup();
     const onTrackCreated = jest.fn();
     mockCreateTrack.mockResolvedValue(buildTrack());
@@ -91,7 +105,7 @@ describe("AddTrackForm", () => {
 
     await user.click(screen.getByRole("button", { name: /add track/i }));
     await user.type(screen.getByLabelText(/track name/i), "Praise on Demand");
-    await user.type(screen.getByLabelText(/youtube url/i), "https://youtu.be/abc");
+    await user.type(screen.getByLabelText(/youtube url/i), url);
     await user.type(screen.getByLabelText(/bpm/i), "90");
     await user.click(screen.getByRole("button", { name: /save track/i }));
 
@@ -102,11 +116,57 @@ describe("AddTrackForm", () => {
     expect(formData.get("name")).toBe("Praise on Demand");
     expect(formData.get("source_type")).toBe("youtube");
     expect(formData.get("position")).toBe("0");
-    expect(formData.get("youtube_url")).toBe("https://youtu.be/abc");
+    expect(formData.get("youtube_url")).toBe(expectedUrl);
     expect(formData.get("bpm")).toBe("90");
 
     await waitFor(() => expect(onTrackCreated).toHaveBeenCalledWith(buildTrack()));
     expect(screen.getByRole("button", { name: /add track/i })).toBeInTheDocument();
+  });
+
+  it("shows a validation error before submit for unrecognized YouTube URLs", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AddTrackForm
+        sessionId={7}
+        insertPosition={0}
+        onTrackCreated={jest.fn()}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: /add track/i }));
+    await user.type(screen.getByLabelText(/track name/i), "Praise on Demand");
+    await user.type(screen.getByLabelText(/youtube url/i), "https://example.com/video");
+    await user.click(screen.getByRole("button", { name: /save track/i }));
+
+    expect(
+      await screen.findByText("Paste a normal YouTube link, e.g. https://youtu.be/...")
+    ).toBeInTheDocument();
+    expect(mockCreateTrack).not.toHaveBeenCalled();
+  });
+
+  it("maps raw network failures to a human save error", async () => {
+    const user = userEvent.setup();
+    mockCreateTrack.mockRejectedValue(new Error("Failed to fetch"));
+
+    render(
+      <AddTrackForm
+        sessionId={7}
+        insertPosition={0}
+        onTrackCreated={jest.fn()}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: /add track/i }));
+    await user.type(screen.getByLabelText(/track name/i), "Praise on Demand");
+    await user.type(screen.getByLabelText(/youtube url/i), "https://youtu.be/fQOXsG8YxvM");
+    await user.click(screen.getByRole("button", { name: /save track/i }));
+
+    expect(
+      await screen.findByText(
+        "We couldn't save this track because the app server didn't respond. Please try again."
+      )
+    ).toBeInTheDocument();
   });
 
   it("submits the expected payload for a valid file track", async () => {
