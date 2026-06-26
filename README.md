@@ -1,280 +1,243 @@
-# Musicians Practice App
+# The Shed
 
-A full-stack web application for musicians to track, analyze, and improve their practice sessions. Built with Django REST Framework and Next.js 15.
+The Shed is a browser-based practice workbench for musicians.
 
-## Features
+It is not just a generic practice timer anymore. The current product is built around sessions: each session holds the songs, charts, reference audio, licks, takes, notes, BPM, metronome/tuner context, and practice material for a piece of work you want to come back to.
 
-### Practice Tracking
-- **Real-time Practice Timer** - Start/stop timer with live duration tracking
-- **Session Management** - Full CRUD operations for practice sessions
-- **Tag System** - Organize sessions with custom colored tags
-- **Multiple Instruments** - Track practice across different instruments
+Status: active beta / tester-ready work in progress. The app is usable, but broader production launch still needs durable media storage, a live smoke test, onboarding polish, and observability.
 
-### Analytics & Insights
-- **Dashboard Stats** - Total hours, weekly practice, current streak, favorite instrument
-- **Calendar Heatmap** - 365-day practice activity visualization
-- **Instrument Breakdown** - Pie chart showing time distribution across instruments
-- **Practice Trends** - Line chart tracking session duration over time
+## What it does now
 
-### User Experience
-- **User Authentication** - Secure registration and login with token-based auth
-- **Dark/Light Mode** - Theme toggle with system preference detection
-- **Responsive Design** - Mobile-friendly UI built with Tailwind CSS
-- **Interactive Charts** - Dynamic visualizations using Chart.js
+### Session workbench
 
-## Tech Stack
+- Create named practice sessions.
+- Add ordered tracks to a session.
+- Supported track sources:
+  - YouTube links
+  - MP3/audio uploads
+  - PDF charts/sheet music
+  - Image charts/screenshots
+- Reorder tracks inside a session.
+- Edit track name, BPM, and notes.
+- Keep each session's practice material together instead of scattering links and files.
+
+### Practice tools
+
+- Built-in metronome with BPM, tap tempo, time signature, volume, and beat display.
+- Built-in tuner using the browser microphone and Web Audio pitch detection.
+- Standalone metronome and tuner pages are also available.
+- Session tools read the selected track BPM so the workbench stays contextual.
+
+### YouTube and audio practice
+
+- Normalizes common YouTube URLs before saving.
+- Embedded YouTube practice player for YouTube tracks.
+- MP3/audio player for uploaded audio tracks.
+- Lick/loop support for audio-style practice sections.
+
+### Charts, sheets, and media
+
+- PDF/image tracks render in the workbench.
+- Uploaded media is attached to the track it belongs to.
+- Upload validation is enforced on the backend by source type and file extension.
+
+### Takes
+
+- Record and save takes against a track.
+- Supports audio, video, and video+audio capture modes where the browser supports them.
+- Takes can be renamed; recorded files stay attached to the track.
+
+### Accounts and admin
+
+- Django/allauth-backed registration and login.
+- Email verification flow.
+- Password reset flow.
+- Account settings and self-delete support.
+- Staff/admin user management page for removing test users.
+- Auth routes are proxied through Next.js so the frontend can work with the Django API cleanly.
+
+### Production hardening already in place
+
+- Environment-driven Django settings.
+- `DEBUG=False` by default outside development.
+- Configurable `ALLOWED_HOSTS`, CORS, and CSRF trusted origins.
+- Secure cookie settings for production.
+- Login/register/password-reset/email-verification rate limiting.
+- Upload size/type validation for tracks and takes.
+- Django deployment checks.
+- CI workflows for backend and frontend tests.
+
+## Current navigation
+
+The main app surfaces are:
+
+- `/sessions` — The Shed practice workbench and session list
+- `/sessions/[id]` — session detail with tracks, players, sheets, takes, metronome, and tuner
+- `/metronome` — standalone metronome
+- `/tuner` — standalone tuner
+- `/account` — account settings
+- `/admin` — staff-only test user/admin management
+- `/login`, `/register`, `/password-reset`, `/auth/verify/...` — auth flows
+
+Older routes such as `/dashboard`, `/practice-timer`, `/profilepage`, `/recommendations`, and `/youtube-practice` now redirect back to `/sessions`. Some legacy components still exist in the repo, but the current product loop is the session workbench.
+
+## Tech stack
 
 ### Backend
-- Django 5.1.4
-- Django REST Framework 3.15.2
-- PostgreSQL (production) / SQLite (development)
-- dj-rest-auth + django-allauth for authentication
-- OpenAI API integration for practice recommendations
-- drf-spectacular for API documentation
+
+- Python 3.10+
+- Django 5.1
+- Django REST Framework
+- dj-rest-auth + django-allauth
+- PostgreSQL in production / configurable local database
+- Gunicorn + WhiteNoise for production serving
+- drf-spectacular for OpenAPI/Swagger docs
 
 ### Frontend
-- Next.js 15 (App Router)
+
+- Next.js 15 App Router
+- React 19
 - TypeScript
-- Tailwind CSS
-- shadcn/ui components
-- Chart.js + react-chartjs-2
-- Axios for API calls
+- Tailwind CSS 4
+- Radix/shadcn-style UI primitives
+- Phosphor icons
+- Web Audio API for metronome and tuner
+- Jest + React Testing Library
+- Playwright for e2e coverage
 
-### DevOps
-- Docker & Docker Compose
-- CORS enabled for API access
+### Deployment/devops
 
-## Project Structure
+- Docker / Docker Compose support
+- Railway-oriented deployment files
+- GitHub Actions workflows
+- Next.js standalone build output
 
-```
+## Repository structure
+
+```text
 MusiciansPracticeApp/
-├── django_project/          # Django settings & configuration
-├── accounts/                # User authentication app
-│   └── models.py           # CustomUser model
-├── session/                 # Practice session app
-│   ├── models.py           # Session & Tag models
-│   ├── views.py            # API endpoints
-│   ├── serializers.py      # DRF serializers
-│   └── urls.py             # API routes
-├── frontend/next-app/       # Next.js 15 frontend
-│   ├── src/app/            # App router pages
-│   ├── src/components/     # React components
-│   └── src/providers/      # Theme provider
-├── manage.py               # Django CLI
-├── requirements.txt        # Python dependencies
-├── docker-compose.yml      # Docker configuration
-└── .env                    # Environment variables (not in repo)
+├── accounts/                  # users, auth, email verification, rate limiting, self-delete
+├── django_project/            # Django settings, URLs, startup/deploy checks
+├── session/                   # sessions, tracks, licks, takes API and tests
+├── frontend/next-app/         # Next.js app
+│   ├── src/app/               # app routes
+│   ├── src/components/        # session workbench, auth, admin, tools, UI
+│   ├── src/hooks/             # transport/loop hooks
+│   ├── src/lib/               # API clients, audio engines, utilities
+│   └── e2e/                   # Playwright tests
+├── docs/                      # older plans, visual direction, implementation notes
+├── TODOS.md                   # current launch/product follow-ups
+├── PRODUCTION_SECURITY_SUMMARY.md
+├── RAILWAY_DEPLOYMENT.md
+├── docker-compose.yml
+├── Dockerfile
+└── requirements.txt
 ```
 
-## Installation & Setup
+## API shape
+
+All app API routes sit under `/api/v1/`.
+
+Current core endpoints:
+
+- `GET/POST /api/v1/sessions/`
+- `GET/PATCH/DELETE /api/v1/sessions/<id>/`
+- `POST /api/v1/sessions/<id>/reorder-tracks/`
+- `GET/POST /api/v1/tracks/`
+- `GET/PATCH/DELETE /api/v1/tracks/<id>/`
+- `POST /api/v1/tracks/<id>/reorder-licks/`
+- `GET/POST /api/v1/licks/`
+- `GET/PATCH/DELETE /api/v1/licks/<id>/`
+- `GET/POST /api/v1/takes/`
+- `GET/PATCH/DELETE /api/v1/takes/<id>/`
+- `GET /api/v1/takes/<id>/file/`
+- `GET /api/v1/current-user/`
+- `DELETE /api/v1/account/`
+- `GET /api/schema/swagger-ui/`
+
+Auth is provided through dj-rest-auth/allauth routes under `/api/v1/dj-rest-auth/`, with custom throttled wrappers for login, registration, email verification resend, and password reset.
+
+## Local development
 
 ### Prerequisites
+
 - Python 3.10+
-- Node.js 18+
-- PostgreSQL (for production) or SQLite (for development)
-- Docker (optional)
+- Node.js 20+ recommended
+- PostgreSQL if you are not using SQLite/local defaults
+- Docker optional
 
-### Local Development Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Dandiggas/MusiciansPracticeApp
-   cd MusiciansPracticeApp
-   ```
-
-2. **Set up environment variables**
-
-   Create a `.env` file in the root directory:
-   ```bash
-   SECRET_KEY=your-django-secret-key
-   OPENAI_API_KEY=your-openai-api-key  # Optional
-   ```
-
-3. **Backend Setup**
-   ```bash
-   # Create virtual environment
-   python3 -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-   # Install dependencies
-   pip install -r requirements.txt
-
-   # Run migrations
-   python3 manage.py migrate
-
-   # Create superuser (for admin access)
-   python3 manage.py createsuperuser
-
-   # Start Django server
-   python3 manage.py runserver
-   ```
-
-4. **Frontend Setup**
-   ```bash
-   # In a new terminal
-   cd frontend/next-app
-
-   # Install dependencies
-   npm install
-
-   # Start development server
-   npm run dev
-   ```
-
-5. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000/api/v1/
-   - Admin Panel: http://localhost:8000/admin
-   - API Docs: http://localhost:8000/api/schema/swagger-ui/
-
-### Docker Setup (Alternative)
+### Backend
 
 ```bash
-# Start both Django and PostgreSQL
-docker-compose up
-
-# Run migrations
-docker-compose exec web python manage.py migrate
-
-# Create superuser
-docker-compose exec web python manage.py createsuperuser
+cd MusiciansPracticeApp
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
 ```
 
-Then start the Next.js frontend separately:
+Backend defaults to `http://localhost:8000`.
+
+### Frontend
+
 ```bash
 cd frontend/next-app
 npm install
 npm run dev
 ```
 
-## API Endpoints
+Frontend defaults to `http://localhost:3000`.
 
-### Authentication
-- `POST /api/v1/dj-rest-auth/login/` - User login
-- `POST /api/v1/dj-rest-auth/registration/` - User registration
-- `POST /api/v1/logout/` - User logout
+For local frontend-to-backend calls, set the frontend environment to point at Django if needed:
 
-### Practice Sessions
-- `GET /api/v1/` - List all sessions
-- `POST /api/v1/` - Create new session
-- `GET /api/v1/<id>/` - Get session details
-- `PUT /api/v1/<id>/` - Update session
-- `DELETE /api/v1/<id>/` - Delete session
-
-### Tags
-- `GET /api/v1/tags/` - List all tags
-- `POST /api/v1/tags/` - Create new tag
-- `DELETE /api/v1/tags/<id>/` - Delete tag
-
-### Analytics
-- `GET /api/v1/stats/` - User practice statistics
-- `GET /api/v1/calendar/?days=365` - Calendar heatmap data
-- `GET /api/v1/by-instrument/?days=30` - Instrument breakdown
-
-### Practice Timer
-- `POST /api/v1/timer/start/` - Start practice timer
-- `POST /api/v1/timer/<id>/stop/` - Stop timer and save session
-- `GET /api/v1/timer/active/` - Get active timer status
-
-### Other
-- `POST /api/v1/recommendations/` - Get AI practice recommendations
-- `GET /api/v1/current-user/` - Get current user info
-
-For complete API documentation, visit the Swagger UI at http://localhost:8000/api/schema/swagger-ui/
-
-## Database Models
-
-### CustomUser
-Extends Django's `AbstractUser` with additional fields:
-- `name` - User's display name
-
-### Session
-Practice session model:
-- `user` - Foreign key to CustomUser
-- `instrument` - Instrument name
-- `duration` - Practice duration
-- `description` - Session description
-- `session_date` - Date of practice
-- `display_id` - User-specific session ID
-- `skill_level` - Beginner/Intermediate/Advanced
-- `instrument_preference` - Primary instrument
-- `goals` - Practice goals
-- `in_progress` - Active timer flag
-- `started_at` - Timer start timestamp
-- `paused_duration` - Cumulative pause time
-- `tags` - Many-to-many relationship with Tag
-
-### Tag
-Custom tags for organizing sessions:
-- `name` - Tag name (unique per user)
-- `color` - Hex color code
-- `user` - Foreign key to CustomUser
-
-## Development
-
-### Running Tests
 ```bash
-# Backend tests
-python3 manage.py test
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-# Frontend tests (if configured)
+Use `.env.example` as the backend environment template.
+
+## Tests and verification
+
+Backend:
+
+```bash
+python manage.py test
+python manage.py check --deploy
+```
+
+Frontend:
+
+```bash
 cd frontend/next-app
 npm test
+npm run build
+npm run test:e2e
 ```
 
-### Database Migrations
-```bash
-# Create new migrations
-python3 manage.py makemigrations
+The current test suite covers backend session/track/lick/take/auth behavior plus frontend auth, session workbench, account, admin, API proxy, and selected e2e flows.
 
-# Apply migrations
-python3 manage.py migrate
+## Current launch blockers
 
-# Show migration status
-python3 manage.py showmigrations
-```
+Before a broader public launch:
 
-### Admin Panel
-Create a superuser to access the Django admin:
-```bash
-python3 manage.py createsuperuser
-```
-Then visit http://localhost:8000/admin
+- Move uploaded tracks/takes/charts to durable storage or confirm a persistent Railway volume is enough for the beta.
+- Run a live smoke test on the deployed domain: register, verify email, login, reset password, create session, upload media, record take, delete account, admin delete.
+- Add basic observability/error tracking.
+- Improve first-run onboarding so a new musician knows what to add first.
+- Add a proper public landing page, screenshots, domain, and social preview metadata.
+- Expand e2e coverage around uploads, recording, account settings, admin, email verification, and password reset.
 
-## Roadmap
+See `TODOS.md` for the current follow-up list.
 
-### Planned Features
-- [ ] Timer pause/resume functionality
-- [ ] Practice recommendations integration (frontend)
-- [ ] Session filtering and search
-- [ ] User profile editing
-- [ ] Email verification
-- [ ] Password reset functionality
-- [ ] Social authentication
-- [ ] Practice goal tracking
-- [ ] Achievement system
-- [ ] Export practice data (CSV/PDF)
+## What this repo is not anymore
 
-### Technical Improvements
-- [ ] Add comprehensive test coverage
-- [ ] Set up CI/CD pipeline
-- [ ] Production environment configuration
-- [ ] Performance optimization
-- [ ] Error tracking (Sentry)
-- [ ] Analytics integration
-
-## Contributing
-
-This is a personal project, but suggestions and feedback are welcome! Feel free to open an issue or submit a pull request.
+Older docs and component names still reference a broad analytics dashboard, standalone practice timer, AI recommendations page, and profile page. Those are not the current product centre. The current direction is The Shed: a musician's session workbench for saving practice material, drilling sections, using built-in tools, and reviewing takes.
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+No license file is currently committed. Add one before treating this as reusable open-source software.
 
-## Contact
+## Author
 
-Created by [Dandiggas](https://github.com/Dandiggas)
-
----
-
-**Note:** This is a work in progress. Some features may be incomplete or under development.
+Built by [Dandiggas](https://github.com/Dandiggas).
