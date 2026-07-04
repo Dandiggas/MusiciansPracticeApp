@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
+import { CaretRight, MusicNotes } from "@phosphor-icons/react/dist/ssr";
 
 import { SessionSummary } from "@/types/session";
 
@@ -6,40 +8,38 @@ import { SessionSummary } from "@/types/session";
 export function SessionList({ sessions }: { sessions: SessionSummary[] }) {
   if (sessions.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-10 text-center">
-        <h2 className="text-xl font-bold text-foreground">No sessions yet</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Create your first session and start collecting the songs and licks
-          you are working on in one place.
+      <div className="rounded-2xl border border-dashed border-border bg-muted/30 px-10 py-14 text-center">
+        <MusicNotes size={28} className="mx-auto text-muted-foreground" aria-hidden />
+        <h2 className="mt-4 text-xl font-bold text-foreground">The bench is clear</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          Name your first session in the panel above — the songs, BPMs, and
+          licks you practise will collect there, ready for next time.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
       {sessions.map((session) => (
         <Link
           key={session.id}
           href={`/sessions/${session.id}`}
-          className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-colors hover:border-primary/40 hover:bg-card/90"
+          className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-primary/5 active:bg-primary/10"
         >
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-bold text-foreground">{session.name}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Updated{" "}
-                {new Intl.DateTimeFormat("en-GB", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                }).format(new Date(session.updated_at))}
-              </p>
-            </div>
-            <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-              Open
-            </span>
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-semibold text-foreground">
+              {session.name}
+            </h2>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              Updated {formatDistanceToNow(new Date(session.updated_at), { addSuffix: true })}
+            </p>
           </div>
+          <CaretRight
+            size={18}
+            aria-hidden
+            className="shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-primary"
+          />
         </Link>
       ))}
     </div>
