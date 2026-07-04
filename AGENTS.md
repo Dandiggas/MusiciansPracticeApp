@@ -15,3 +15,8 @@ Django backend + Next.js frontend, deployed on Railway (prod). Real testers are 
 
 ## State
 - `STATE.md` in this repo is the session handoff: update it at the end of every working session (shipped / open / issue refs). Read it before any "where are we at" repo pass.
+
+## Prod smoke (issue #34 — BUILT 2026-07-04)
+`cd frontend/next-app && npm run smoke` — real-stack flow: login → create session → add track → recorder mounts → delete session. Local default (demo/Practice123! on :3000/:8001).
+Prod: `BASE_URL=https://<railway-app> SMOKE_USER=<smoke user> SMOKE_PASS=<pass> npm run smoke` (needs a pre-verified smoke account on prod — create once, keep creds in env, never in chat).
+Rule 2 of this file: run this after EVERY deploy and report its output before saying "done".
