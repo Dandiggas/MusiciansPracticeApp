@@ -88,42 +88,44 @@
 }
 
 .dark {
-  --background: #191919;
-  --foreground: #ededec;
-  --card: #252525;
-  --card-foreground: #ededec;
-  --popover: #2a2a2a;
-  --popover-foreground: #ededec;
-  --primary: #2dd4bf;
-  --primary-foreground: #0f1513;
-  --secondary: #2f2f2f;
-  --secondary-foreground: #ededec;
-  --muted: #2f2f2f;
-  --muted-foreground: #ababab;
-  --accent: #2f2f2f;
-  --accent-foreground: #ededec;
-  --destructive: #f87171;
+  /* Warm-dark studio surfaces (see .impeccable.md): charcoal with a warm
+     undertone, not neutral gray. One restrained teal accent does the work. */
+  --background: #16130f;
+  --foreground: #ece7e1;
+  --card: #1f1b16;
+  --card-foreground: #ece7e1;
+  --popover: #26211b;
+  --popover-foreground: #ece7e1;
+  --primary: #3aa392;
+  --primary-foreground: #07120f;
+  --secondary: #2a251f;
+  --secondary-foreground: #ece7e1;
+  --muted: #2a251f;
+  --muted-foreground: #a89f94;
+  --accent: #2a251f;
+  --accent-foreground: #ece7e1;
+  --destructive: #e0776f;
   --destructive-foreground: #1a0a0a;
-  --border: rgba(255, 255, 255, 0.12);
-  --input: rgba(255, 255, 255, 0.12);
-  --ring: #14B8A6;
+  --border: rgba(236, 227, 213, 0.12);
+  --input: rgba(236, 227, 213, 0.12);
+  --ring: #3aa392;
   --warm: #c4972f;
   --warm-foreground: #ffffff;
   --success: #4dab9a;
   --success-foreground: #ffffff;
-  --chart-1: #14B8A6;
+  --chart-1: #3aa392;
   --chart-2: #c4972f;
   --chart-3: #4dab9a;
-  --chart-4: #9065c0;
-  --chart-5: #d9730d;
-  --sidebar: #191919;
-  --sidebar-foreground: #e3e2e0;
-  --sidebar-primary: #14B8A6;
+  --chart-4: #8f7bb0;
+  --chart-5: #c97a3a;
+  --sidebar: #16130f;
+  --sidebar-foreground: #e3ddd5;
+  --sidebar-primary: #3aa392;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2f2f2f;
-  --sidebar-accent-foreground: #e3e2e0;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #14B8A6;
+  --sidebar-accent: #2a251f;
+  --sidebar-accent-foreground: #e3ddd5;
+  --sidebar-border: rgba(236, 227, 213, 0.08);
+  --sidebar-ring: #3aa392;
 }
 
 @layer base {
