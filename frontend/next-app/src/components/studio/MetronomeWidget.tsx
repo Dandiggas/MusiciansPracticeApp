@@ -122,7 +122,7 @@ export default function MetronomeWidget({
         {TIME_SIGNATURES.map((ts) => (
           <Button
             key={ts.label}
-            variant={beatsPerMeasure === ts.beats ? "default" : "secondary"}
+            variant={beatsPerMeasure === ts.beats ? "selected" : "secondary"}
             size="sm"
             className="rounded-lg text-xs h-8 transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             onClick={() => onBeatsPerMeasureChange(ts.beats)}

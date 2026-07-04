@@ -151,7 +151,7 @@ export function TrackPane({
                 <Button type="button" onClick={() => void handleSave()} disabled={!isDirty || isSaving}>
                   {isSaving ? "Saving..." : "Save Track"}
                 </Button>
-                <Button type="button" variant="destructive" onClick={() => void handleDelete()} disabled={isDeleting}>
+                <Button type="button" variant="destructiveOutline" onClick={() => void handleDelete()} disabled={isDeleting}>
                   {isDeleting ? "Deleting..." : "Delete"}
                 </Button>
               </div>

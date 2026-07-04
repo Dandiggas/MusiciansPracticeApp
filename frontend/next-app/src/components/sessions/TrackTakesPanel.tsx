@@ -552,7 +552,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
                 </Button>
                 <Button
                   type="button"
-                  variant="destructive"
+                  variant="destructiveOutline"
                   onClick={stopRecording}
                   disabled={!isRecording}
                 >
@@ -567,7 +567,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
                 <Button
                   key={captureMode}
                   type="button"
-                  variant={mode === captureMode ? "default" : "secondary"}
+                  variant={mode === captureMode ? "selected" : "secondary"}
                   size="sm"
                   onClick={() => setMode(captureMode)}
                   disabled={isPreparing || isRecording || isUploading}

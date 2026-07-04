@@ -212,7 +212,7 @@ export default function TakeRecorder() {
       <div className="flex items-center gap-2">
         <Button
           type="button"
-          variant={mode === "audio" ? "default" : "outline"}
+          variant={mode === "audio" ? "selected" : "outline"}
           className={cn(
             "h-10 rounded-full px-4 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
             mode === "audio"
@@ -227,7 +227,7 @@ export default function TakeRecorder() {
         </Button>
         <Button
           type="button"
-          variant={mode === "video" ? "default" : "outline"}
+          variant={mode === "video" ? "selected" : "outline"}
           className={cn(
             "h-10 rounded-full px-4 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
             mode === "video"
@@ -358,7 +358,7 @@ export default function TakeRecorder() {
                 <Button
                   type="button"
                   onClick={stopRecording}
-                  variant="destructive"
+                  variant="destructiveOutline"
                   className="h-11 w-full rounded-2xl"
                 >
                   <Square size={20} weight="regular" className="mr-2" />

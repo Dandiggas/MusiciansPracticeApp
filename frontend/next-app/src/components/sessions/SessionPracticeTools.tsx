@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { MetronomeEngine } from "@/lib/audio/metronome-engine";
 import { detectPitch } from "@/lib/audio/pitch-detector";
 import { frequencyToNote, type NoteInfo } from "@/lib/audio/note-utils";
-import { cn } from "@/lib/utils";
 
 
 type PracticeTool = "metronome" | "tuner";
@@ -210,8 +209,8 @@ export function SessionPracticeTools({
           <Button
             type="button"
             size="sm"
-            variant={activeTool === "metronome" ? "default" : "secondary"}
-            className={cn("w-full", activeTool === "metronome" ? "bg-primary text-primary-foreground" : "")}
+            variant={activeTool === "metronome" ? "selected" : "secondary"}
+            className="w-full"
             onClick={() => setActiveTool("metronome")}
           >
             <Metronome size={16} weight="bold" />
@@ -220,8 +219,8 @@ export function SessionPracticeTools({
           <Button
             type="button"
             size="sm"
-            variant={activeTool === "tuner" ? "default" : "secondary"}
-            className={cn("w-full", activeTool === "tuner" ? "bg-primary text-primary-foreground" : "")}
+            variant={activeTool === "tuner" ? "selected" : "secondary"}
+            className="w-full"
             onClick={() => setActiveTool("tuner")}
           >
             <Microphone size={16} weight="bold" />
