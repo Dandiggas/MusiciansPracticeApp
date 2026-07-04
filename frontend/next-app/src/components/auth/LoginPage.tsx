@@ -143,15 +143,15 @@ const LoginPage = () => {
       icon: Clock,
       title: "Build consistency",
       desc: "Short sessions still matter when the setup is ready the moment you sit down.",
-      color: "text-warm",
-      bg: "bg-warm/[0.1] dark:bg-warm/[0.15]",
+      color: "text-primary",
+      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
     },
     {
       icon: Sparkle,
       title: "Plan when you need it",
       desc: "Recommendations stay available without getting in the way of practice.",
-      color: "text-success",
-      bg: "bg-success/[0.1] dark:bg-success/[0.15]",
+      color: "text-primary",
+      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
     },
   ];
 
