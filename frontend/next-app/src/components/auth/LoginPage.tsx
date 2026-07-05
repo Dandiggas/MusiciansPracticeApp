@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Clock, Eye, EyeSlash, MusicNote, Sparkle } from "@phosphor-icons/react";
-import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
+import { ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
+import { MotionDiv } from "@/components/ui/motion-wrapper";
 
 const resendEmailPath = "/api/django/dj-rest-auth/registration/resend-email/";
 
@@ -131,30 +132,6 @@ const LoginPage = () => {
     }
   };
 
-  const features = [
-    {
-      icon: MusicNote,
-      title: "Resume your setup",
-      desc: "Jump back into the last instrument, media source, and flow.",
-      color: "text-primary",
-      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
-    },
-    {
-      icon: Clock,
-      title: "Build consistency",
-      desc: "Short sessions still matter when the setup is ready the moment you sit down.",
-      color: "text-primary",
-      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
-    },
-    {
-      icon: Sparkle,
-      title: "Plan when you need it",
-      desc: "Recommendations stay available without getting in the way of practice.",
-      color: "text-primary",
-      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
-    },
-  ];
-
   return (
     <div className="min-h-[100dvh] bg-background">
       <div className="container mx-auto flex min-h-[100dvh] items-center px-4 py-16 md:px-8">
@@ -169,31 +146,31 @@ const LoginPage = () => {
           >
             <p className="text-sm font-medium text-muted-foreground">Welcome back</p>
 
-            <h1 className="mt-4 text-3xl font-bold tracking-tight leading-snug text-foreground md:text-[42px]">
-              Practice makes permanent.{" "}
-              <span className="text-muted-foreground">Intentional practice makes progress.</span>
+            <h1 className="mt-4 text-4xl font-black leading-[0.98] tracking-tighter text-foreground md:text-6xl">
+              Pick up where you left off.
             </h1>
 
-            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-              Log in, reopen your last session, and get back to focused work
-              without rebuilding your setup from scratch.
+            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
+              The bench is how you left it: tracks, tempos, loops, and takes
+              still in place.
             </p>
 
-            <StaggerReveal className="mt-10 space-y-2">
-              {features.map((f) => (
-                <StaggerItem key={f.title}>
-                  <div className="flex items-start gap-3.5 rounded-lg p-3 transition-colors duration-200 hover:bg-muted/60">
-                    <div className={`flex-shrink-0 rounded-lg ${f.bg} p-2`}>
-                      <f.icon size={16} weight="regular" className={f.color} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{f.title}</p>
-                      <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">{f.desc}</p>
-                    </div>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerReveal>
+            <div className="relative mt-12 hidden max-w-md xl:block">
+              <Image
+                src="/landing/tracks-rail.png"
+                alt="A session's track list in The Shed"
+                width={640}
+                height={582}
+                className="w-[70%] rounded-2xl border border-border/60 shadow-[0_30px_70px_-35px_rgba(0,0,0,0.7)]"
+              />
+              <Image
+                src="/landing/metronome-card.png"
+                alt="The metronome that lives inside every session"
+                width={680}
+                height={928}
+                className="absolute -bottom-8 right-0 w-[46%] rotate-2 rounded-2xl border border-border/60 shadow-[0_35px_80px_-35px_rgba(0,0,0,0.8)]"
+              />
+            </div>
           </MotionDiv>
 
           {/* Right — Login form (order-1 on mobile) */}

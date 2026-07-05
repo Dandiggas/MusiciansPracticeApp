@@ -132,15 +132,15 @@ const RegisterPage = () => {
       icon: Clock,
       title: "Session history",
       desc: "Track streaks, hours, and progress over time with charts and heatmaps.",
-      color: "text-warm",
-      bg: "bg-warm/[0.1] dark:bg-warm/[0.15]",
+      color: "text-primary",
+      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
     },
     {
       icon: Sparkle,
       title: "AI recommendations",
       desc: "Get practice plans tailored to your instrument and skill level.",
-      color: "text-success",
-      bg: "bg-success/[0.1] dark:bg-success/[0.15]",
+      color: "text-primary",
+      bg: "bg-primary/[0.1] dark:bg-primary/[0.15]",
     },
   ];
 
@@ -162,7 +162,7 @@ const RegisterPage = () => {
               New to The Shed
             </div>
 
-            <h1 className="mt-6 text-4xl font-bold tracking-tighter leading-[0.95] text-foreground md:text-6xl">
+            <h1 className="mt-6 text-4xl font-black tracking-tighter leading-[0.95] text-foreground md:text-6xl">
               Your setup stays ready.{" "}
               <span className="text-muted-foreground">
                 Just sit down and play.
