@@ -23,6 +23,7 @@ export function Header() {
   const [showAdmin, setShowAdmin] = React.useState(false);
 
   const isAuthPage =
+    pathname === "/" ||
     pathname === "/login" ||
     pathname === "/register" ||
     pathname.startsWith("/password-reset");
