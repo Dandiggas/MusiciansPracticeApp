@@ -10,7 +10,7 @@ import LogoutButton from "@/components/practice/LogoutButton";
 import type { CurrentUser } from "@/types/admin";
 
 const baseNavigation = [
-  { name: "The Shed", href: "/sessions" },
+  { name: "Sessions", href: "/sessions" },
   { name: "Metronome", href: "/metronome" },
   { name: "Tuner", href: "/tuner" },
   { name: "Account", href: "/account" },
@@ -23,6 +23,7 @@ export function Header() {
   const [showAdmin, setShowAdmin] = React.useState(false);
 
   const isAuthPage =
+    pathname === "/" ||
     pathname === "/login" ||
     pathname === "/register" ||
     pathname.startsWith("/password-reset");
@@ -81,9 +82,9 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex h-14 items-center transition-colors hover:text-foreground",
-                  pathname === item.href
-                    ? "text-foreground"
+                  "relative flex h-14 items-center transition-colors hover:text-foreground",
+                  pathname === item.href || pathname.startsWith(item.href + "/")
+                    ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-primary"
                     : "text-muted-foreground"
                 )}
               >

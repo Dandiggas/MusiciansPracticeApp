@@ -14,7 +14,7 @@ export default async function SessionsPage() {
           <p className="text-sm font-medium uppercase tracking-[0.12em] text-muted-foreground">
             Sessions
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-foreground">
+          <h1 className="mt-2 text-4xl font-black leading-[0.98] tracking-tighter text-foreground md:text-5xl">
             Your practice workbench
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">

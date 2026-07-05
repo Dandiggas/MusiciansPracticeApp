@@ -227,7 +227,7 @@ export function SessionWorkbench({ session }: { session: SessionDetail }) {
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 Empty session
               </p>
-              <h2 className="mt-3 text-2xl font-black tracking-tight text-foreground">
+              <h2 className="mt-3 text-3xl font-black leading-[0.98] tracking-tighter text-foreground md:text-4xl">
                 Add your first practice item
               </h2>
               <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
