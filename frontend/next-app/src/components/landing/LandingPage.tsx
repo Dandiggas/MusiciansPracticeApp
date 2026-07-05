@@ -118,7 +118,7 @@ export function LandingPage() {
           className="relative mx-auto w-full max-w-xl lg:max-w-none"
         >
           <div className="relative">
-            <div className="overflow-hidden rounded-2xl border border-[#ece3d5]/[0.12] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)]">
+            <div className="relative overflow-hidden rounded-2xl border border-[#ece3d5]/[0.12] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)]">
               {reduce ? (
                 <Image
                   src="/landing/room-poster.jpg"
@@ -142,6 +142,15 @@ export function LandingPage() {
                   <source src="/landing/room.mp4" type="video/mp4" />
                 </video>
               )}
+              {/* Scrim: seats the warm footage into the dark page without flattening it */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(22,19,15,0.42)_100%)] shadow-[inset_0_0_0_1px_rgba(236,227,213,0.06)]"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 rounded-b-2xl bg-gradient-to-t from-[#16130f]/55 to-transparent"
+              />
             </div>
             <Image
               src="/landing/metronome-card.png"
