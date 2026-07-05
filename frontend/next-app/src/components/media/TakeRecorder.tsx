@@ -11,7 +11,6 @@ import {
   Video,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { MotionDiv } from "@/components/ui/motion-wrapper";
 import { AnimatePresence } from "framer-motion";
 
@@ -213,12 +212,7 @@ export default function TakeRecorder() {
         <Button
           type="button"
           variant={mode === "audio" ? "selected" : "outline"}
-          className={cn(
-            "h-10 rounded-full px-4 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-            mode === "audio"
-              ? "bg-slate-950 text-white hover:bg-slate-800"
-              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-          )}
+          className="h-10 rounded-full px-4 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
           onClick={() => setMode("audio")}
           disabled={isRecording || isPreparing}
         >
@@ -228,12 +222,7 @@ export default function TakeRecorder() {
         <Button
           type="button"
           variant={mode === "video" ? "selected" : "outline"}
-          className={cn(
-            "h-10 rounded-full px-4 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-            mode === "video"
-              ? "bg-slate-950 text-white hover:bg-slate-800"
-              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-          )}
+          className="h-10 rounded-full px-4 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
           onClick={() => setMode("video")}
           disabled={isRecording || isPreparing}
         >
@@ -242,14 +231,14 @@ export default function TakeRecorder() {
         </Button>
       </div>
 
-      <div className="rounded-[1.75rem] border border-slate-200 bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(248,250,252,0.92))] p-4">
+      <div className="rounded-[1.75rem] border border-border/60 bg-card p-4">
         {isRecording && isVideoMode ? (
           <video
             ref={livePreviewRef}
             autoPlay
             playsInline
             muted
-            className="aspect-video w-full rounded-[1.25rem] border border-slate-200 bg-slate-950 object-cover"
+            className="aspect-video w-full rounded-[1.25rem] border border-border/60 bg-black object-cover"
           />
         ) : hasRecording ? (
           isVideoMode ? (
@@ -260,19 +249,19 @@ export default function TakeRecorder() {
               controls
               playsInline
               src={recordingUrl ?? undefined}
-              className="aspect-video w-full rounded-[1.25rem] border border-slate-200 bg-slate-950 object-cover"
+              className="aspect-video w-full rounded-[1.25rem] border border-border/60 bg-black object-cover"
             />
           ) : (
-            <div className="space-y-4 rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4">
+            <div className="space-y-4 rounded-[1.25rem] border border-border/60 bg-muted/30 p-4">
               <div className="flex items-center gap-3">
-                <div className="rounded-full bg-slate-950 p-3 text-white">
+                <div className="rounded-full bg-primary/[0.12] p-3 text-primary">
                   <Microphone size={20} weight="regular" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-sm font-semibold text-foreground">
                     Audio take ready for review
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Listen back to what you actually played.
                   </p>
                 </div>
@@ -288,9 +277,9 @@ export default function TakeRecorder() {
             </div>
           )
         ) : (
-          <div className="flex aspect-video items-center justify-center rounded-[1.25rem] border border-dashed border-slate-300 bg-slate-50 px-6 text-center">
+          <div className="flex aspect-video items-center justify-center rounded-[1.25rem] border border-dashed border-border bg-muted/30 px-6 text-center">
             <div className="space-y-3">
-              <div className="mx-auto w-fit rounded-full bg-slate-950 p-4 text-white">
+              <div className="mx-auto w-fit rounded-full bg-primary/[0.12] p-4 text-primary">
                 {isVideoMode ? (
                   <Video size={20} weight="regular" />
                 ) : (
@@ -298,12 +287,12 @@ export default function TakeRecorder() {
                 )}
               </div>
               <div>
-                <p className="font-semibold text-slate-900">
+                <p className="font-semibold text-foreground">
                   {isVideoMode
                     ? "Record a take with webcam and audio"
                     : "Record an audio take and listen back"}
                 </p>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Useful for hearing what you really sound like, not what you think you sound like.
                 </p>
               </div>
@@ -312,20 +301,20 @@ export default function TakeRecorder() {
         )}
       </div>
 
-      <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4">
+      <div className="rounded-[1.5rem] border border-border/60 bg-card/60 p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             {isRecording && (
               <span className="relative flex h-3 w-3 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-destructive" />
               </span>
             )}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 Status
               </p>
-              <p className="mt-1 text-sm text-slate-700">
+              <p className="mt-1 text-sm text-foreground">
                 {isRecording
                   ? "Recording now"
                   : hasRecording
@@ -334,13 +323,13 @@ export default function TakeRecorder() {
               </p>
             </div>
           </div>
-          <div className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm">
+          <div className="rounded-full bg-muted px-3 py-1 font-mono text-sm font-semibold text-foreground">
             {formatElapsed(elapsedSeconds)}
           </div>
         </div>
 
         {recordingError && (
-          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          <div className="mt-4 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
             {recordingError}
           </div>
         )}
@@ -379,7 +368,7 @@ export default function TakeRecorder() {
                     void startRecording();
                   }}
                   disabled={isPreparing}
-                  className="h-11 w-full rounded-2xl bg-slate-950 text-white hover:bg-slate-800"
+                  className="h-11 w-full rounded-2xl"
                 >
                   <Circle size={20} weight="regular" className="mr-2" />
                   {isPreparing ? "Preparing..." : "Start Recording"}
@@ -402,7 +391,7 @@ export default function TakeRecorder() {
                 type="button"
                 variant="secondary"
                 onClick={resetRecording}
-                className="h-11 rounded-2xl border border-slate-200 bg-slate-100 text-slate-800 shadow-none hover:bg-slate-200"
+                className="h-11 rounded-2xl shadow-none"
               >
                 <ArrowCounterClockwise size={20} weight="regular" className="mr-2" />
                 Record Another Take
@@ -411,7 +400,7 @@ export default function TakeRecorder() {
                 type="button"
                 asChild
                 variant="outline"
-                className="h-11 rounded-2xl border-slate-200 bg-white text-slate-800 hover:bg-slate-50"
+                className="h-11 rounded-2xl"
               >
                 <a
                   href={recordingUrl}

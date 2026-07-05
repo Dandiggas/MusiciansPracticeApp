@@ -15,28 +15,26 @@ interface StatsCardProps {
 
 export function StatsCard({ title, value, description, icon: Icon, trend }: StatsCardProps) {
   return (
-    <Card className="border-white/70 bg-white/86 shadow-[0_20px_70px_-55px_rgba(15,23,42,0.45)] backdrop-blur">
+    <Card className="border-border/60 bg-card shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             {title}
           </p>
         </div>
-        <div className="rounded-full bg-slate-100 p-2 text-slate-700">
+        <div className="rounded-full bg-muted p-2 text-muted-foreground">
           <Icon size={20} weight="regular" />
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-black tracking-tight text-slate-950">{value}</div>
+        <div className="text-3xl font-black tracking-tight text-foreground">{value}</div>
         {description && (
-          <p className="mt-2 text-sm text-slate-600">{description}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{description}</p>
         )}
         {trend && (
           <p
             className={`mt-2 text-xs font-semibold ${
-              trend.isPositive
-                ? "text-green-600 dark:text-green-400"
-                : "text-red-600 dark:text-red-400"
+              trend.isPositive ? "text-success" : "text-destructive"
             }`}
           >
             {trend.isPositive ? "+" : ""}
