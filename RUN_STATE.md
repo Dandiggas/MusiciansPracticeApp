@@ -1,18 +1,20 @@
-# RUN_STATE — prod smoke script (issue #34)
+# RUN_STATE — design overhaul round 2 COMPLETE (taste-skill, branch design/taste-pass)
 
-GOAL: Playwright smoke exercising the deployed app end-to-end so Dan stops being the regression suite.
+GOAL: Finish the deferred design-audit findings with the newly installed design-taste-frontend skill. DONE 2026-07-05.
 
-DONE:
-- Cron pack installed in Hermes (morning brief 08:15, dojo auto-review 13:00 conditional, weekly gig invoices Mon 09:00, hermes self-update Sun 20:00 no-agent; ALR + Market Intel delivery fixed origin→telegram; 09:00 dojo job slimmed to nudge-only, no skill load).
-- Design taste pass committed on design/taste-pass (4 commits, tests green, NOT pushed).
-- Local env: Django via docker compose on :8001 (indexer owns :8000; override file in session scratchpad), frontend :3000 with NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1, user demo/Practice123! verified.
+SHIPPED (3 commits on design/taste-pass, NOT pushed — total now 7 style commits + smoke):
+- c7dcbcd F3+F7: sentence-case field labels across 12 files, eyebrows only on zone titles, zero-count noise hidden, relative dates, mono readouts, lick in/out de-nested (F4 subset)
+- 8eec6c5 F10: rise-in stagger on sessions list (prefers-reduced-motion gated), contained transport/YouTube error, em-dash out of UI copy
+- ee9e087 theme: TakeRecorder + StatsCard hardcoded light slate → semantic tokens (dark-mode bug)
 
-DONE: smoke.spec.ts + playwright.smoke.config.ts + npm run smoke — PASSING locally (3.3s). NEXT: create pre-verified smoke user on Railway prod, then wire BASE_URL prod run into deploy flow.
-DESIGN:
-- BASE_URL env (default http://localhost:3000). SMOKE_USER/SMOKE_PASS env (default demo/Practice123!).
-- Flow: login → create session (timestamped name) → open it → add YouTube track w/ BPM → verify track renders → save track → delete session (cleanup) → assert gone.
-- Skip register/email-verify in the spec (needs backend hooks); prod runs use the pre-verified smoke user. Recording/replay skipped headless (no devices) — assert the recorder UI mounts instead.
-- Add npm script "smoke": "playwright test e2e/smoke.spec.ts". Playwright + @playwright/test already in devDeps; check for existing playwright.config.
-- After green locally: document prod invocation BASE_URL=https://<railway-url> SMOKE_USER=... in AGENTS.md; wire into deploy flow later (issue #34).
+VERIFIED: tsc clean for touched files (7 pre-existing test-file errors remain), 68/68 jest, npm run smoke green 2.9s, dark + light screenshots at frontend/next-app/.design-audit/round2/.
 
-FINDINGS: playwright.config existence unchecked; YouTube embed doesn't play headless (don't assert playback, assert player container).
+VAULT: The Shed Wiki + TODOs + LLM Wiki Log updated 2026-07-05.
+
+NEXT (Dan's queue):
+1. Review design/taste-pass and push (7 style commits ready)
+2. Railway pre-verified smoke user (issue #34) → wire smoke into deploy flow
+3. Auth rate limiting #45 stays top security risk
+4. Polish candidates: metronome pulse-on-beat, player hero art, landing page (doesn't exist)
+
+ENV: Django on :8001 via compose override (indexer owns :8000), frontend :3000 with NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1, demo/Practice123!.
