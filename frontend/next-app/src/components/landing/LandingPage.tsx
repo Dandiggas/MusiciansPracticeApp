@@ -81,14 +81,14 @@ export function LandingPage() {
         </div>
       </header>
 
-      {/* Hero: asymmetric split, layered product shots right */}
+      {/* Hero: asymmetric split, legible product UI right */}
       <section className="mx-auto grid max-w-6xl gap-14 px-5 pb-24 pt-16 md:px-8 lg:grid-cols-[7fr_5fr] lg:items-center lg:gap-10 lg:pt-20">
         <div>
           <motion.h1
             initial={reduce ? false : { opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: EASE }}
-            className="text-5xl font-black leading-[0.98] tracking-tighter md:text-7xl"
+            className="text-balance text-5xl font-black leading-[0.98] tracking-tighter md:text-7xl"
           >
             The practice room that remembers.
           </motion.h1>
@@ -98,8 +98,8 @@ export function LandingPage() {
             transition={{ duration: 0.8, delay: 0.12, ease: EASE }}
             className="mt-6 max-w-[46ch] text-lg leading-relaxed text-[#a89f94]"
           >
-            Songs, BPMs, loop regions, and takes stay exactly where you left
-            them. Open a session and keep going.
+            Songs, BPMs, loops, and takes stay exactly where you left them.
+            Open a session and keep going. Free.
           </motion.p>
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -115,50 +115,24 @@ export function LandingPage() {
           initial={reduce ? false : { opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.15, ease: EASE }}
-          className="relative mx-auto w-full max-w-xl lg:max-w-none"
+          className="relative mx-auto w-full max-w-md lg:max-w-none"
         >
           <div className="relative">
-            <div className="relative overflow-hidden rounded-2xl border border-[#ece3d5]/[0.12] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)]">
-              {reduce ? (
-                <Image
-                  src="/landing/room-poster.jpg"
-                  alt="An empty rehearsal room: keyboards, amps, and mic stands set up and waiting"
-                  width={1276}
-                  height={720}
-                  priority
-                  className="aspect-video w-full object-cover"
-                />
-              ) : (
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                  poster="/landing/room-poster.jpg"
-                  aria-label="An empty rehearsal room: keyboards, amps, and mic stands set up and waiting"
-                  className="aspect-video w-full object-cover"
-                >
-                  <source src="/landing/room.mp4" type="video/mp4" />
-                </video>
-              )}
-              {/* Scrim: seats the warm footage into the dark page without flattening it */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(22,19,15,0.42)_100%)] shadow-[inset_0_0_0_1px_rgba(236,227,213,0.06)]"
-              />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 rounded-b-2xl bg-gradient-to-t from-[#16130f]/55 to-transparent"
-              />
-            </div>
+            <Image
+              src="/landing/tracks-rail.png"
+              alt="A session's track list in The Shed"
+              width={640}
+              height={582}
+              priority
+              className="w-[72%] rounded-2xl border border-[#ece3d5]/[0.1] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]"
+            />
             <Image
               src="/landing/metronome-card.png"
               alt="The metronome that lives inside every session"
               width={680}
               height={928}
               priority
-              className="absolute -bottom-9 -right-4 w-[34%] rotate-2 rounded-2xl border border-[#ece3d5]/[0.12] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)] md:-bottom-10"
+              className="absolute -bottom-10 right-0 w-[52%] rotate-2 rounded-2xl border border-[#ece3d5]/[0.12] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)]"
             />
           </div>
         </motion.div>
@@ -168,12 +142,12 @@ export function LandingPage() {
       <section className="border-t border-[#ece3d5]/[0.08] bg-[#1a1712]">
         <div className="mx-auto max-w-6xl px-5 py-24 md:px-8">
           <Reveal>
-            <h2 className="max-w-[22ch] text-3xl font-black tracking-tighter md:text-5xl">
+            <h2 className="max-w-[22ch] text-balance text-3xl font-black tracking-tighter md:text-5xl">
               Loop the hard bars. Name them. Keep them.
             </h2>
             <p className="mt-4 max-w-[52ch] text-base leading-relaxed text-[#a89f94]">
               Mark an in and out point while the track plays, save it as a
-              lick, and it waits on the bench with its own practice speed.
+              lick, and it waits with its own practice speed.
             </p>
           </Reveal>
           <Reveal delay={0.1} className="mt-12">
@@ -193,20 +167,20 @@ export function LandingPage() {
         <Reveal>
           <Image
             src="/landing/sessions-list.png"
-            alt="A list of practice sessions, each updated recently"
+            alt="Practice sessions updated one day, two days, eight days, and twenty-two days ago"
             width={1920}
-            height={500}
+            height={668}
             className="w-full rounded-2xl border border-[#ece3d5]/[0.1] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)]"
           />
         </Reveal>
         <Reveal delay={0.1}>
-          <h2 className="text-3xl font-black tracking-tighter md:text-5xl">
-            A bench you never have to clear.
+          <h2 className="text-balance text-3xl font-black tracking-tighter md:text-5xl">
+            Three weeks later, nothing has moved.
           </h2>
           <p className="mt-4 max-w-[46ch] text-base leading-relaxed text-[#a89f94]">
-            Each session is one long-lived workspace. The Lionel Richie study
-            you opened last month still has its tracks, tempos, and loops in
-            place tonight.
+            Each session is one long-lived workspace. The Sunday set you built
+            last month opens tonight with its tracks, tempos, and loops in
+            place.
           </p>
         </Reveal>
       </section>
@@ -215,8 +189,8 @@ export function LandingPage() {
       <section className="border-t border-[#ece3d5]/[0.08] bg-[#1a1712]">
         <div className="mx-auto max-w-6xl px-5 py-24 md:px-8">
           <Reveal>
-            <h2 className="text-3xl font-black tracking-tighter md:text-5xl">
-              The whole bench, one tab.
+            <h2 className="text-balance text-3xl font-black tracking-tighter md:text-5xl">
+              The whole rig, one tab.
             </h2>
           </Reveal>
           <div className="mt-12 divide-y divide-[#ece3d5]/[0.08] border-y border-[#ece3d5]/[0.08]">
@@ -238,7 +212,7 @@ export function LandingPage() {
               },
             ].map((item, i) => (
               <Reveal key={item.title} delay={i * 0.08}>
-                <div className="grid gap-3 py-8 transition-colors hover:bg-[#ece3d5]/[0.02] md:grid-cols-[auto_minmax(0,18rem)_1fr] md:items-baseline md:gap-8">
+                <div className="grid gap-3 py-8 md:grid-cols-[auto_minmax(0,18rem)_1fr] md:items-baseline md:gap-8">
                   <span className="text-[#3aa392]">{item.icon}</span>
                   <h3 className="text-xl font-bold tracking-tight">{item.title}</h3>
                   <p className="max-w-[52ch] text-base leading-relaxed text-[#a89f94]">
@@ -251,20 +225,52 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Manifesto close */}
-      <section className="mx-auto max-w-4xl px-5 py-28 text-center md:px-8">
-        <Reveal>
-          <h2 className="text-4xl font-black leading-[1.02] tracking-tighter md:text-6xl">
-            Built by a working musician, for the hours nobody sees.
-          </h2>
-          <p className="mx-auto mt-6 max-w-[44ch] text-lg leading-relaxed text-[#a89f94]">
-            No streaks, no badges, no feed. Just your material, set up the way
-            you left it.
-          </p>
-          <div className="mt-10 flex justify-center">
-            <PrimaryCta />
-          </div>
-        </Reveal>
+      {/* Close: the room, waiting. Full-bleed video with scrim. */}
+      <section className="relative overflow-hidden border-t border-[#ece3d5]/[0.08]">
+        {reduce ? (
+          <Image
+            src="/landing/room-poster.jpg"
+            alt=""
+            fill
+            aria-hidden="true"
+            className="object-cover"
+          />
+        ) : (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            poster="/landing/room-poster.jpg"
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+          >
+            <source src="/landing/room.mp4" type="video/mp4" />
+          </video>
+        )}
+        {/* Scrim: keeps the type WCAG-readable over the warm footage */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[#16130f]/72"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(22,19,15,0.55)_100%)]"
+        />
+        <div className="relative mx-auto max-w-4xl px-5 py-36 text-center md:px-8 md:py-44">
+          <Reveal>
+            <h2 className="text-balance text-4xl font-black leading-[1.02] tracking-tighter md:text-6xl">
+              This is where you shed.
+            </h2>
+            <p className="mx-auto mt-6 max-w-[44ch] text-balance text-lg leading-relaxed text-[#cfc7bc]">
+              Open it tomorrow. Everything is where you left it.
+            </p>
+            <div className="mt-10 flex justify-center">
+              <PrimaryCta />
+            </div>
+          </Reveal>
+        </div>
       </section>
 
       {/* Footer */}
@@ -275,7 +281,7 @@ export function LandingPage() {
             <Link href="/login" className="transition-colors hover:text-[#ece7e1]">
               Log in
             </Link>
-            <span>{new Date().getFullYear()}</span>
+            <span>© {new Date().getFullYear()} The Shed</span>
           </div>
         </div>
       </footer>
