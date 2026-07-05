@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "@phosphor-icons/react";
 import { MotionDiv } from "@/components/ui/motion-wrapper";
@@ -39,6 +40,8 @@ export default function MetronomeWidget({
   onToggle,
   onTapTempo,
 }: MetronomeWidgetProps) {
+  const reduceMotion = useReducedMotion();
+
   const handleBpmChange = (value: number) => {
     onBpmChange(Math.max(20, Math.min(300, value)));
   };
@@ -51,8 +54,14 @@ export default function MetronomeWidget({
 
       <div className="text-center">
         <MotionDiv
-          key={bpm}
-          initial={{ scale: 1.08, opacity: 0.7 }}
+          key={isActive && !reduceMotion ? `beat-${currentBeat}` : `bpm-${bpm}`}
+          initial={
+            reduceMotion
+              ? false
+              : isActive
+                ? { scale: currentBeat === 0 ? 1.06 : 1.025 }
+                : { scale: 1.08, opacity: 0.7 }
+          }
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
           className="inline-block"
