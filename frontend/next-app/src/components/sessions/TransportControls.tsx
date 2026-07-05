@@ -61,7 +61,7 @@ export function TransportControls({
         </Button>
 
         <div className="flex min-w-[180px] flex-1 flex-col gap-2">
-          <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+          <div className="flex items-center justify-between font-mono text-xs text-muted-foreground">
             <span>{formatTime(transport.currentTime)}</span>
             <span>{formatTime(transport.duration)}</span>
           </div>
@@ -77,9 +77,9 @@ export function TransportControls({
         </div>
 
         <div className="w-full min-w-[220px] flex-1 md:max-w-[260px]">
-          <div className="mb-2 flex items-center justify-between text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            <span>Speed</span>
-            <span>{speed.toFixed(2)}x</span>
+          <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+            <span className="font-medium">Speed</span>
+            <span className="font-mono">{speed.toFixed(2)}x</span>
           </div>
           <input
             type="range"
@@ -94,7 +94,9 @@ export function TransportControls({
       </div>
 
       {transport.error ? (
-        <p className="text-sm text-destructive">{transport.error}</p>
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+          {transport.error}
+        </div>
       ) : null}
     </div>
   );

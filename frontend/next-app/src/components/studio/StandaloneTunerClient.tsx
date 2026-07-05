@@ -100,7 +100,7 @@ export function StandaloneTunerClient() {
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             Standalone tool
           </p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-foreground">
+          <h1 className="mt-3 text-4xl font-black leading-[0.98] tracking-tighter text-foreground md:text-5xl">
             Tune before you dig in.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">

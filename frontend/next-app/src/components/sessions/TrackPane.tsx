@@ -116,7 +116,7 @@ export function TrackPane({
             <div className="min-w-0">
               <label
                 htmlFor="track-name-edit"
-                className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                className="text-sm font-medium text-foreground"
               >
                 Track name
               </label>
@@ -132,7 +132,7 @@ export function TrackPane({
               <div className="w-full max-w-[160px] shrink-0">
                 <label
                   htmlFor="track-bpm-edit"
-                  className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                  className="text-sm font-medium text-foreground"
                 >
                   BPM
                 </label>
@@ -151,7 +151,7 @@ export function TrackPane({
                 <Button type="button" onClick={() => void handleSave()} disabled={!isDirty || isSaving}>
                   {isSaving ? "Saving..." : "Save Track"}
                 </Button>
-                <Button type="button" variant="destructive" onClick={() => void handleDelete()} disabled={isDeleting}>
+                <Button type="button" variant="destructiveOutline" onClick={() => void handleDelete()} disabled={isDeleting}>
                   {isDeleting ? "Deleting..." : "Delete"}
                 </Button>
               </div>
@@ -159,10 +159,10 @@ export function TrackPane({
           </div>
 
           <div className="min-w-0 rounded-2xl border border-border/60 bg-muted/20 p-4 2xl:border-none 2xl:bg-transparent 2xl:p-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-              Source locked to this track
+            <p className="text-sm font-medium text-foreground">
+              Source
             </p>
-            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
               {track.source_type.toUpperCase()}
             </p>
             <p className="mt-2 text-sm text-muted-foreground [overflow-wrap:anywhere]">
@@ -174,7 +174,7 @@ export function TrackPane({
         <div className="mt-5 min-w-0">
           <label
             htmlFor="track-note-edit"
-            className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+            className="text-sm font-medium text-foreground"
           >
             Track notes
           </label>

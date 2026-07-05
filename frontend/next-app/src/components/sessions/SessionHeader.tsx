@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatDistanceToNow } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,12 +96,8 @@ export function SessionHeader({
         </div>
 
         <div className="flex flex-col items-start gap-3 lg:items-end">
-          <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            Updated {new Intl.DateTimeFormat("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }).format(new Date(session.updated_at))}
+          <p className="text-xs text-muted-foreground">
+            Updated {formatDistanceToNow(new Date(session.updated_at), { addSuffix: true })}
           </p>
           <Button
             type="button"

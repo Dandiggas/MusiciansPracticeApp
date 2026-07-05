@@ -40,7 +40,7 @@ export function NewSessionButton() {
     <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
       <label
         htmlFor="new-session-name"
-        className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground"
+        className="text-sm font-medium text-foreground"
       >
         New session
       </label>

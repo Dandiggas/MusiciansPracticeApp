@@ -69,9 +69,9 @@ export default function TunerWidget({
       </div>
 
       <div className="space-y-1">
-        <div className="flex justify-between text-[10px] text-muted-foreground uppercase tracking-wider">
+        <div className="flex justify-between text-[10px] text-muted-foreground">
           <span>Flat</span>
-          <span>In Tune</span>
+          <span>In tune</span>
           <span>Sharp</span>
         </div>
         <div className="relative h-2.5 bg-muted rounded-full overflow-hidden">

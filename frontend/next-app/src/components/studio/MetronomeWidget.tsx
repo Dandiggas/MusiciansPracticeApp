@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "@phosphor-icons/react";
 import { MotionDiv } from "@/components/ui/motion-wrapper";
@@ -39,6 +40,8 @@ export default function MetronomeWidget({
   onToggle,
   onTapTempo,
 }: MetronomeWidgetProps) {
+  const reduceMotion = useReducedMotion();
+
   const handleBpmChange = (value: number) => {
     onBpmChange(Math.max(20, Math.min(300, value)));
   };
@@ -51,8 +54,14 @@ export default function MetronomeWidget({
 
       <div className="text-center">
         <MotionDiv
-          key={bpm}
-          initial={{ scale: 1.08, opacity: 0.7 }}
+          key={isActive && !reduceMotion ? `beat-${currentBeat}` : `bpm-${bpm}`}
+          initial={
+            reduceMotion
+              ? false
+              : isActive
+                ? { scale: currentBeat === 0 ? 1.06 : 1.025 }
+                : { scale: 1.08, opacity: 0.7 }
+          }
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
           className="inline-block"
@@ -61,7 +70,7 @@ export default function MetronomeWidget({
             {bpm}
           </span>
         </MotionDiv>
-        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground mt-1">
+        <p className="text-xs font-medium text-muted-foreground mt-1">
           BPM
         </p>
       </div>
@@ -122,7 +131,7 @@ export default function MetronomeWidget({
         {TIME_SIGNATURES.map((ts) => (
           <Button
             key={ts.label}
-            variant={beatsPerMeasure === ts.beats ? "default" : "secondary"}
+            variant={beatsPerMeasure === ts.beats ? "selected" : "secondary"}
             size="sm"
             className="rounded-lg text-xs h-8 transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             onClick={() => onBeatsPerMeasureChange(ts.beats)}
@@ -133,9 +142,9 @@ export default function MetronomeWidget({
       </div>
 
       <div>
-        <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-          <span>Volume</span>
-          <span>{Math.round(volume * 100)}%</span>
+        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+          <span className="font-medium">Volume</span>
+          <span className="font-mono">{Math.round(volume * 100)}%</span>
         </div>
         <input
           type="range"

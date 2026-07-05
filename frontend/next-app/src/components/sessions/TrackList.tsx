@@ -69,10 +69,10 @@ function SortableTrackRow({
         </div>
         <div className="min-w-0">
           <p className="truncate font-semibold text-foreground">{track.name}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.12em] text-muted-foreground">
-            <span>{track.source_type}</span>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span className="uppercase">{track.source_type}</span>
             {track.bpm ? <span>{track.bpm} BPM</span> : null}
-            <span>{track.licks.length} licks</span>
+            {track.licks.length > 0 ? <span>{track.licks.length} licks</span> : null}
           </div>
         </div>
       </button>
