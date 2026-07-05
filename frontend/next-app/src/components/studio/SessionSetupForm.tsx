@@ -60,7 +60,7 @@ export default function SessionSetupForm({
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="instrument" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+          <Label htmlFor="instrument">
             Instrument
           </Label>
           <select
@@ -77,8 +77,8 @@ export default function SessionSetupForm({
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="song-title" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-            Song Title
+          <Label htmlFor="song-title">
+            Song title
           </Label>
           <Input
             id="song-title"
@@ -91,7 +91,7 @@ export default function SessionSetupForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+        <Label htmlFor="description">
           Description
         </Label>
         <Input
@@ -104,8 +104,8 @@ export default function SessionSetupForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-          Focus Points
+        <Label htmlFor="notes">
+          Focus points
         </Label>
         <textarea
           id="notes"
@@ -118,8 +118,8 @@ export default function SessionSetupForm({
       </div>
 
       <div className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-          Practice Source
+        <p className="text-sm font-medium text-foreground">
+          Practice source
         </p>
         <div className="flex gap-2">
           <Button

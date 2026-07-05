@@ -128,12 +128,12 @@ function SortableLickRow({
       >
         <div className="min-w-0">
           <p className="truncate font-semibold text-foreground">{lick.name}</p>
-          <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground">
             {formatTime(lick.start_seconds)} - {formatTime(lick.end_seconds)}
             {lick.last_speed ? ` · ${lick.last_speed.toFixed(2)}x` : ""}
           </p>
         </div>
-        <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-medium text-muted-foreground">
           {editing ? "Editing" : active ? "Active" : "Load"}
         </span>
       </button>
@@ -442,10 +442,10 @@ export function LickPanel({
           </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <div className="rounded-xl border border-border/60 bg-muted/40 p-3">
+            <div>
               <label
                 htmlFor="lick-in-timestamp"
-                className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                className="text-sm font-medium text-foreground"
               >
                 In point
               </label>
@@ -457,10 +457,10 @@ export function LickPanel({
                 className="mt-2 h-10 font-semibold"
               />
             </div>
-            <div className="rounded-xl border border-border/60 bg-muted/40 p-3">
+            <div>
               <label
                 htmlFor="lick-out-timestamp"
-                className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                className="text-sm font-medium text-foreground"
               >
                 Out point
               </label>
@@ -477,7 +477,7 @@ export function LickPanel({
           <div className="mt-4 space-y-2">
             <label
               htmlFor="lick-name"
-              className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+              className="text-sm font-medium text-foreground"
             >
               {editingLick ? "Edit saved lick" : "New lick name"}
             </label>

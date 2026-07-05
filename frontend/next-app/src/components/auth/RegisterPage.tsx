@@ -234,7 +234,7 @@ const RegisterPage = () => {
                   <div className="space-y-2">
                     <Label
                       htmlFor="username"
-                      className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground"
+                      className="text-sm font-medium text-foreground"
                     >
                       Username
                     </Label>
@@ -259,7 +259,7 @@ const RegisterPage = () => {
                   <div className="space-y-2">
                     <Label
                       htmlFor="email"
-                      className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground"
+                      className="text-sm font-medium text-foreground"
                     >
                       Email
                     </Label>
@@ -304,7 +304,7 @@ const RegisterPage = () => {
                   <div className="space-y-2">
                     <Label
                       htmlFor="password1"
-                      className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground"
+                      className="text-sm font-medium text-foreground"
                     >
                       Password
                     </Label>
@@ -344,9 +344,9 @@ const RegisterPage = () => {
                   <div className="space-y-2">
                     <Label
                       htmlFor="password2"
-                      className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground"
+                      className="text-sm font-medium text-foreground"
                     >
-                      Confirm Password
+                      Confirm password
                     </Label>
                     <div className="relative">
                       <Input

@@ -195,7 +195,7 @@ export function SessionPracticeTools({
             </p>
           </div>
           {trackName ? (
-            <div className="rounded-full bg-muted/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            <div className="rounded-full bg-muted/60 px-3 py-1 text-[11px] font-medium text-muted-foreground">
               {trackBpm ? `${trackBpm} BPM loaded` : "No BPM yet"}
             </div>
           ) : null}

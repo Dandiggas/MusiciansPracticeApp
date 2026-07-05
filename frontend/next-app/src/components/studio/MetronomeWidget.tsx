@@ -61,7 +61,7 @@ export default function MetronomeWidget({
             {bpm}
           </span>
         </MotionDiv>
-        <p className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground mt-1">
+        <p className="text-xs font-medium text-muted-foreground mt-1">
           BPM
         </p>
       </div>
@@ -133,9 +133,9 @@ export default function MetronomeWidget({
       </div>
 
       <div>
-        <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-          <span>Volume</span>
-          <span>{Math.round(volume * 100)}%</span>
+        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+          <span className="font-medium">Volume</span>
+          <span className="font-mono">{Math.round(volume * 100)}%</span>
         </div>
         <input
           type="range"

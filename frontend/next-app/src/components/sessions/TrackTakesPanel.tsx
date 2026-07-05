@@ -171,7 +171,7 @@ function TakeRow({
           ) : (
             <div>
               <p className="truncate font-semibold text-foreground">{take.name}</p>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>{CAPTURE_LABELS[take.capture_mode]}</span>
                 <span>{formatCreatedAt(take.created_at)}</span>
               </div>
@@ -466,9 +466,11 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
             Record yourself against this track, save the take, and come back to it later.
           </p>
         </div>
-        <div className="rounded-full bg-muted/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          {track.takes.length} saved
-        </div>
+        {track.takes.length > 0 ? (
+          <div className="rounded-full bg-muted/60 px-3 py-1 text-[11px] font-medium text-muted-foreground">
+            {track.takes.length} saved
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
@@ -491,7 +493,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">{selectedTake.name}</p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         Audio take
                       </p>
                     </div>
@@ -528,7 +530,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
               <div>
                 <label
                   htmlFor="take-name"
-                  className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                  className="text-sm font-medium text-foreground"
                 >
                   Take name
                 </label>
@@ -583,7 +585,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
                 <div>
                   <label
                     htmlFor="take-audio-input"
-                    className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                    className="text-sm font-medium text-foreground"
                   >
                     Audio input
                   </label>
@@ -611,7 +613,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
                 <div>
                   <label
                     htmlFor="take-video-input"
-                    className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                    className="text-sm font-medium text-foreground"
                   >
                     Camera
                   </label>
@@ -644,7 +646,7 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
 
         <div className="rounded-2xl border border-border/60 bg-card/60 p-4">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            <p className="text-sm font-semibold text-foreground">
               Take library
             </p>
             <Button type="button" size="sm" variant="ghost" onClick={() => void loadDevices()}>
@@ -673,11 +675,11 @@ export function TrackTakesPanel({ mutateTrack, track }: TrackTakesPanelProps) {
 
           {selectedTake ? (
             <div className="mt-4 rounded-2xl border border-border/60 bg-muted/20 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              <p className="text-sm font-semibold text-foreground">
                 Selected take
               </p>
               <p className="mt-2 font-semibold text-foreground">{selectedTake.name}</p>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>{CAPTURE_LABELS[selectedTake.capture_mode]}</span>
                 <span>{formatCreatedAt(selectedTake.created_at)}</span>
               </div>
