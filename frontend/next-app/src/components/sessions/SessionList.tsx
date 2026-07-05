@@ -12,7 +12,7 @@ export function SessionList({ sessions }: { sessions: SessionSummary[] }) {
         <MusicNotes size={28} className="mx-auto text-muted-foreground" aria-hidden />
         <h2 className="mt-4 text-xl font-bold text-foreground">The bench is clear</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Name your first session in the panel above — the songs, BPMs, and
+          Name your first session in the panel above. The songs, BPMs, and
           licks you practise will collect there, ready for next time.
         </p>
       </div>
@@ -21,11 +21,12 @@ export function SessionList({ sessions }: { sessions: SessionSummary[] }) {
 
   return (
     <div className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
-      {sessions.map((session) => (
+      {sessions.map((session, index) => (
         <Link
           key={session.id}
           href={`/sessions/${session.id}`}
-          className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-primary/5 active:bg-primary/10"
+          style={{ "--stagger": index } as React.CSSProperties}
+          className="rise-in group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-primary/5 active:bg-primary/10"
         >
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold text-foreground">
