@@ -115,24 +115,41 @@ export function LandingPage() {
           initial={reduce ? false : { opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.15, ease: EASE }}
-          className="relative mx-auto w-full max-w-md lg:max-w-none"
+          className="relative mx-auto w-full max-w-xl lg:max-w-none"
         >
           <div className="relative">
-            <Image
-              src="/landing/tracks-rail.png"
-              alt="A session's track list in The Shed"
-              width={640}
-              height={582}
-              priority
-              className="w-[72%] rounded-2xl border border-[#ece3d5]/[0.1] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]"
-            />
+            <div className="overflow-hidden rounded-2xl border border-[#ece3d5]/[0.12] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)]">
+              {reduce ? (
+                <Image
+                  src="/landing/room-poster.jpg"
+                  alt="An empty rehearsal room: keyboards, amps, and mic stands set up and waiting"
+                  width={1276}
+                  height={720}
+                  priority
+                  className="aspect-video w-full object-cover"
+                />
+              ) : (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  poster="/landing/room-poster.jpg"
+                  aria-label="An empty rehearsal room: keyboards, amps, and mic stands set up and waiting"
+                  className="aspect-video w-full object-cover"
+                >
+                  <source src="/landing/room.mp4" type="video/mp4" />
+                </video>
+              )}
+            </div>
             <Image
               src="/landing/metronome-card.png"
               alt="The metronome that lives inside every session"
               width={680}
               height={928}
               priority
-              className="absolute -bottom-10 right-0 w-[52%] rotate-2 rounded-2xl border border-[#ece3d5]/[0.12] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)]"
+              className="absolute -bottom-9 -right-4 w-[34%] rotate-2 rounded-2xl border border-[#ece3d5]/[0.12] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)] md:-bottom-10"
             />
           </div>
         </motion.div>
