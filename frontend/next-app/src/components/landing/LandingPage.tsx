@@ -225,6 +225,50 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Proof: real stages. The person behind the product, in photographs. */}
+      <section className="mx-auto max-w-6xl px-5 py-24 md:px-8">
+        <Reveal>
+          <h2 className="max-w-[20ch] text-balance text-3xl font-black tracking-tighter md:text-5xl">
+            Made between soundchecks.
+          </h2>
+          <p className="mt-4 max-w-[52ch] text-base leading-relaxed text-[#a89f94]">
+            The Shed is built by a working session keyboardist who practises
+            for real stages. Every feature exists because a gig needed it.
+          </p>
+        </Reveal>
+        <div className="mt-12 grid gap-4 md:gap-5">
+          <Reveal>
+            <Image
+              src="/landing/stage-crowd.jpg"
+              alt="Behind the keys on a festival stage, looking out over the crowd"
+              width={2048}
+              height={1536}
+              className="w-full rounded-2xl border border-[#ece3d5]/[0.1] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)]"
+            />
+          </Reveal>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-[3fr_2fr] md:gap-5">
+            <Reveal delay={0.08}>
+              <Image
+                src="/landing/stage-nord.jpg"
+                alt="Playing a Nord Stage 3 under stage lights"
+                width={1600}
+                height={1067}
+                className="h-64 w-full rounded-2xl border border-[#ece3d5]/[0.1] object-cover shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)] md:h-[420px]"
+              />
+            </Reveal>
+            <Reveal delay={0.14}>
+              <Image
+                src="/landing/stage-mainstage.jpg"
+                alt="Playing keys on a festival main stage"
+                width={1100}
+                height={1651}
+                className="h-64 w-full rounded-2xl border border-[#ece3d5]/[0.1] object-cover shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)] md:h-[420px]"
+              />
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       {/* Close: the room, waiting. Full-bleed video with scrim. */}
       <section className="relative overflow-hidden border-t border-[#ece3d5]/[0.08]">
         {reduce ? (
