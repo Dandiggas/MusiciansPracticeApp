@@ -106,7 +106,7 @@ export function TrackPane({
 
   const sourceDetail = track.source_type === "youtube"
     ? track.youtube_url
-    : track.file?.split("/").pop() ?? "Uploaded file";
+    : track.file?.split("/").pop()?.split("?")[0] ?? "Uploaded file";
 
   return (
     <div className="min-w-0 space-y-5">
