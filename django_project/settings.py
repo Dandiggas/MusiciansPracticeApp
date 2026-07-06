@@ -15,6 +15,8 @@ import sys
 from pathlib import Path
 import dj_database_url
 
+from django_project.storage import r2_storage_options
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -256,6 +258,21 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+# ─── Durable media storage: Cloudflare R2 (optional) ────────────────
+# When R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and
+# R2_ENDPOINT_URL are all set, uploaded media (tracks, charts, takes) is
+# stored in a private R2 bucket via django-storages' S3 backend. With none
+# of them set, local MEDIA_ROOT behavior is unchanged (dev + tests).
+# See django_project/storage.py and RAILWAY_DEPLOYMENT.md → "Durable media
+# storage (Cloudflare R2)".
+_R2_STORAGE_OPTIONS = r2_storage_options(os.environ)
+USE_R2_MEDIA_STORAGE = _R2_STORAGE_OPTIONS is not None
+if USE_R2_MEDIA_STORAGE:
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": _R2_STORAGE_OPTIONS,
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
