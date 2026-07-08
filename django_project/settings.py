@@ -146,7 +146,7 @@ REST_AUTH = {
     "OLD_PASSWORD_FIELD_ENABLED": True,
 }
 
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "hello@theshed.app")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "hello@intheshed.app")
 
 def env_bool(name, default=False):
     value = os.getenv(name)
@@ -155,8 +155,11 @@ def env_bool(name, default=False):
     return value.lower() in {"1", "true", "yes", "on"}
 
 
-# SendGrid in prod; console backend (already set above) stays default in dev.
-if os.getenv("SENDGRID_API_KEY"):
+# Resend (preferred) or SendGrid in prod; console backend stays default in dev.
+if os.getenv("RESEND_API_KEY"):
+    EMAIL_BACKEND = "django_project.email_backends.ResendApiEmailBackend"
+    EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))
+elif os.getenv("SENDGRID_API_KEY"):
     EMAIL_BACKEND = "django_project.email_backends.SendGridApiEmailBackend"
     EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))
 elif EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
