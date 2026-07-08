@@ -11,37 +11,48 @@ def has_frontend_url():
 def email_delivery_status(env=None):
     """Return non-secret email-delivery readiness details."""
     env = os.environ if env is None else env
+    resend_api_key = env.get("RESEND_API_KEY", "")
     sendgrid_api_key = env.get("SENDGRID_API_KEY", "")
     email_backend = env.get(
         "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
     )
-    default_from_email = env.get("DEFAULT_FROM_EMAIL", "hello@theshed.app")
+    default_from_email = env.get("DEFAULT_FROM_EMAIL", "hello@intheshed.app")
     frontend_url = env.get("FRONTEND_URL", "")
 
+    uses_resend = bool(resend_api_key)
     uses_sendgrid = bool(sendgrid_api_key)
-    effective_backend = (
-        "django_project.email_backends.SendGridApiEmailBackend"
-        if uses_sendgrid
-        else email_backend
-    )
+    uses_api_provider = uses_resend or uses_sendgrid
+
+    if uses_resend:
+        provider = "resend"
+        effective_backend = "django_project.email_backends.ResendApiEmailBackend"
+        email_host = "api.resend.com"
+    elif uses_sendgrid:
+        provider = "sendgrid"
+        effective_backend = "django_project.email_backends.SendGridApiEmailBackend"
+        email_host = "api.sendgrid.com"
+    else:
+        provider = "none"
+        effective_backend = email_backend
+        email_host = env.get("EMAIL_HOST", "")
+
     missing = []
-    if not sendgrid_api_key:
-        missing.append("SENDGRID_API_KEY")
+    if not uses_api_provider:
+        missing.append("RESEND_API_KEY")
     if not default_from_email:
         missing.append("DEFAULT_FROM_EMAIL")
     if not frontend_url:
         missing.append("FRONTEND_URL")
 
     return {
-        "ready": (
-            not missing
-            and effective_backend == "django_project.email_backends.SendGridApiEmailBackend"
-        ),
+        "ready": uses_api_provider and not missing,
+        "provider": provider,
+        "uses_resend": uses_resend,
         "uses_sendgrid": uses_sendgrid,
         "email_backend": effective_backend,
-        "email_host": "api.sendgrid.com" if uses_sendgrid else env.get("EMAIL_HOST", ""),
-        "email_port": "443" if uses_sendgrid else env.get("EMAIL_PORT", ""),
-        "email_host_user": "(api token)" if uses_sendgrid else env.get("EMAIL_HOST_USER", ""),
+        "email_host": email_host,
+        "email_port": "443" if uses_api_provider else env.get("EMAIL_PORT", ""),
+        "email_host_user": "(api token)" if uses_api_provider else env.get("EMAIL_HOST_USER", ""),
         "default_from_email": default_from_email,
         "frontend_url": frontend_url,
         "missing": missing,

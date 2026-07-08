@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
         rows = [
             ("ready", "yes" if status["ready"] else "no"),
-            ("uses_sendgrid", "yes" if status["uses_sendgrid"] else "no"),
+            ("provider", status["provider"]),
             ("email_backend", status["email_backend"]),
             ("email_host", status["email_host"] or "(not set)"),
             ("email_port", status["email_port"] or "(not set)"),
@@ -30,5 +30,6 @@ class Command(BaseCommand):
         if not status["ready"]:
             raise CommandError(
                 "Email delivery is not production-ready. Set the missing vars "
-                "and confirm DEFAULT_FROM_EMAIL is verified in SendGrid."
+                "and confirm DEFAULT_FROM_EMAIL is on a domain authenticated "
+                "with your email provider (Resend)."
             )
