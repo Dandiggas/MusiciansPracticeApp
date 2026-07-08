@@ -144,12 +144,11 @@ export function LandingPage() {
         <div className="mx-auto max-w-6xl px-5 py-24 md:px-8">
           <Reveal>
             <h2 className="max-w-[22ch] text-balance text-3xl font-black tracking-tighter md:text-5xl">
-              Learn one song without rebuilding the setup.
+              Drill the bars that fight you.
             </h2>
             <p className="mt-4 max-w-[52ch] text-base leading-relaxed text-[#a89f94]">
-              Add the YouTube video, mp3, or chart once. Save the awkward bars
-              as named loops, slow them down, and come back to the same setup
-              next time.
+              Save the hard section as a named loop. It&apos;s still there next
+              time.
             </p>
           </Reveal>
           <Reveal delay={0.1} className="mt-12">
@@ -177,12 +176,10 @@ export function LandingPage() {
         </Reveal>
         <Reveal delay={0.1}>
           <h2 className="text-balance text-3xl font-black tracking-tighter md:text-5xl">
-            Three weeks later, your practice desk is still set up.
+            Come back weeks later. Nothing moved.
           </h2>
           <p className="mt-4 max-w-[46ch] text-base leading-relaxed text-[#a89f94]">
-            Each session is a long-lived workspace for a song, set, or routine.
-            The Sunday set you built last month opens tonight with its tracks,
-            tempos, charts, and loops in place.
+            Your song opens with its tempo, loops, and takes set.
           </p>
         </Reveal>
       </section>
