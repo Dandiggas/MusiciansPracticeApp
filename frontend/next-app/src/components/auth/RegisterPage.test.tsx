@@ -125,6 +125,30 @@ describe("RegisterPage", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("shows duplicate username actions so testers are not dead-ended", async () => {
+    global.fetch = jest.fn().mockResolvedValue(
+      mockResponse({ username: ["A user with that username already exists."] }, 400)
+    ) as typeof fetch;
+
+    render(<RegisterPage />);
+    fillValidForm();
+
+    fireEvent.click(screen.getByRole("button", { name: /create.*account/i }));
+
+    expect(
+      await screen.findByText("Looks like this username is already taken.")
+    ).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole("link", { name: /sign in/i })
+        .some((link) => link.getAttribute("href") === "/login")
+    ).toBe(true);
+    expect(screen.getByRole("link", { name: /reset password/i })).toHaveAttribute(
+      "href",
+      "/password-reset"
+    );
+  });
+
   it("lets users reveal and hide both password fields", () => {
     render(<RegisterPage />);
 
