@@ -82,7 +82,10 @@ jobs:
       - name: Deploy to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service MusiciansPracticeApp
+        # --detach: trigger the build and exit, don't stream logs.
+        # Streaming flakes ("Failed to retrieve build log") exit 1 even on a
+        # successful build; the test jobs above already gate this deploy.
+        run: railway up --detach --service MusiciansPracticeApp
 
   deploy-frontend:
     name: Deploy Frontend to Railway
@@ -99,4 +102,4 @@ jobs:
         working-directory: frontend/next-app
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service frontend
+        run: railway up --detach --service frontend
