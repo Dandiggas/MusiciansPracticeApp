@@ -35,6 +35,8 @@ class ResendApiEmailBackendTest(TestCase):
         request = mock_urlopen.call_args.args[0]
         self.assertEqual(request.full_url, "https://api.resend.com/emails")
         self.assertEqual(request.headers["Authorization"], "Bearer test-key")
+        # Cloudflare in front of Resend 403s the default Python-urllib UA.
+        self.assertEqual(request.headers["User-agent"], "TheShed/1.0 (+https://intheshed.app)")
         self.assertEqual(mock_urlopen.call_args.kwargs["timeout"], 7)
 
         payload = json.loads(request.data.decode("utf-8"))

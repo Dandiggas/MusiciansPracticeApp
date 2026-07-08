@@ -40,6 +40,9 @@ class _JsonApiEmailBackend(BaseEmailBackend):
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
+                # Resend is fronted by Cloudflare, which 403s the default
+                # "Python-urllib/x.y" agent (error 1010). Send a real UA.
+                "User-Agent": "TheShed/1.0 (+https://intheshed.app)",
             },
             method="POST",
         )
