@@ -25,8 +25,27 @@ function normalizeErrorValue(value: unknown) {
   return typeof value === "string" ? value : undefined;
 }
 
-function isDuplicateEmailError(message?: string) {
+function isDuplicateAccountError(message?: string) {
   return Boolean(message?.match(/already|registered|exists|in use/i));
+}
+
+function ExistingAccountHelp() {
+  return (
+    <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+      <Link
+        href="/login"
+        className="font-semibold text-foreground hover:underline"
+      >
+        Sign in
+      </Link>
+      <Link
+        href="/password-reset"
+        className="font-semibold text-foreground hover:underline"
+      >
+        Reset password
+      </Link>
+    </div>
+  );
 }
 
 const RegisterPage = () => {
@@ -250,9 +269,16 @@ const RegisterPage = () => {
                       disabled={isSubmitting}
                     />
                     {errors.username && (
-                      <p className="text-sm font-medium text-destructive">
-                        {errors.username}
-                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-destructive">
+                          {isDuplicateAccountError(errors.username)
+                            ? "Looks like this username is already taken."
+                            : errors.username}
+                        </p>
+                        {isDuplicateAccountError(errors.username) && (
+                          <ExistingAccountHelp />
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -277,25 +303,12 @@ const RegisterPage = () => {
                     {errors.email && (
                       <div className="space-y-2">
                         <p className="text-sm font-medium text-destructive">
-                          {isDuplicateEmailError(errors.email)
+                          {isDuplicateAccountError(errors.email)
                             ? "Looks like this email already has an account."
                             : errors.email}
                         </p>
-                        {isDuplicateEmailError(errors.email) && (
-                          <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
-                            <Link
-                              href="/login"
-                              className="font-semibold text-foreground hover:underline"
-                            >
-                              Sign in
-                            </Link>
-                            <Link
-                              href="/password-reset"
-                              className="font-semibold text-foreground hover:underline"
-                            >
-                              Reset password
-                            </Link>
-                          </div>
+                        {isDuplicateAccountError(errors.email) && (
+                          <ExistingAccountHelp />
                         )}
                       </div>
                     )}

@@ -90,7 +90,7 @@ export function LandingPage() {
             transition={{ duration: 0.8, ease: EASE }}
             className="text-balance text-5xl font-black leading-[0.98] tracking-tighter md:text-7xl"
           >
-            The practice room that remembers.
+            A saved practice room for your songs.
           </motion.h1>
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 24 }}
@@ -98,8 +98,9 @@ export function LandingPage() {
             transition={{ duration: 0.8, delay: 0.12, ease: EASE }}
             className="mt-6 max-w-[46ch] text-lg leading-relaxed text-[#a89f94]"
           >
-            Songs, BPMs, loops, and takes stay exactly where you left them.
-            Open a session and keep going. Free.
+            The Shed is for musicians rehearsing real material: each song keeps
+            its audio, chart, tempo, loop points, notes, and takes in one place.
+            Open the session later and keep going. Free.
           </motion.p>
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -143,11 +144,12 @@ export function LandingPage() {
         <div className="mx-auto max-w-6xl px-5 py-24 md:px-8">
           <Reveal>
             <h2 className="max-w-[22ch] text-balance text-3xl font-black tracking-tighter md:text-5xl">
-              Loop the hard bars. Name them. Keep them.
+              Learn one song without rebuilding the setup.
             </h2>
             <p className="mt-4 max-w-[52ch] text-base leading-relaxed text-[#a89f94]">
-              Mark an in and out point while the track plays, save it as a
-              lick, and it waits with its own practice speed.
+              Add the YouTube video, mp3, or chart once. Save the awkward bars
+              as named loops, slow them down, and come back to the same setup
+              next time.
             </p>
           </Reveal>
           <Reveal delay={0.1} className="mt-12">
@@ -175,12 +177,12 @@ export function LandingPage() {
         </Reveal>
         <Reveal delay={0.1}>
           <h2 className="text-balance text-3xl font-black tracking-tighter md:text-5xl">
-            Three weeks later, nothing has moved.
+            Three weeks later, your practice desk is still set up.
           </h2>
           <p className="mt-4 max-w-[46ch] text-base leading-relaxed text-[#a89f94]">
-            Each session is one long-lived workspace. The Sunday set you built
-            last month opens tonight with its tracks, tempos, and loops in
-            place.
+            Each session is a long-lived workspace for a song, set, or routine.
+            The Sunday set you built last month opens tonight with its tracks,
+            tempos, charts, and loops in place.
           </p>
         </Reveal>
       </section>
@@ -308,7 +310,8 @@ export function LandingPage() {
               This is where you shed.
             </h2>
             <p className="mx-auto mt-6 max-w-[44ch] text-balance text-lg leading-relaxed text-[#cfc7bc]">
-              Open it tomorrow. Everything is where you left it.
+              Open it tomorrow. The music, tools, and notes are where you left
+              them.
             </p>
             <div className="mt-10 flex justify-center">
               <PrimaryCta />

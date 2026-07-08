@@ -8,7 +8,7 @@ import { getAuthCookieName } from "@/lib/django-api";
 export const metadata: Metadata = {
   title: "The Shed: the practice room that remembers",
   description:
-    "Sessions keep your songs, BPMs, loop regions, and recorded takes exactly where you left them. Open a session and keep going.",
+    "A saved practice workspace for musicians: keep each song's audio, charts, tempo, loops, notes, and recorded takes together so you can pick up where you left off.",
 };
 
 export default async function Home() {
