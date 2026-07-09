@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Clock, Eye, EyeSlash, Guitar, Sparkle } from "@phosphor-icons/react";
+import { useReducedMotion } from "framer-motion";
 import { StaggerReveal, StaggerItem, MotionDiv } from "@/components/ui/motion-wrapper";
 
 interface FormErrors {
@@ -60,6 +62,7 @@ const RegisterPage = () => {
   const [showPassword1, setShowPassword1] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
   const router = useRouter();
+  const reduce = useReducedMotion();
 
   const validate = () => {
     const tempErrors: FormErrors = {};
@@ -168,32 +171,73 @@ const RegisterPage = () => {
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-background">
-      <div className="container relative mx-auto flex min-h-[100dvh] items-center px-4 py-24 md:px-8">
-        <div className="mx-auto grid w-full max-w-6xl gap-8 xl:grid-cols-[1.1fr_0.9fr]">
-          {/* Left — Marketing panel */}
+      {/* Split-screen: the open room owns the left edge (xl+) */}
+      <div className="absolute inset-y-0 left-0 hidden w-[38vw] overflow-hidden xl:block">
+        {reduce ? (
+          <Image
+            src="/landing/register-room-poster.jpg"
+            alt=""
+            fill
+            aria-hidden="true"
+            className="object-cover"
+          />
+        ) : (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster="/landing/register-room-poster.jpg"
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+          >
+            <source src="/landing/register-room.mp4" type="video/mp4" />
+          </video>
+        )}
+        {/* Seam + scrim: heavier than login — this footage is brighter */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-background/30 to-background"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-background via-background/35 to-transparent"
+        />
+        <MotionDiv
+          initial={{ opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+          className="absolute bottom-12 left-10 max-w-sm pr-8"
+        >
+          <div className="inline-flex w-fit items-center rounded-full bg-primary/[0.08] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-primary">
+            New to The Shed
+          </div>
+
+          <h1 className="mt-6 text-4xl font-black tracking-tighter leading-[0.95] text-foreground">
+            Your setup stays ready.{" "}
+            <span className="text-muted-foreground">
+              Just sit down and play.
+            </span>
+          </h1>
+
+          <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground">
+            Create an account so your instruments, sessions, and progress
+            persist across every visit.
+          </p>
+        </MotionDiv>
+      </div>
+
+      <div className="relative flex min-h-[100dvh] items-center px-4 py-24 md:px-8 xl:ml-[38vw]">
+        <div className="mx-auto grid w-full max-w-md gap-8 xl:max-w-4xl xl:grid-cols-[0.9fr_1fr]">
+          {/* Feature cards */}
           <MotionDiv
             initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
             className="hidden flex-col justify-center xl:flex"
           >
-            <div className="inline-flex w-fit items-center rounded-full bg-primary/[0.08] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-primary">
-              New to The Shed
-            </div>
-
-            <h1 className="mt-6 text-4xl font-black tracking-tighter leading-[0.95] text-foreground md:text-6xl">
-              Your setup stays ready.{" "}
-              <span className="text-muted-foreground">
-                Just sit down and play.
-              </span>
-            </h1>
-
-            <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground">
-              Create an account so your instruments, sessions, and progress
-              persist across every visit.
-            </p>
-
-            <StaggerReveal className="mt-12 space-y-3">
+            <StaggerReveal className="space-y-3">
               {features.map((f) => (
                 <StaggerItem key={f.title}>
                   <div className="rounded-2xl bg-black/[0.03] p-1 ring-1 ring-black/[0.04] dark:bg-white/[0.03] dark:ring-white/[0.06]">
