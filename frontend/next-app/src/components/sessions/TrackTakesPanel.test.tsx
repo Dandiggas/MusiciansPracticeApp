@@ -35,6 +35,7 @@ function buildTrack(overrides: Partial<Track> = {}): Track {
     session: 3,
     name: "Pocket Study",
     note: "",
+    called_key: "",
     source_type: "youtube",
     youtube_url: "https://youtu.be/abcdefghijk",
     file: null,

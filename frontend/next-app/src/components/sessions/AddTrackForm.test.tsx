@@ -18,6 +18,7 @@ function buildTrack(overrides: Partial<Track> = {}): Track {
     session: 7,
     name: "Praise on Demand",
     note: "",
+    called_key: "",
     source_type: "youtube",
     youtube_url: "https://youtu.be/abc",
     file: null,

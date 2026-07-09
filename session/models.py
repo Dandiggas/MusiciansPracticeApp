@@ -25,11 +25,13 @@ class Track(models.Model):
     SOURCE_MP3 = "mp3"
     SOURCE_PDF = "pdf"
     SOURCE_IMAGE = "image"
+    SOURCE_NONE = "none"
     SOURCE_CHOICES = [
         (SOURCE_YOUTUBE, "YouTube"),
         (SOURCE_MP3, "MP3"),
         (SOURCE_PDF, "PDF"),
         (SOURCE_IMAGE, "Image"),
+        (SOURCE_NONE, "No source yet"),
     ]
 
     session = models.ForeignKey(
@@ -39,6 +41,9 @@ class Track(models.Model):
     )
     name = models.CharField(max_length=200)
     note = models.TextField(blank=True, default="")
+    # The key this song is *called* in for this context (may differ from
+    # the reference recording) — e.g. "Bb", "C#m".
+    called_key = models.CharField(max_length=12, blank=True, default="")
     source_type = models.CharField(max_length=10, choices=SOURCE_CHOICES)
     youtube_url = models.URLField(max_length=500, blank=True, default="")
     file = models.FileField(upload_to="tracks/", blank=True, null=True)

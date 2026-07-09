@@ -1,4 +1,5 @@
 import os
+import re
 
 from django.conf import settings
 from rest_framework import serializers
@@ -141,6 +142,7 @@ class TrackSerializer(serializers.ModelSerializer):
             "session",
             "name",
             "note",
+            "called_key",
             "source_type",
             "youtube_url",
             "file",
@@ -154,6 +156,14 @@ class TrackSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "licks", "takes", "created_at", "updated_at"]
 
+    def validate_called_key(self, value):
+        value = (value or "").strip()
+        if value and not re.fullmatch(r"[A-G][#b]?m?", value):
+            raise serializers.ValidationError(
+                'Use a key like "Bb", "F#" or "C#m".'
+            )
+        return value
+
     def validate(self, attrs):
         source_type = attrs.get("source_type", getattr(self.instance, "source_type", None))
         youtube_url = attrs.get(
@@ -164,7 +174,12 @@ class TrackSerializer(serializers.ModelSerializer):
 
         errors = {}
 
-        if source_type == Track.SOURCE_YOUTUBE:
+        if source_type == Track.SOURCE_NONE:
+            if youtube_url:
+                errors["youtube_url"] = "Tracks without a source must not have a URL."
+            if file_obj:
+                errors["file"] = "Tracks without a source must not have a file."
+        elif source_type == Track.SOURCE_YOUTUBE:
             if not youtube_url:
                 errors["youtube_url"] = "Required for YouTube tracks."
             if file_obj:

@@ -1,4 +1,4 @@
-import { Lick, SessionSummary, Take, Track } from "@/types/session";
+import { Lick, SessionDetail, SessionSummary, Take, Track } from "@/types/session";
 
 
 type JsonBody = Record<string, unknown>;
@@ -76,6 +76,50 @@ export async function createSession(name: string): Promise<SessionSummary> {
     "/api/django/sessions",
     jsonRequest("POST", { name }),
     "Could not create session."
+  );
+}
+
+export interface SetListMatch {
+  track_id: number;
+  track_name: string;
+  session_name: string;
+  source_type: Track["source_type"];
+  has_playable_source: boolean;
+  bpm: number | null;
+  lick_count: number;
+}
+
+export interface SetListPreviewItem {
+  line: string;
+  title: string;
+  key: string | null;
+  match: SetListMatch | null;
+}
+
+export async function previewSetListImport(
+  text: string
+): Promise<{ items: SetListPreviewItem[] }> {
+  return requestJson(
+    "/api/django/sessions/import-set/preview",
+    jsonRequest("POST", { text }),
+    "Couldn't read that set list."
+  );
+}
+
+export interface SetListImportItem {
+  title: string;
+  key: string;
+  source_track_id: number | null;
+}
+
+export async function importSetList(
+  name: string,
+  items: SetListImportItem[]
+): Promise<SessionDetail> {
+  return requestJson(
+    "/api/django/sessions/import-set",
+    jsonRequest("POST", { name, items }),
+    "Could not create the session from that set list."
   );
 }
 

@@ -16,7 +16,7 @@ interface AddTrackFormProps {
   sessionId: number;
 }
 
-const SOURCE_LABELS: Record<TrackSourceType, string> = {
+const SOURCE_LABELS: Record<Exclude<TrackSourceType, "none">, string> = {
   youtube: "YouTube",
   mp3: "MP3",
   pdf: "PDF",
