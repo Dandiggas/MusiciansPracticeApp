@@ -19,6 +19,9 @@ Session handoff file (per AGENTS.md). Newest entry first.
 
 **DEPLOYED 2026-07-09 evening:** branch pushed, merged to main (5857667), CI green, Railway build live. Verified on prod (frontend-production-65a2.up.railway.app): /login and /register 200, all three film assets byte-exact, both videos confirmed PLAYING in a real browser session. Prod smoke could NOT run: no smoke account exists on prod (demo/Practice123! rejected) — the known "Railway smoke user" blocker. Provision it, then `BASE_URL=<prod> SMOKE_USER=... SMOKE_PASS=... npm run smoke`.
 
+## 2026-07-09 (late) — Paste-the-set-list feature BUILT (branch `paste-set-import`, a946d64, NOT pushed)
+The adversarial pass's #1 survivor, built as specced (paste-only, no PCO OAuth): paste the MD's text -> parse songs+keys -> fuzzy-match own history -> preview (editable, carry-over toggleable) -> one click creates the week's session in set order. Carried tracks bring YouTube source, BPM, note, last speed, named loops. New: Track.called_key + 'none' source type (migration 0012). 31 new backend tests (107 total green), 6 new jest (75 total), tsc clean. Verified live end-to-end on a real stack (:8002 sqlite + :3117): paste -> preview matched "Way Maker" from last week -> created session carried the Bridge-run loop + note, metronome pre-loaded at 68. Docker dev container does NOT have this code until rebuilt (image is baked; `docker compose up --build web` + migrate after merging).
+
 **Open / next:**
 - Pre-existing launch blockers unchanged (Resend key rotation, password reset verify, Railway smoke user, auth rate limiting #45, R2 migration).
 - Idea held in reserve: same film band on session detail / empty state.
