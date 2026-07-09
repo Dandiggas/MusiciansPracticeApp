@@ -17,7 +17,8 @@ Session handoff file (per AGENTS.md). Newest entry first.
 - Frontend dev against it: `DJANGO_API_URL=http://localhost:8001/api/v1 npm run dev`.
 - Film assets in `frontend/next-app/public/landing/`: login-room.mp4 (1920×1080, 2.5MB), register-room.mp4 (1080×1920), empty-room.jpg, + posters. Raw masters + all candidates in Higgsfield account (danieladekugbe@gmail.com).
 
+**DEPLOYED 2026-07-09 evening:** branch pushed, merged to main (5857667), CI green, Railway build live. Verified on prod (frontend-production-65a2.up.railway.app): /login and /register 200, all three film assets byte-exact, both videos confirmed PLAYING in a real browser session. Prod smoke could NOT run: no smoke account exists on prod (demo/Practice123! rejected) — the known "Railway smoke user" blocker. Provision it, then `BASE_URL=<prod> SMOKE_USER=... SMOKE_PASS=... npm run smoke`.
+
 **Open / next:**
-- Push + deploy is Dan's call (branch not pushed). After deploy: run `npm run smoke` per AGENTS.md rule 2.
 - Pre-existing launch blockers unchanged (Resend key rotation, password reset verify, Railway smoke user, auth rate limiting #45, R2 migration).
 - Idea held in reserve: same film band on session detail / empty state.
