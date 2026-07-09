@@ -10,10 +10,12 @@ Session handoff file (per AGENTS.md). Newest entry first.
 
 **Evidence:** 69/69 jest both commits; tsc errors are pre-existing test-file issues only (route.test NODE_ENV, useYoutubeTransport.test); verified live — Django on :8001 + Next on :3117, demo login through the UI, all three videos confirmed playing (paused:false, currentTime advancing), screenshots at 1440/390.
 
+**Quality pass (c54e2be, e4bfb2e):** login = original wide Mini motion Bytedance-upscaled to 2K (Kling regens made people look uncanny — lesson: upscale approved motion instead of regenerating people); register = Kling 3.0 Turbo 1080p portrait (fine from overhead); sessions empty state ("The bench is clear") = generated empty-room still behind a scrim, verified with a sessionless user against the Docker backend. Higgsfield verdict: NO plan upgrade needed — Kling 1080p ≈16-20cr and Bytedance 2K upscale ≈0.2cr on starter. ~132 credits remain.
+
 **Local dev notes:**
-- Port 8000 is occupied by Music-library-indexer → run this backend on `:8001` and start frontend with `DJANGO_API_URL=http://localhost:8001/api/v1`.
-- Local db.sqlite3 demo user recreated (demo / Practice123! per AGENTS.md), verified email, 2 seed sessions.
-- New assets in `frontend/next-app/public/landing/`: login-room.mp4/-poster.jpg (clip A, dark live-set), register-room.mp4/-poster.jpg (clip B, overhead jam). Raw 720p candidates in Higgsfield account (danieladekugbe@gmail.com, 186 credits left).
+- THE REAL DEV BACKEND IS DOCKER: `musicianspracticeapp-web-1` publishes *:8001→8000 + postgres:13 — demo user and real dev sessions live in the container db, NOT db.sqlite3. A bare `runserver 8001` binds IPv4 while Docker holds IPv6; localhost silently routes to the container. Port 8000 is the Music-library-indexer.
+- Frontend dev against it: `DJANGO_API_URL=http://localhost:8001/api/v1 npm run dev`.
+- Film assets in `frontend/next-app/public/landing/`: login-room.mp4 (1920×1080, 2.5MB), register-room.mp4 (1080×1920), empty-room.jpg, + posters. Raw masters + all candidates in Higgsfield account (danieladekugbe@gmail.com).
 
 **Open / next:**
 - Push + deploy is Dan's call (branch not pushed). After deploy: run `npm run smoke` per AGENTS.md rule 2.
