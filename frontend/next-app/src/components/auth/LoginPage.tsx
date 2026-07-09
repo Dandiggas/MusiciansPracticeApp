@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
+import { useReducedMotion } from "framer-motion";
 import { MotionDiv } from "@/components/ui/motion-wrapper";
 
 const resendEmailPath = "/api/django/dj-rest-auth/registration/resend-email/";
@@ -26,6 +27,7 @@ const LoginPage = () => {
   >("idle");
   const autoResendFiredRef = useRef(false);
   const router = useRouter();
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     void fetch("/api/django/sessions", { method: "GET" }).then((response) => {
@@ -133,52 +135,71 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background">
-      <div className="container mx-auto flex min-h-[100dvh] items-center px-4 py-16 md:px-8">
-        <div className="mx-auto grid w-full max-w-5xl gap-12 xl:grid-cols-[1.1fr_0.9fr]">
-
-          {/* Left — Marketing (order-2 on mobile so form shows first) */}
-          <MotionDiv
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-            className="order-2 flex flex-col justify-center xl:order-1"
+    <div className="relative min-h-[100dvh] bg-background">
+      {/* Split-screen: the room owns the left edge (xl+) */}
+      <div className="absolute inset-y-0 left-0 hidden w-[42vw] overflow-hidden xl:block">
+        {reduce ? (
+          <Image
+            src="/landing/login-room-poster.jpg"
+            alt=""
+            fill
+            aria-hidden="true"
+            className="object-cover"
+          />
+        ) : (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster="/landing/login-room-poster.jpg"
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
           >
-            <p className="text-sm font-medium text-muted-foreground">Welcome back</p>
+            <source src="/landing/login-room.mp4" type="video/mp4" />
+          </video>
+        )}
+        {/* Seam + scrim: blend the footage into the page dark, keep the caption legible */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-background"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent"
+        />
+        <MotionDiv
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+          className="absolute bottom-10 left-10 max-w-sm pr-8"
+        >
+          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.22em] text-warm">
+            <span
+              aria-hidden="true"
+              className="inline-block h-1.5 w-1.5 rounded-full bg-warm motion-safe:animate-pulse"
+            />
+            Live from the shed
+          </p>
+          <h1 className="mt-3 text-5xl font-black leading-[0.98] tracking-tighter text-foreground">
+            Pick up where you left off.
+          </h1>
+          <p className="mt-3 text-[15px] leading-relaxed text-[#cfc7bc]">
+            Somewhere, someone is putting the hours in.
+          </p>
+        </MotionDiv>
+      </div>
 
-            <h1 className="mt-4 text-4xl font-black leading-[0.98] tracking-tighter text-foreground md:text-6xl">
-              Pick up where you left off.
-            </h1>
+      <div className="relative flex min-h-[100dvh] items-center px-4 py-16 md:px-8 xl:ml-[42vw]">
+        <div className="mx-auto w-full max-w-md">
 
-            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-              The bench is how you left it: tracks, tempos, loops, and takes
-              still in place.
-            </p>
-
-            <div className="relative mt-12 hidden max-w-md xl:block">
-              <Image
-                src="/landing/tracks-rail.png"
-                alt="A session's track list in The Shed"
-                width={640}
-                height={582}
-                className="w-[70%] rounded-2xl border border-border/60 shadow-[0_30px_70px_-35px_rgba(0,0,0,0.7)]"
-              />
-              <Image
-                src="/landing/metronome-card.png"
-                alt="The metronome that lives inside every session"
-                width={680}
-                height={928}
-                className="absolute -bottom-8 right-0 w-[46%] rotate-2 rounded-2xl border border-border/60 shadow-[0_35px_80px_-35px_rgba(0,0,0,0.8)]"
-              />
-            </div>
-          </MotionDiv>
-
-          {/* Right — Login form (order-1 on mobile) */}
+          {/* Login form */}
           <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1], delay: 0.08 }}
-            className="order-1 flex items-center xl:order-2"
+            className="flex items-center"
           >
             <div className="w-full rounded-xl border border-border/60 bg-card p-7 shadow-sm">
               <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
@@ -309,6 +330,18 @@ const LoginPage = () => {
               </div>
             </div>
           </MotionDiv>
+
+          {/* Welcome copy (the headline lives on the film at xl) */}
+          <div className="mt-10 xl:hidden">
+            <p className="text-sm font-medium text-muted-foreground">Welcome back</p>
+            <h1 className="mt-4 text-4xl font-black leading-[0.98] tracking-tighter text-foreground">
+              Pick up where you left off.
+            </h1>
+            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
+              The bench is how you left it: tracks, tempos, loops, and takes
+              still in place.
+            </p>
+          </div>
         </div>
       </div>
     </div>
