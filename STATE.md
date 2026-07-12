@@ -2,6 +2,10 @@
 
 Session handoff file (per AGENTS.md). Newest entry first.
 
+## 2026-07-11 — Main branch push gate check
+
+Checked GitHub branch protection for `Dandiggas/MusiciansPracticeApp` (`main`): branch is protected and force-push/delete are disabled, but admin enforcement is off, required checks are unset, and no repository rulesets are configured. A safe `git push --dry-run origin HEAD:main` as Dan's authenticated account was accepted, so The Shed is NOT gated from Dan/admins pushing straight to `main`. Non-admin direct pushes should still be blocked by the PR-before-merge protection.
+
 ## 2026-07-09 — Cinematic film language across auth + sessions (branch `login-session-video`, NOT pushed)
 
 **Shipped (local commits):**
@@ -18,6 +22,9 @@ Session handoff file (per AGENTS.md). Newest entry first.
 - Film assets in `frontend/next-app/public/landing/`: login-room.mp4 (1920×1080, 2.5MB), register-room.mp4 (1080×1920), empty-room.jpg, + posters. Raw masters + all candidates in Higgsfield account (danieladekugbe@gmail.com).
 
 **DEPLOYED 2026-07-09 evening:** branch pushed, merged to main (5857667), CI green, Railway build live. Verified on prod (frontend-production-65a2.up.railway.app): /login and /register 200, all three film assets byte-exact, both videos confirmed PLAYING in a real browser session. Prod smoke could NOT run: no smoke account exists on prod (demo/Practice123! rejected) — the known "Railway smoke user" blocker. Provision it, then `BASE_URL=<prod> SMOKE_USER=... SMOKE_PASS=... npm run smoke`.
+
+## 2026-07-12 — PR #55 open, deliberately parked
+`paste-set-import` pushed (incl. AddSourceCard 38b6777 + README docs 1ab6eec) → PR #55 to protected main. All CI green (backend, frontend, GitGuardian). Merge is BLOCKED by design: CODEOWNERS=@Dandiggas + required code-owner review + enforce_admins, and GitHub forbids self-approval — so Dan's own PRs can't merge under current governance. Dan chose to LEAVE IT PARKED rather than loosen protection (options on file: allow admin bypass permanently — amzy108 unaffected since he has write not admin — or toggle-merge-restore per PR). On merge later: migration session/0012 runs on deploy, run prod smoke (still blocked on missing prod smoke user), rebuild local Docker dev image.
 
 ## 2026-07-09 (late) — Paste-the-set-list feature BUILT (branch `paste-set-import`, a946d64, NOT pushed)
 The adversarial pass's #1 survivor, built as specced (paste-only, no PCO OAuth): paste the MD's text -> parse songs+keys -> fuzzy-match own history -> preview (editable, carry-over toggleable) -> one click creates the week's session in set order. Carried tracks bring YouTube source, BPM, note, last speed, named loops. New: Track.called_key + 'none' source type (migration 0012). 31 new backend tests (107 total green), 6 new jest (75 total), tsc clean. Verified live end-to-end on a real stack (:8002 sqlite + :3117): paste -> preview matched "Way Maker" from last week -> created session carried the Bridge-run loop + note, metronome pre-loaded at 68. Docker dev container does NOT have this code until rebuilt (image is baked; `docker compose up --build web` + migrate after merging).
