@@ -8,6 +8,18 @@ Status: active beta / tester-ready work in progress. The app is usable, but broa
 
 ## What it does now
 
+### Set list import — paste your week, get your bench back
+
+The weekly front door for set-list musicians (worship teams, session players):
+
+- Paste the raw set list exactly as it arrives — WhatsApp, email, or a Planning Center export. Numbered lines, bullets, `Song – Bb`, `Song (Bb)`, `Song in G`, and `C#m`-style minor keys all parse; header lines are skipped. Parsing is deterministic (no AI, no network call).
+- Every song is fuzzy-matched against your own track history. Repeats carry last time's work forward automatically: YouTube source, BPM, notes, last-used speed, and named loop points.
+- An editable preview shows each song with its key and a carry-over badge (toggle it off to start a song fresh), then one click creates the week's session in set order.
+- Each track stores its **called key** — the key the song is called in this week, separate from whatever key the reference recording is in.
+- New songs arrive as tracks without a source, holding their name, key, and position. Open one and paste a YouTube link straight into the track pane to unlock the player, loops, and takes in place.
+
+Find it on `/sessions` — "Paste this week's set list".
+
 ### Session workbench
 
 - Create named practice sessions.
@@ -142,6 +154,8 @@ Current core endpoints:
 
 - `GET/POST /api/v1/sessions/`
 - `GET/PATCH/DELETE /api/v1/sessions/<id>/`
+- `POST /api/v1/sessions/import-set/preview/` — parse pasted set-list text and match against your history
+- `POST /api/v1/sessions/import-set/` — create the week's session with carry-over
 - `POST /api/v1/sessions/<id>/reorder-tracks/`
 - `GET/POST /api/v1/tracks/`
 - `GET/PATCH/DELETE /api/v1/tracks/<id>/`
