@@ -1,4 +1,4 @@
-export type TrackSourceType = "youtube" | "mp3" | "pdf" | "image";
+export type TrackSourceType = "youtube" | "mp3" | "pdf" | "image" | "none";
 export type TakeCaptureMode = "audio" | "video" | "video_audio";
 
 export interface Lick {
@@ -28,6 +28,7 @@ export interface Track {
   session: number;
   name: string;
   note: string;
+  called_key: string;
   source_type: TrackSourceType;
   youtube_url: string;
   file: string | null;

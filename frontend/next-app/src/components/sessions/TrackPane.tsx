@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { AddSourceCard } from "@/components/sessions/AddSourceCard";
 import { Mp3Player } from "@/components/sessions/Mp3Player";
 import { TrackTakesPanel } from "@/components/sessions/TrackTakesPanel";
 import { YoutubePlayer } from "@/components/sessions/YoutubePlayer";
@@ -106,7 +107,9 @@ export function TrackPane({
 
   const sourceDetail = track.source_type === "youtube"
     ? track.youtube_url
-    : track.file?.split("/").pop()?.split("?")[0] ?? "Uploaded file";
+    : track.source_type === "none"
+      ? "No source yet — paste a YouTube link below to start practising this."
+      : track.file?.split("/").pop()?.split("?")[0] ?? "Uploaded file";
 
   return (
     <div className="min-w-0 space-y-5">
@@ -190,6 +193,9 @@ export function TrackPane({
         {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
       </div>
 
+      {track.source_type === "none" ? (
+        <AddSourceCard track={track} replaceTrack={replaceTrack} />
+      ) : null}
       {track.source_type === "mp3" ? (
         <Mp3Player track={track} mutateTrack={mutateTrack} replaceTrack={replaceTrack} />
       ) : null}

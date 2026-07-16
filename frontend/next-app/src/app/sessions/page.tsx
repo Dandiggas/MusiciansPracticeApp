@@ -1,3 +1,4 @@
+import { ImportSetCard } from "@/components/sessions/ImportSetCard";
 import { SessionList } from "@/components/sessions/SessionList";
 import { SessionsHero } from "@/components/sessions/SessionsHero";
 import { NewSessionButton } from "@/components/sessions/NewSessionButton";
@@ -27,6 +28,10 @@ export default async function SessionsPage() {
           <NewSessionButton />
         </div>
       </SessionsHero>
+
+      <div className="mt-6">
+        <ImportSetCard />
+      </div>
 
       <div className="mt-8">
         <SessionList sessions={sessions} />

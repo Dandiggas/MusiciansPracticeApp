@@ -70,6 +70,7 @@ function buildTrack(overrides: Partial<Track> = {}): Track {
     session: 3,
     name: "Practice Track",
     note: "",
+    called_key: "",
     source_type: "youtube",
     youtube_url: "https://youtu.be/4nqDHK_dtwE",
     file: null,
