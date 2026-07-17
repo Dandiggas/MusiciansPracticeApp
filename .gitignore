@@ -29,3 +29,8 @@ stitch_recommendations_improved/
 *_FEEDBACK_*.md
 *-feedback-*.md
 *_feedback_*.md
+
+# Agent working files - local only, not for the public repo
+RUN_STATE.md
+STATE.md
+.impeccable.md
