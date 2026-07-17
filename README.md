@@ -125,10 +125,7 @@ MusiciansPracticeApp/
 │   ├── src/hooks/             # transport/loop hooks
 │   ├── src/lib/               # API clients, audio engines, utilities
 │   └── e2e/                   # Playwright tests
-├── docs/                      # older plans, visual direction, implementation notes
-├── TODOS.md                   # current launch/product follow-ups
-├── PRODUCTION_SECURITY_SUMMARY.md
-├── RAILWAY_DEPLOYMENT.md
+├── docs/                      # plans, TODOs, deployment + security notes, API schema
 ├── docker-compose.yml
 ├── Dockerfile
 └── requirements.txt
@@ -228,7 +225,7 @@ Before a broader public launch:
 - Add a proper public landing page, screenshots, domain, and social preview metadata.
 - Expand e2e coverage around uploads, recording, account settings, admin, email verification, and password reset.
 
-See `TODOS.md` for the current follow-up list.
+See `docs/TODOS.md` for the current follow-up list.
 
 ## What this repo is not anymore
 
