@@ -198,6 +198,7 @@ export function SessionWorkbench({ session }: { session: SessionDetail }) {
               <AddTrackForm
                 sessionId={sessionState.id}
                 insertPosition={0}
+                existingTrackIds={sessionState.tracks.map((track) => track.id)}
                 onTrackCreated={handleTrackCreated}
               />
             </div>

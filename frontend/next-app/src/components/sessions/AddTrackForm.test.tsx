@@ -2,15 +2,17 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { AddTrackForm } from "@/components/sessions/AddTrackForm";
-import { createTrack } from "@/lib/api";
+import { createTrack, getSession } from "@/lib/api";
 import { Track } from "@/types/session";
 
 
 jest.mock("@/lib/api", () => ({
   createTrack: jest.fn(),
+  getSession: jest.fn(),
 }));
 
 const mockCreateTrack = createTrack as jest.MockedFunction<typeof createTrack>;
+const mockGetSession = getSession as jest.MockedFunction<typeof getSession>;
 
 function buildTrack(overrides: Partial<Track> = {}): Track {
   return {
@@ -35,6 +37,7 @@ function buildTrack(overrides: Partial<Track> = {}): Track {
 describe("AddTrackForm", () => {
   beforeEach(() => {
     mockCreateTrack.mockReset();
+    mockGetSession.mockReset();
   });
 
   it("shows a validation error when the YouTube URL is blank", async () => {
@@ -44,6 +47,7 @@ describe("AddTrackForm", () => {
       <AddTrackForm
         sessionId={7}
         insertPosition={0}
+        existingTrackIds={[]}
         onTrackCreated={jest.fn()}
       />
     );
@@ -63,6 +67,7 @@ describe("AddTrackForm", () => {
       <AddTrackForm
         sessionId={7}
         insertPosition={0}
+        existingTrackIds={[]}
         onTrackCreated={jest.fn()}
       />
     );
@@ -99,6 +104,7 @@ describe("AddTrackForm", () => {
       <AddTrackForm
         sessionId={7}
         insertPosition={0}
+        existingTrackIds={[]}
         onTrackCreated={onTrackCreated}
       />
     );
@@ -130,6 +136,7 @@ describe("AddTrackForm", () => {
       <AddTrackForm
         sessionId={7}
         insertPosition={0}
+        existingTrackIds={[]}
         onTrackCreated={jest.fn()}
       />
     );
@@ -145,14 +152,22 @@ describe("AddTrackForm", () => {
     expect(mockCreateTrack).not.toHaveBeenCalled();
   });
 
-  it("maps raw network failures to a human save error", async () => {
+  it("maps raw network failures to a human save error when the track truly wasn't saved", async () => {
     const user = userEvent.setup();
     mockCreateTrack.mockRejectedValue(new Error("Failed to fetch"));
+    mockGetSession.mockResolvedValue({
+      id: 7,
+      name: "Sunday set",
+      created_at: "2026-05-13T10:00:00.000Z",
+      updated_at: "2026-05-13T10:00:00.000Z",
+      tracks: [],
+    });
 
     render(
       <AddTrackForm
         sessionId={7}
         insertPosition={0}
+        existingTrackIds={[]}
         onTrackCreated={jest.fn()}
       />
     );
@@ -167,6 +182,42 @@ describe("AddTrackForm", () => {
         "We couldn't save this track because the app server didn't respond. Please try again."
       )
     ).toBeInTheDocument();
+  });
+
+  it("recovers silently when a 'failed' create actually landed on the server", async () => {
+    const user = userEvent.setup();
+    const onTrackCreated = jest.fn();
+    mockCreateTrack.mockRejectedValue(new Error("Failed to fetch"));
+    const recoveredTrack = buildTrack({ id: 99 });
+    mockGetSession.mockResolvedValue({
+      id: 7,
+      name: "Sunday set",
+      created_at: "2026-05-13T10:00:00.000Z",
+      updated_at: "2026-05-13T10:00:00.000Z",
+      tracks: [recoveredTrack],
+    });
+
+    render(
+      <AddTrackForm
+        sessionId={7}
+        insertPosition={0}
+        existingTrackIds={[]}
+        onTrackCreated={onTrackCreated}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: /add track/i }));
+    await user.type(screen.getByLabelText(/track name/i), "Praise on Demand");
+    await user.type(screen.getByLabelText(/youtube url/i), "https://youtu.be/fQOXsG8YxvM");
+    await user.click(screen.getByRole("button", { name: /save track/i }));
+
+    await waitFor(() => expect(onTrackCreated).toHaveBeenCalledWith(recoveredTrack));
+    expect(
+      screen.queryByText(
+        "We couldn't save this track because the app server didn't respond. Please try again."
+      )
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add track/i })).toBeInTheDocument();
   });
 
   it("submits the expected payload for a valid file track", async () => {
@@ -185,6 +236,7 @@ describe("AddTrackForm", () => {
       <AddTrackForm
         sessionId={7}
         insertPosition={2}
+        existingTrackIds={[]}
         onTrackCreated={onTrackCreated}
       />
     );
