@@ -6,11 +6,12 @@ import { Plus } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createTrack } from "@/lib/api";
+import { createTrack, getSession } from "@/lib/api";
 import { Track, TrackSourceType } from "@/types/session";
 
 
 interface AddTrackFormProps {
+  existingTrackIds: number[];
   insertPosition: number;
   onTrackCreated: (track: Track) => void;
   sessionId: number;
@@ -81,6 +82,7 @@ function createTrackErrorMessage(error: unknown) {
 }
 
 export function AddTrackForm({
+  existingTrackIds,
   insertPosition,
   onTrackCreated,
   sessionId,
@@ -176,6 +178,29 @@ export function AddTrackForm({
       onTrackCreated(track);
       resetForm();
     } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+
+      // The create request can time out or drop client-side even after the
+      // server has already saved the track (e.g. a slow/cold-starting
+      // backend). Before showing an error, check whether the track actually
+      // landed so we don't tell the user it failed - or let them resubmit
+      // and create a duplicate.
+      if (isNetworkFailureMessage(message)) {
+        try {
+          const latestSession = await getSession(sessionId);
+          const recoveredTrack = latestSession.tracks.find(
+            (candidate) => !existingTrackIds.includes(candidate.id)
+          );
+          if (recoveredTrack) {
+            onTrackCreated(recoveredTrack);
+            resetForm();
+            return;
+          }
+        } catch {
+          // Reconciliation failed too; fall through to showing the original error.
+        }
+      }
+
       setError(createTrackErrorMessage(err));
     } finally {
       setIsSubmitting(false);

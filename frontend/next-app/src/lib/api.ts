@@ -1,4 +1,4 @@
-import { Lick, SessionSummary, Take, Track } from "@/types/session";
+import { Lick, SessionDetail, SessionSummary, Take, Track } from "@/types/session";
 
 
 type JsonBody = Record<string, unknown>;
@@ -92,6 +92,14 @@ export async function deleteSession(sessionId: number) {
     `/api/django/sessions/${sessionId}/`,
     { method: "DELETE", headers: { Accept: "application/json" } },
     "Could not delete session."
+  );
+}
+
+export async function getSession(sessionId: number): Promise<SessionDetail> {
+  return requestJson<SessionDetail>(
+    `/api/django/sessions/${sessionId}/`,
+    { method: "GET", headers: { Accept: "application/json" } },
+    "Could not load session."
   );
 }
 
