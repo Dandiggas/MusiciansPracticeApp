@@ -1,5 +1,11 @@
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
+// How long (in ms) the tuner keeps showing the last detected note after pitch
+// detection drops out for a frame or two (e.g. between attacks, brief dips
+// below the RMS threshold). Without this hold, the display flickers to "--"
+// and back on every missed frame, making it hard to actually read the note.
+export const NOTE_HOLD_MS = 400;
+
 export interface NoteInfo {
   name: string;
   octave: number;

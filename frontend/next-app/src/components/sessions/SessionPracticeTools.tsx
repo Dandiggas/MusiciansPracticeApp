@@ -8,7 +8,7 @@ import TunerWidget from "@/components/studio/TunerWidget";
 import { Button } from "@/components/ui/button";
 import { MetronomeEngine } from "@/lib/audio/metronome-engine";
 import { detectPitch } from "@/lib/audio/pitch-detector";
-import { frequencyToNote, type NoteInfo } from "@/lib/audio/note-utils";
+import { frequencyToNote, NOTE_HOLD_MS, type NoteInfo } from "@/lib/audio/note-utils";
 
 
 type PracticeTool = "metronome" | "tuner";
@@ -39,6 +39,7 @@ export function SessionPracticeTools({
   const audioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
+  const lastDetectedAtRef = useRef<number>(0);
 
   useEffect(() => {
     if (trackBpm !== null) {
@@ -162,7 +163,16 @@ export function SessionPracticeTools({
 
         analyserRef.current.getFloatTimeDomainData(buffer);
         const frequency = detectPitch(buffer, audioContextRef.current.sampleRate);
-        setNote(frequency ? frequencyToNote(frequency) : null);
+
+        if (frequency) {
+          lastDetectedAtRef.current = performance.now();
+          setNote(frequencyToNote(frequency));
+        } else if (performance.now() - lastDetectedAtRef.current > NOTE_HOLD_MS) {
+          setNote(null);
+        }
+        // else: briefly missed a frame - keep showing the last note instead
+        // of flickering it away immediately.
+
         rafRef.current = requestAnimationFrame(tick);
       };
 
