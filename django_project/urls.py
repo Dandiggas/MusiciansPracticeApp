@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from accounts.views import CookieLoginView
+from django_project.storage import should_serve_local_media
 from accounts.views_auth import (
     ThrottledPasswordResetConfirmView,
     ThrottledPasswordResetView,
@@ -61,5 +62,9 @@ urlpatterns = [
 
 ]
 
-if settings.DEBUG:
+
+# See should_serve_local_media() docstring: this used to only get added when
+# DEBUG=True, which 404'd every uploaded MP3/PDF/image file in production
+# (DEBUG=False, R2 unset) even though the upload itself succeeded.
+if should_serve_local_media(settings.DEBUG, settings.USE_R2_MEDIA_STORAGE):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
