@@ -16,10 +16,10 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.conf.urls.static import static
-from django.urls import path, include
+from django.urls import path, re_path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from accounts.views import CookieLoginView
+from django_project.media_views import serve_media
 from django_project.storage import should_serve_local_media
 from accounts.views_auth import (
     ThrottledPasswordResetConfirmView,
@@ -66,5 +66,17 @@ urlpatterns = [
 # See should_serve_local_media() docstring: this used to only get added when
 # DEBUG=True, which 404'd every uploaded MP3/PDF/image file in production
 # (DEBUG=False, R2 unset) even though the upload itself succeeded.
+#
+# Uses our own serve_media() instead of Django's django.views.static.serve()
+# (what django.conf.urls.static.static() wraps) because that view ignores
+# Range requests entirely, which breaks seeking on file-backed audio/video
+# tracks - see media_views.py docstring.
 if should_serve_local_media(settings.DEBUG, settings.USE_R2_MEDIA_STORAGE):
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    media_path = settings.MEDIA_URL.lstrip("/")
+    urlpatterns += [
+        re_path(
+            rf"^{media_path}(?P<path>.*)$",
+            serve_media,
+            {"document_root": settings.MEDIA_ROOT},
+        ),
+    ]
