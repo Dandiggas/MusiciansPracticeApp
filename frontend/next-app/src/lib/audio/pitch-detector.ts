@@ -39,7 +39,14 @@ export function detectPitch(
   const next = autocorrelationAt(buffer, bestPeriod + 1);
 
   const shift = (prev - next) / (2 * (prev - 2 * curr + next));
-  const refinedPeriod = bestPeriod + (isFinite(shift) ? shift : 0);
+  // A legitimate parabolic correction should only nudge the period by a
+  // fraction of a sample. On a weak/noisy signal this can blow up into a
+  // huge or negative value, which would push refinedPeriod to zero or
+  // negative and produce a negative/invalid frequency below. Reject it and
+  // fall back to the whole-number period estimate instead.
+  const refinedPeriod = isFinite(shift) && Math.abs(shift) < 1 ? bestPeriod + shift : bestPeriod;
+
+  if (refinedPeriod <= 0) return null;
 
   return sampleRate / refinedPeriod;
 }
