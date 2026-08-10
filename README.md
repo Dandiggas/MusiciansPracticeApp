@@ -2,9 +2,9 @@
 
 The Shed is a browser-based practice workbench for musicians.
 
-It is not just a generic practice timer anymore. The current product is built around sessions: each session holds the songs, charts, reference audio, licks, takes, notes, BPM, metronome/tuner context, and practice material for a piece of work you want to come back to.
+Each session keeps the songs, charts, reference audio, licks, takes, notes, BPM, metronome, tuner, and practice material for a piece of work together.
 
-Status: active beta / tester-ready work in progress. The app is usable, but broader production launch still needs durable media storage, a live smoke test, onboarding polish, and observability.
+Status: active beta.
 
 ## What it does now
 
@@ -71,13 +71,13 @@ Status: active beta / tester-ready work in progress. The app is usable, but broa
 
 The main app surfaces are:
 
-- `/sessions` — The Shed practice workbench and session list
-- `/sessions/[id]` — session detail with tracks, players, sheets, takes, metronome, and tuner
-- `/metronome` — standalone metronome
-- `/tuner` — standalone tuner
-- `/account` — account settings
-- `/admin` — staff-only test user/admin management
-- `/login`, `/register`, `/password-reset`, `/auth/verify/...` — auth flows
+- `/sessions`: The Shed practice workbench and session list
+- `/sessions/[id]`: session detail with tracks, players, sheets, takes, metronome, and tuner
+- `/metronome`: standalone metronome
+- `/tuner`: standalone tuner
+- `/account`: account settings
+- `/admin`: staff-only test user/admin management
+- `/login`, `/register`, `/password-reset`, `/auth/verify/...`: auth flows
 
 Older routes such as `/dashboard`, `/practice-timer`, `/profilepage`, `/recommendations`, and `/youtube-practice` now redirect back to `/sessions`. Some legacy components still exist in the repo, but the current product loop is the session workbench.
 
@@ -125,7 +125,7 @@ MusiciansPracticeApp/
 │   ├── src/hooks/             # transport/loop hooks
 │   ├── src/lib/               # API clients, audio engines, utilities
 │   └── e2e/                   # Playwright tests
-├── docs/                      # plans, TODOs, deployment + security notes, API schema
+├── docs/                      # public technical documentation and API schema
 ├── docker-compose.yml
 ├── Dockerfile
 └── requirements.txt
@@ -214,26 +214,9 @@ npm run test:e2e
 
 The current test suite covers backend session/track/lick/take/auth behavior plus frontend auth, session workbench, account, admin, API proxy, and selected e2e flows.
 
-## Current launch blockers
-
-Before a broader public launch:
-
-- Move uploaded tracks/takes/charts to durable storage or confirm a persistent Railway volume is enough for the beta.
-- Run a live smoke test on the deployed domain: register, verify email, login, reset password, create session, upload media, record take, delete account, admin delete.
-- Add basic observability/error tracking.
-- Improve first-run onboarding so a new musician knows what to add first.
-- Add a proper public landing page, screenshots, domain, and social preview metadata.
-- Expand e2e coverage around uploads, recording, account settings, admin, email verification, and password reset.
-
-See `docs/TODOS.md` for the current follow-up list.
-
-## What this repo is not anymore
-
-Older docs and component names still reference a broad analytics dashboard, standalone practice timer, AI recommendations page, and profile page. Those are not the current product centre. The current direction is The Shed: a musician's session workbench for saving practice material, drilling sections, using built-in tools, and reviewing takes.
-
 ## License
 
-No license file is currently committed. Add one before treating this as reusable open-source software.
+Licensed under the [MIT License](LICENSE).
 
 ## Author
 

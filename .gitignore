@@ -34,3 +34,19 @@ stitch_recommendations_improved/
 RUN_STATE.md
 STATE.md
 .impeccable.md
+/AGENTS.md
+/CLAUDE.md
+
+# Private planning and review material
+/docs/APP_OVERVIEW.md
+/docs/TODO.md
+/docs/TODOS.md
+/docs/frontend-design-audit.md
+/docs/product-ideas-visual-identity.md
+/docs/future/
+/docs/plans/
+/docs/superpowers/
+
+# Generated test reports
+/frontend/next-app/playwright-report/
+/frontend/next-app/test-results/
