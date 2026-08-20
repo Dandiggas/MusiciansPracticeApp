@@ -34,3 +34,7 @@ stitch_recommendations_improved/
 RUN_STATE.md
 STATE.md
 .impeccable.md
+
+# WhatsApp Web session cache + per-tester onboarding — local only
+.wwebjs_cache/
+Shed-Onboarding-*.md
