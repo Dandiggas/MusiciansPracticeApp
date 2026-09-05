@@ -217,6 +217,7 @@ export function SessionWorkbench({ session }: { session: SessionDetail }) {
         >
           {selectedTrack ? (
             <TrackPane
+              key={selectedTrack.id}
               track={selectedTrack}
               mutateTrack={(updater) => mutateTrack(selectedTrack.id, updater)}
               replaceTrack={(track) => replaceTrack(selectedTrack.id, track)}
