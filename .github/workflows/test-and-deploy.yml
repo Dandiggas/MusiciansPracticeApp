@@ -35,13 +35,13 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run Django tests
+      - name: Run all backend tests
         env:
           DATABASE_URL: postgresql://postgres@localhost:5432/postgres
           FRONTEND_URL: https://ci.localhost
           SECURE_SSL_REDIRECT: "False"
         run: |
-          python manage.py test
+          python -m pytest -q
 
   test-frontend:
     name: Frontend Tests
