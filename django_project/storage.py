@@ -72,3 +72,17 @@ def r2_storage_options(env):
         "file_overwrite": False,
         "signature_version": "s3v4",
     }
+
+
+def should_serve_local_media(debug, use_r2_media_storage):
+    """Whether Django itself should serve /media/ URLs.
+
+    Uploaded tracks/charts are only reachable through Django's own /media/
+    route when they're sitting on local disk (FileSystemStorage) - R2-backed
+    uploads are served directly from R2 via presigned URLs instead. Local
+    storage is used whenever R2 isn't configured, in ANY environment,
+    including production. So this route needs to be served whenever local
+    storage is in play, not just when DEBUG is on - otherwise files upload
+    fine but every /media/ URL 404s.
+    """
+    return debug or not use_r2_media_storage
